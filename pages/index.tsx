@@ -177,13 +177,13 @@ const Home: NextPage<HomeProps> = () => {
             scrollAreaTopRef={restaurantListTopRef}
           >
             <div
-              className="grid grid-cols-3 grid-rows-2 md:grid-rows-1 gap-3"
+              className="grid grid-cols-3 grid-rows-2 md:grid-rows-1 gap-x-3"
               style={{ gridTemplateColumns: "auto 1fr 1fr" }}
             >
               <h2 className="text-3xl sm:text-4xl font-bold">Restaurants</h2>
               <input
                 type="search"
-                className="mt-0 block px-0.5 border-0 border-b border-slate-300 focus:ring-0 focus:border-black row-start-2 md:row-start-1 md:col-start-2 col-span-3 md:col-span-1"
+                className="text-sm md:text-base mt-0 block px-0.5 border-0 border-b border-slate-300 focus:ring-0 focus:border-black row-start-2 md:row-start-1 md:col-start-2 col-span-3 md:col-span-1"
                 value={searchTerm}
                 onChange={(event) => {
                   setSearchTerm(event.target.value);
