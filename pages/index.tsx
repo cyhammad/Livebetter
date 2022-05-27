@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type { NextPage, GetServerSideProps } from "next";
+import type { NextPage, GetServerSideProps, GetStaticProps } from "next";
 import Head from "next/head";
 import { CrosshairSimple, Sliders, Spinner, X } from "phosphor-react";
 import {
@@ -32,7 +32,7 @@ interface HomeProps {
 
 const PAGE_SIZE = 20;
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   const queryClient = new QueryClient();
   const limit = PAGE_SIZE;
   const offset = 0;
@@ -53,6 +53,8 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
     props: {
       dehydratedState: dehydrate(queryClient),
     },
+    // Regenerate the page every 30 minutes (30 * 60 seconds)
+    revalidate: 30 * 60,
   };
 };
 
