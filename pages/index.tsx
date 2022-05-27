@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import type { NextPage, GetServerSideProps, GetStaticProps } from "next";
+import type { NextPage, GetStaticProps } from "next";
 import Head from "next/head";
 import { CrosshairSimple, Sliders, Spinner, X } from "phosphor-react";
 import {
@@ -86,7 +86,7 @@ const Home: NextPage<HomeProps> = () => {
     deferredSearchTerm,
   ];
 
-  const { isLoading, error, data, isFetching } = useQuery(
+  const { isLoading, error, data } = useQuery(
     queryKey,
     () =>
       fetchRestaurants({
@@ -183,7 +183,13 @@ const Home: NextPage<HomeProps> = () => {
               <h2 className="text-3xl sm:text-4xl font-bold">Restaurants</h2>
               <input
                 type="search"
-                className="text-sm md:text-base mt-0 block px-0.5 border-0 border-b border-slate-300 focus:ring-0 focus:border-black row-start-2 md:row-start-1 md:col-start-2 col-span-3 md:col-span-1"
+                className="
+                  text-sm md:text-base
+                  mt-0 px-0.5 mx-0.5
+                  border-0 border-b border-slate-300
+                  focus:ring-0 focus:border-black
+                  row-start-2 md:row-start-1 md:col-start-2 col-span-3 md:col-span-1
+                "
                 value={searchTerm}
                 onChange={(event) => {
                   setSearchTerm(event.target.value);
@@ -195,10 +201,9 @@ const Home: NextPage<HomeProps> = () => {
                   color={"currentColor"}
                   weight={selectedCuisines.length > 0 ? "fill" : "regular"}
                   className={classNames({
-                    "animate-spin": isFetching || isLoading,
-                    hidden: !isFetching && !isLoading,
+                    "animate-spin": isLoading,
+                    hidden: !isLoading,
                     "text-black": true,
-                    "text-slate-400": isFetching && !isLoading,
                   })}
                 />
                 <button
