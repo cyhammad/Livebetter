@@ -181,11 +181,13 @@ const Home: NextPage<HomeProps> = () => {
               <div className="flex gap-2 items-center">
                 <Spinner
                   size={32}
-                  color={shouldQueryLocation ? "#FFFFFF" : "#000000"}
+                  color={"currentColor"}
                   weight={selectedCuisines.length > 0 ? "fill" : "regular"}
                   className={classNames({
                     "animate-spin": isFetching || isLoading,
                     hidden: !isFetching && !isLoading,
+                    "text-black": true,
+                    "text-slate-400": isFetching && !isLoading,
                   })}
                 />
                 <button
@@ -204,24 +206,26 @@ const Home: NextPage<HomeProps> = () => {
                 >
                   <CrosshairSimple
                     size={32}
-                    color={shouldQueryLocation ? "#FFFFFF" : "#000000"}
+                    color={"currentColor"}
                     weight={selectedCuisines.length > 0 ? "fill" : "regular"}
                     style={{ gridArea: "1 / 1" }}
                     className={classNames({
                       "animation-spin":
                         shouldQueryLocation && !latitude && !longitude,
+                      "text-black": !shouldQueryLocation,
+                      "text-white": shouldQueryLocation,
                     })}
                   />
                   {locationError ? (
                     <X
                       size={12}
-                      color={
-                        shouldQueryLocation && locationError
-                          ? "#000000"
-                          : "#FFFFFF"
-                      }
+                      color={"currentColor"}
                       weight={"bold"}
                       style={{ gridArea: "1 / 1" }}
+                      className={classNames({
+                        "text-black": shouldQueryLocation && locationError,
+                        "text-white": !(shouldQueryLocation && locationError),
+                      })}
                     ></X>
                   ) : null}
                 </button>
@@ -238,8 +242,12 @@ const Home: NextPage<HomeProps> = () => {
                 >
                   <Sliders
                     size={32}
-                    color={isSettingsVisible ? "#FFFFFF" : "#000000"}
+                    color={"currentColor"}
                     weight={selectedCuisines.length > 0 ? "fill" : "regular"}
+                    className={classNames({
+                      "text-black": !isSettingsVisible,
+                      "text-white": isSettingsVisible,
+                    })}
                   />
                 </button>
               </div>
