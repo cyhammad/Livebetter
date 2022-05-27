@@ -140,9 +140,8 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
   return (
     <>
       <Head>
-        <title>Live Better</title>
-        <meta name="description" content="Vegan dining and delivery app" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>{restaurant.Restaurant} | Live Better</title>
+        <meta name="description" content="Vegan dining and delivery" />
       </Head>
       <main className="flex flex-col mb-6">
         <Header />
