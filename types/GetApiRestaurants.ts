@@ -16,3 +16,11 @@ interface GetApiRestaurantsResult {
 export type GetApiRestaurants = (
   options?: GetApiRestaurantsOptions
 ) => Promise<GetApiRestaurantsResult>;
+
+export type FetchApiRestaurantsQueryKey = [
+  "restaurants",
+  number,
+  number,
+  Coordinates | null,
+  string
+];

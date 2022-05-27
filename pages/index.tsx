@@ -17,7 +17,7 @@ import { Header } from "components/Header";
 import { RestaurantList } from "components/RestaurantList";
 import { Toolbar } from "components/Toolbar";
 import { usePosition } from "hooks/usePosition";
-import type { ApiRestaurant, Coordinates } from "types";
+import type { Coordinates, FetchApiRestaurantsQueryKey } from "types";
 
 interface HomeProps {
   dehydratedState: DehydratedState;
@@ -30,12 +30,17 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   const limit = PAGE_SIZE;
   const offset = 0;
 
-  await queryClient.prefetchQuery(
-    ["restaurants", limit, offset, null, ""],
-    async () => {
+  const queryKey: FetchApiRestaurantsQueryKey = [
+    "restaurants",
+    limit,
+    offset,
+    null,
+    "",
+  ];
+
+  await queryClient.prefetchQuery(queryKey, async () => {
       return await getApiRestaurants({ limit, offset });
-    }
-  );
+  });
 
   return {
     props: {
@@ -58,18 +63,27 @@ const Home: NextPage<HomeProps> = () => {
     longitude,
     error: locationError,
   } = usePosition(shouldQueryLocation);
-  const userPosition: Coordinates | undefined =
+  const userPosition: Coordinates | null =
     latitude && longitude && shouldQueryLocation
       ? { latitude, longitude }
-      : undefined;
+      : null;
+
+  const queryKey: FetchApiRestaurantsQueryKey = [
+    "restaurants",
+    limit,
+    offset,
+    userPosition,
+    searchTerm,
+  ];
+
   const { isLoading, error, data, isFetching } = useQuery(
-    ["restaurants", limit, offset, userPosition, searchTerm],
+    queryKey,
     () =>
       fetchRestaurants({
         limit,
         offset,
         search: searchTerm,
-        sortByDistanceFrom: userPosition,
+        sortByDistanceFrom: userPosition ?? undefined,
       }),
     {
       keepPreviousData: true,
