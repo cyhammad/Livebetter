@@ -97,6 +97,8 @@ export const getStaticProps: GetStaticProps<
       menu,
       menuItemsByCategory,
     },
+    // Regenerate the page every 30 minutes (30 * 60 seconds)
+    revalidate: 30 * 60,
   };
 };
 
