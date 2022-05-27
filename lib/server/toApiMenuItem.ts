@@ -13,9 +13,9 @@ export const toApiMenuItem = (
     optionalChoices,
   }: MenuItem
 ): ApiMenuItem => ({
-  category: category.trim(),
+  category: category?.trim() ?? null,
   choices: choices ?? null,
-  mealDescription: meal_Description?.trim() ? meal_Description?.trim() : null,
+  mealDescription: meal_Description?.trim() ?? null,
   mealPrice: meal_Price,
   name,
   optionalChoices: optionalChoices ?? null,

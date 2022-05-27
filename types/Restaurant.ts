@@ -31,7 +31,7 @@ export interface ApiRestaurant extends Restaurant {
 }
 
 export interface MenuItem {
-  category: string;
+  category?: string;
   /**
    * An object that looks like:
    * {
@@ -61,7 +61,7 @@ export interface MenuItem {
 interface ApiRestaurantMenuItemChoice {}
 
 export interface ApiMenuItem {
-  category: string;
+  category: string | null;
   choices: Record<string, number> | null;
   mealDescription: string | null;
   mealPrice: number;
