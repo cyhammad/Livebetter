@@ -50,25 +50,31 @@ const Home: NextPage<HomeProps> = () => {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [shouldQueryLocation, setShouldQueryLocation] = useState(false);
   const [_isPending, startTransition] = useTransition();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
   const {
     latitude,
     longitude,
     error: locationError,
-    handlePositionToggle,
-    shouldQueryLocation,
-  } = usePosition();
+  } = usePosition(shouldQueryLocation);
   const userPosition: Coordinates | null =
     latitude && longitude ? { latitude, longitude } : null;
   const { isLoading, error, data, isFetching } = useQuery(
-    ["restaurants", limit, offset, userPosition, searchTerm],
+    [
+      "restaurants",
+      limit,
+      offset,
+      shouldQueryLocation ? userPosition : undefined,
+      searchTerm,
+    ],
     () =>
       fetchRestaurants({
         limit,
         offset,
         search: searchTerm,
-        sortByDistanceFrom: userPosition ?? undefined,
+        sortByDistanceFrom:
+          shouldQueryLocation && userPosition ? userPosition : undefined,
       }),
     {
       keepPreviousData: true,
@@ -135,7 +141,7 @@ const Home: NextPage<HomeProps> = () => {
   };
 
   const handleLocationClick = () => {
-    handlePositionToggle();
+    setShouldQueryLocation(!shouldQueryLocation);
   };
 
   return (

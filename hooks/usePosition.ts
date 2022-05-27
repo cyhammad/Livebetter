@@ -2,8 +2,7 @@ import { useCallback, useState, useEffect } from "react";
 
 import type { Coordinates } from "types";
 
-export const usePosition = () => {
-  const [shouldQueryLocation, setShouldQueryLocation] = useState(false);
+export const usePosition = (shouldQueryLocation: boolean) => {
   const [position, setPosition] = useState<Coordinates | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -15,7 +14,6 @@ export const usePosition = () => {
   };
   const onError: PositionErrorCallback = (error) => {
     setError(error.message);
-    setShouldQueryLocation(false);
     alert(error.message);
   };
 
@@ -26,8 +24,6 @@ export const usePosition = () => {
       setError("Geolocation is not supported");
       return;
     }
-
-    setShouldQueryLocation(true);
   };
 
   useEffect(() => {
@@ -47,5 +43,5 @@ export const usePosition = () => {
     return () => geo.clearWatch(watcher);
   }, [shouldQueryLocation]);
 
-  return { ...position, error, handlePositionToggle, shouldQueryLocation };
+  return { ...position, error };
 };

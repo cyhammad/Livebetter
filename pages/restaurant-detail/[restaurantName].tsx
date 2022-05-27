@@ -106,13 +106,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
   menuItemsByCategory,
 }) => {
   const scrollAreaTopRef = useRef<HTMLDivElement | null>(null);
-  const {
-    latitude,
-    longitude,
-    error: locationError,
-    handlePositionToggle,
-    shouldQueryLocation,
-  } = usePosition();
+  const { latitude, longitude, error: locationError } = usePosition(false);
 
   const userPosition: Coordinates | undefined =
     latitude && longitude ? { latitude, longitude } : undefined;
