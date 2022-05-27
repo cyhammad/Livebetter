@@ -2,7 +2,14 @@ import classNames from "classnames";
 import type { NextPage, GetServerSideProps } from "next";
 import Head from "next/head";
 import { CrosshairSimple, Sliders, Spinner, X } from "phosphor-react";
-import React, { useState, useTransition, useMemo, useRef } from "react";
+import {
+  ChangeEvent,
+  useDeferredValue,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import {
   dehydrate,
   QueryClient,
@@ -39,7 +46,7 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
   ];
 
   await queryClient.prefetchQuery(queryKey, async () => {
-      return await getApiRestaurants({ limit, offset });
+    return await getApiRestaurants({ limit, offset });
   });
 
   return {
@@ -55,6 +62,7 @@ const Home: NextPage<HomeProps> = () => {
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const deferredSearchTerm = useDeferredValue(searchTerm);
   const [shouldQueryLocation, setShouldQueryLocation] = useState(false);
   const [_isPending, startTransition] = useTransition();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
@@ -73,7 +81,7 @@ const Home: NextPage<HomeProps> = () => {
     limit,
     offset,
     userPosition,
-    searchTerm,
+    deferredSearchTerm,
   ];
 
   const { isLoading, error, data, isFetching } = useQuery(
@@ -82,7 +90,7 @@ const Home: NextPage<HomeProps> = () => {
       fetchRestaurants({
         limit,
         offset,
-        search: searchTerm,
+        search: deferredSearchTerm,
         sortByDistanceFrom: userPosition ?? undefined,
       }),
     {
@@ -135,7 +143,7 @@ const Home: NextPage<HomeProps> = () => {
     return [...nextAvailableCuisines].sort((a, b) => (a < b ? -1 : 1));
   }, [data?.restaurants, selectedCuisines]);
 
-  const handleCuisineChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCuisineChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
 
     if (checked) {
@@ -166,19 +174,20 @@ const Home: NextPage<HomeProps> = () => {
             isShadowVisible={isSettingsVisible}
             scrollAreaTopRef={restaurantListTopRef}
           >
-            <div className="flex w-full justify-between items-center">
-              <form className="flex gap-4 items-end">
-                <h2 className="text-3xl sm:text-4xl font-bold">Restaurants</h2>
-                {/* <input
-                  type="search"
-                  className="border-slate-200 rounded-full"
-                  value={searchTerm}
-                  onChange={(event) => {
-                    setSearchTerm(event.target.value);
-                  }}
-                /> */}
-              </form>
-              <div className="flex gap-2 items-center">
+            <div
+              className="grid grid-cols-3 grid-rows-2 md:grid-rows-1 gap-3"
+              style={{ gridTemplateColumns: "auto 1fr 1fr" }}
+            >
+              <h2 className="text-3xl sm:text-4xl font-bold">Restaurants</h2>
+              <input
+                type="search"
+                className="mt-0 block px-0.5 border-0 border-b border-slate-300 focus:ring-0 focus:border-black row-start-2 md:row-start-1 md:col-start-2 col-span-3 md:col-span-1"
+                value={searchTerm}
+                onChange={(event) => {
+                  setSearchTerm(event.target.value);
+                }}
+              />
+              <div className="flex gap-2 items-center ml-auto col-start-3">
                 <Spinner
                   size={32}
                   color={"currentColor"}

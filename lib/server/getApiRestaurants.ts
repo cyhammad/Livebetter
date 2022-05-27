@@ -11,7 +11,6 @@ import haversineDistance from "haversine-distance";
 import { db } from "lib/server/db";
 import type { ApiRestaurant, Restaurant, GetApiRestaurants } from "types";
 import { isOpen } from "lib/isOpen";
-import { notNullOrUndefined } from "lib/notNullOrUndefined";
 
 const METERS_TO_MILES_DIVISOR = 1609.344;
 
@@ -19,7 +18,10 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
   const { limit, offset = 0, search, sortByDistanceFrom } = options || {};
 
   const queryConstraints = search
-    ? [where("name", ">=", search), where("name", "<=", search + "\uf8ff")]
+    ? [
+        where("Restaurant", ">=", search.toUpperCase()),
+        where("Restaurant", "<=", search.toUpperCase() + "~"),
+      ]
     : [];
 
   const restaurantDocs = await getDocs(
