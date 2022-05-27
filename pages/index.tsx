@@ -58,23 +58,18 @@ const Home: NextPage<HomeProps> = () => {
     longitude,
     error: locationError,
   } = usePosition(shouldQueryLocation);
-  const userPosition: Coordinates | null =
-    latitude && longitude ? { latitude, longitude } : null;
+  const userPosition: Coordinates | undefined =
+    latitude && longitude && shouldQueryLocation
+      ? { latitude, longitude }
+      : undefined;
   const { isLoading, error, data, isFetching } = useQuery(
-    [
-      "restaurants",
-      limit,
-      offset,
-      shouldQueryLocation ? userPosition : undefined,
-      searchTerm,
-    ],
+    ["restaurants", limit, offset, userPosition, searchTerm],
     () =>
       fetchRestaurants({
         limit,
         offset,
         search: searchTerm,
-        sortByDistanceFrom:
-          shouldQueryLocation && userPosition ? userPosition : undefined,
+        sortByDistanceFrom: userPosition,
       }),
     {
       keepPreviousData: true,
