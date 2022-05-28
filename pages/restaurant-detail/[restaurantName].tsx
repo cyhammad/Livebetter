@@ -1,6 +1,5 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Image from "next/image";
-import Head from "next/head";
 import { collection, getDocs, query, limit, where } from "firebase/firestore";
 import { useRef } from "react";
 import classNames from "classnames";
@@ -11,6 +10,7 @@ import haversine from "haversine-distance";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import { toApiMenuItem } from "lib/server/toApiMenuItem";
 
+import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { Toolbar } from "components/Toolbar";
 import type { Coordinates, Restaurant, MenuItem, ApiMenuItem } from "types";
@@ -135,10 +135,20 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
 
   return (
     <>
-      <Head>
-        <title>{restaurant.Restaurant} | Live Better</title>
-        <meta name="description" content="Vegan dining and delivery" />
-      </Head>
+      <Head
+        titles={[restaurant.Restaurant]}
+        description={"Vegan dining and delivery"}
+        ogMetadata={{
+          title: restaurant.Restaurant,
+          image: restaurant.Image ?? "",
+          type: "website",
+          url: `${
+            process.env.NEXT_PUBLIC_BASE_URL
+          }/restaurant-detail/${encodeURIComponent(
+            restaurantNameToUrlParam(restaurant.Restaurant)
+          )}`,
+        }}
+      ></Head>
       <main className="flex flex-col mb-6">
         <Header />
         <section className="flex flex-col gap-0 container mx-auto">
