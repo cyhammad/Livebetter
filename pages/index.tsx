@@ -29,6 +29,7 @@ import { fetchRestaurants } from "lib/client/fetchRestaurants";
 import { Header } from "components/Header";
 import { RestaurantList } from "components/RestaurantList";
 import { Toolbar } from "components/Toolbar";
+import { useHomeContext } from "hooks/useHomeContext";
 import { usePosition } from "hooks/usePosition";
 import type { Coordinates, FetchApiRestaurantsQueryKey } from "types";
 
@@ -66,13 +67,20 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
 };
 
 const Home: NextPage<HomeProps> = () => {
-  const [limit, setLimit] = useState(PAGE_SIZE);
-  const [offset, setOffset] = useState(0);
+  const {
+    limit,
+    offset,
+    searchTerm,
+    selectedCuisines,
+    setLimit,
+    setOffset,
+    setSearchTerm,
+    setSelectedCuisines,
+    setShouldQueryLocation,
+    shouldQueryLocation,
+  } = useHomeContext();
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const deferredSearchTerm = useDeferredValue(searchTerm);
-  const [shouldQueryLocation, setShouldQueryLocation] = useState(false);
   const [_isPending, startTransition] = useTransition();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
   const {

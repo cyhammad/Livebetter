@@ -4,6 +4,8 @@ import Head from "next/head";
 import { useState } from "react";
 import { Hydrate, QueryClient, QueryClientProvider } from "react-query";
 
+import { HomeContextProvider } from "hooks/useHomeContext";
+
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
 
@@ -16,7 +18,9 @@ export default function App({ Component, pageProps }: AppProps) {
             content="width=device-width, initial-scale=1, maximum-scale=1"
           />
         </Head>
-        <Component {...pageProps} />
+        <HomeContextProvider>
+          <Component {...pageProps} />
+        </HomeContextProvider>
       </Hydrate>
     </QueryClientProvider>
   );
