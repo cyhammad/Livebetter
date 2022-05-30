@@ -1,11 +1,4 @@
-import {
-  collection,
-  getDocs,
-  startAt,
-  endAt,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import haversineDistance from "haversine-distance";
 
 import { db } from "lib/server/db";
@@ -15,7 +8,13 @@ import { isOpen } from "lib/isOpen";
 const METERS_TO_MILES_DIVISOR = 1609.344;
 
 export const getApiRestaurants: GetApiRestaurants = async (options) => {
-  const { limit, offset = 0, search, sortByDistanceFrom } = options || {};
+  const {
+    cuisines: filteredCuisines,
+    limit,
+    offset = 0,
+    search,
+    sortByDistanceFrom,
+  } = options || {};
 
   const queryConstraints = search
     ? [
@@ -37,6 +36,18 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
 
     if (restaurant.Cuisine) {
       apiRestaurant.cuisines = restaurant.Cuisine.toLowerCase().split(", ");
+
+      // Filter out restaurants that do not have any cuisines in common with
+      // the `filteredCuisines` parameter
+      if (
+        filteredCuisines &&
+        filteredCuisines.length > 0 &&
+        !filteredCuisines.every((cuisine) =>
+          apiRestaurant.cuisines?.includes(cuisine)
+        )
+      ) {
+        return;
+      }
 
       apiRestaurant.cuisines.forEach((cuisineItem) => {
         cuisines.add(cuisineItem);

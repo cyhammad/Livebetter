@@ -6,6 +6,7 @@ interface GetApiRestaurantsOptions {
   search?: string;
   sortByDistanceFrom?: Coordinates;
   shouldIncludeClosed?: boolean;
+  cuisines?: string[];
 }
 
 interface GetApiRestaurantsResult {
@@ -22,5 +23,6 @@ export type FetchApiRestaurantsQueryKey = [
   number,
   number,
   Coordinates | null,
-  string
+  string,
+  string[]
 ];

@@ -4,6 +4,7 @@ import { getApiRestaurants } from "lib/server/getApiRestaurants";
 import type { ApiRestaurant } from "types";
 
 type Data = {
+  cuisines: string[];
   restaurants: ApiRestaurant[];
 };
 
@@ -31,14 +32,19 @@ export default async function handler(
       : undefined;
   const search =
     typeof req.query.search === "string" ? req.query.search : undefined;
+  const cuisinesParam =
+    typeof req.query.cuisines === "string" && req.query.cuisines.length > 0
+      ? req.query.cuisines.split(",")
+      : undefined;
 
-  const { restaurants } = await getApiRestaurants({
+  const { cuisines, restaurants } = await getApiRestaurants({
     limit,
     offset,
     search,
     sortByDistanceFrom:
       latitude && longitude ? { latitude, longitude } : undefined,
+    cuisines: cuisinesParam,
   });
 
-  res.status(200).json({ restaurants });
+  res.status(200).json({ cuisines, restaurants });
 }

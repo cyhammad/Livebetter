@@ -2,7 +2,13 @@ import { request } from "lib/request";
 import type { GetApiRestaurants } from "types";
 
 export const fetchRestaurants: GetApiRestaurants = async (options) => {
-  const { limit = 20, offset = 0, search, sortByDistanceFrom } = options || {};
+  const {
+    cuisines,
+    limit = 20,
+    offset = 0,
+    search,
+    sortByDistanceFrom,
+  } = options || {};
 
   const restaurantsUrl = new URL(
     "/api/restaurants",
@@ -21,6 +27,10 @@ export const fetchRestaurants: GetApiRestaurants = async (options) => {
 
   if (search) {
     restaurantsUrl.searchParams.set("search", search);
+  }
+
+  if (cuisines) {
+    restaurantsUrl.searchParams.set("cuisines", cuisines.join(","));
   }
 
   return await request(restaurantsUrl.toString(), {

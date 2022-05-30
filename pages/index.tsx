@@ -43,6 +43,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
     offset,
     null,
     "",
+    [],
   ];
 
   await queryClient.prefetchQuery(queryKey, async () => {
@@ -84,6 +85,7 @@ const Home: NextPage<HomeProps> = () => {
     offset,
     userPosition,
     deferredSearchTerm,
+    selectedCuisines,
   ];
 
   const { isLoading, error, data } = useQuery(
@@ -94,6 +96,7 @@ const Home: NextPage<HomeProps> = () => {
         offset,
         search: deferredSearchTerm,
         sortByDistanceFrom: userPosition ?? undefined,
+        cuisines: selectedCuisines,
       }),
     {
       keepPreviousData: true,
@@ -121,29 +124,6 @@ const Home: NextPage<HomeProps> = () => {
   //     getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
   //   }
   // );
-
-  const availableCuisines = useMemo(() => {
-    const nextAvailableCuisines = new Set<string>();
-
-    data?.restaurants.forEach((restaurant) => {
-      // Default to true, so all are available when no cuisines are checked
-      let hasAllSelectedCuisines = true;
-
-      if (selectedCuisines.length > 0) {
-        hasAllSelectedCuisines = selectedCuisines.every(
-          (cuisineItem) => !!restaurant.cuisines?.includes(cuisineItem) ?? false
-        );
-      }
-
-      if (restaurant.cuisines && hasAllSelectedCuisines) {
-        restaurant.cuisines.forEach((cuisineItem) => {
-          nextAvailableCuisines.add(cuisineItem);
-        });
-      }
-    });
-
-    return [...nextAvailableCuisines].sort((a, b) => (a < b ? -1 : 1));
-  }, [data?.restaurants, selectedCuisines]);
 
   const handleCuisineChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
@@ -276,7 +256,7 @@ const Home: NextPage<HomeProps> = () => {
               })}
             >
               <form className="flex flex-col gap-2 capitalize py-2">
-                {availableCuisines.map((cuisineLabel) => {
+                {data?.cuisines.map((cuisineLabel) => {
                   return (
                     <label
                       className="flex gap-2 items-center"
