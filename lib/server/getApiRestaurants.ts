@@ -75,8 +75,51 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
       return -1;
     } else if (!isAOpen && isBOpen) {
       return 1;
-    } else if (a.distance && b.distance) {
-      return a.distance - b.distance;
+    } else {
+      // a and b are either both open or both closed
+
+      // Restaurants with a Tracking property should be sorted above those
+      // without one. If both have a Tracking property, the restaurant with
+      // the higher number appears first
+      if (typeof a.Tracking === "number" && typeof b.Tracking !== "number") {
+        return -1;
+      } else if (
+        typeof a.Tracking !== "number" &&
+        typeof b.Tracking === "number"
+      ) {
+        return 1;
+      } else if (
+        typeof a.Tracking === "number" &&
+        typeof b.Tracking === "number"
+      ) {
+        return b.Tracking - a.Tracking;
+      }
+
+      if (a.isDeliveryAvailable && !b.isDeliveryAvailable) {
+        // Restaurants with delivery available go at the top
+        return -1;
+      } else if (!a.isDeliveryAvailable && b.isDeliveryAvailable) {
+        return 1;
+      } else if (a.isDeliveryAvailable && b.isDeliveryAvailable) {
+        if (a.distance && b.distance) {
+          return a.distance - b.distance;
+        }
+      }
+
+      if (a.isPickUpAvailable && !b.isPickUpAvailable) {
+        // Restaurants with delivery available go at the top
+        return -1;
+      } else if (!a.isPickUpAvailable && b.isPickUpAvailable) {
+        return 1;
+      } else if (a.isPickUpAvailable && b.isPickUpAvailable) {
+        if (a.distance && b.distance) {
+          return a.distance - b.distance;
+        }
+      }
+
+      if (a.distance && b.distance) {
+        return a.distance - b.distance;
+      }
     }
 
     return 0;

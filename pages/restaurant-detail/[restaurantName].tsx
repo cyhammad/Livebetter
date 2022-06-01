@@ -14,7 +14,6 @@ import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { Toolbar } from "components/Toolbar";
 import type { Coordinates, Restaurant, MenuItem, ApiMenuItem } from "types";
-import { amountToDollars } from "lib/amountToDollars";
 import { db } from "lib/server/db";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { urlParamToRestaurantName } from "lib/urlParamToRestaurantName";
@@ -277,7 +276,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                                         </span>
                                       ) : null}
                                       <span className="text-sm">
-                                        {amountToDollars(menuItem.mealPrice)}
+                                        ${menuItem.mealPrice.toFixed(2)}
                                       </span>
                                     </div>
                                   </div>
