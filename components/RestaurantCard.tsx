@@ -17,7 +17,7 @@ export const RestaurantCard = ({
   className,
   restaurant,
 }: RestaurantCardProps) => {
-  const [_, closeDate] = openAndCloseDates(restaurant);
+  const [openDate, closeDate] = openAndCloseDates(restaurant);
 
   const isOpenHoursVisible = !!closeDate;
   const isAddressVisible = !!restaurant.Address;
@@ -53,6 +53,18 @@ export const RestaurantCard = ({
       </div>
       <div className="flex flex-col gap-2 sm:gap-4 mt-2 w-full">
         <div className="flex flex-col gap-1 sm:gap-2">
+          {!openDate && !closeDate ? (
+            <div className="flex gap-2 items-start">
+              <Clock
+                className="flex-none mt-0 sm:mt-0.5 w-[16px] sm:w-[20px]"
+                size={20}
+                color={"#000000"}
+              />
+              <p className="text-sm sm:text-base flex items-center gap-2">
+                Closed today
+              </p>
+            </div>
+          ) : null}
           {isOpenHoursVisible ? (
             <div className="flex gap-2 items-start">
               <Clock

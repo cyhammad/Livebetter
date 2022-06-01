@@ -124,7 +124,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         ) / 100
       : null;
 
-  const [_, closeDate] = openAndCloseDates(restaurant);
+  const [openDate, closeDate] = openAndCloseDates(restaurant);
 
   const isOpenHoursVisible = !!closeDate;
   const isAddressVisible = !!restaurant.Address;
@@ -175,6 +175,18 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 Info
               </h3>
               <div className="flex flex-col gap-1 sm:gap-2">
+                {!openDate && !closeDate ? (
+                  <div className="flex gap-2 items-start">
+                    <Clock
+                      className="flex-none mt-0 sm:mt-0.5 w-[16px] sm:w-[20px]"
+                      size={20}
+                      color={"#000000"}
+                    />
+                    <p className="text-sm sm:text-base flex items-center gap-2">
+                      Closed today
+                    </p>
+                  </div>
+                ) : null}
                 {isOpenHoursVisible ? (
                   <div className="flex gap-2 items-center">
                     <Clock
