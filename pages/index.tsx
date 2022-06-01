@@ -11,7 +11,6 @@ import {
 import {
   ChangeEvent,
   useDeferredValue,
-  useMemo,
   useRef,
   useState,
   useTransition,
@@ -182,18 +181,21 @@ const Home: NextPage<HomeProps> = () => {
                     w-full
                     text-sm md:text-base
                     mt-0 px-0.5 mx-0.5 pl-6
-                    border-0 border-b border-slate-300
+                    border-0 border-b border-slate-400
                     focus:ring-0 focus:border-black
+                    placeholder:text-slate-400 focus:placeholder:text-black
+                    peer
                   "
                   value={searchTerm}
                   onChange={(event) => {
                     setSearchTerm(event.target.value);
                   }}
+                  placeholder="Search..."
                   style={{ gridArea: "1 / 1" }}
                 />
                 <MagnifyingGlass
                   color="currentColor"
-                  className="h-5 w-5 text-gray-300"
+                  className="h-5 w-5 text-slate-400 peer-focus:text-black"
                   size={20}
                   style={{ gridArea: "1 / 1" }}
                   weight="bold"
