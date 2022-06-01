@@ -61,7 +61,11 @@ export const RestaurantCard = ({
                 color={"#000000"}
               />
               <p className="text-sm sm:text-base flex items-center gap-2">
-                Open for {formatDistanceToNow(closeDate)}
+                {new Date() < closeDate ? (
+                  <>Open for {formatDistanceToNow(closeDate)}</>
+                ) : (
+                  <>Closed {formatDistanceToNow(closeDate)} ago</>
+                )}
               </p>
             </div>
           ) : null}
