@@ -3,7 +3,7 @@ import haversineDistance from "haversine-distance";
 
 import { db } from "lib/server/db";
 import type { ApiRestaurant, Restaurant, GetApiRestaurants } from "types";
-import { isOpen } from "lib/isOpen";
+import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
 
 const METERS_TO_MILES_DIVISOR = 1609.344;
 
@@ -68,58 +68,78 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
   });
 
   apiRestaurants = apiRestaurants.sort((a, b) => {
-    const isAOpen = isOpen(a);
-    const isBOpen = isOpen(b);
+    // Handle basic sorting based on the two restaurants having different
+    // opening hours statuses. For example, if restaurant A is open later today,
+    // but restaurant B is open now, restaurant B should appear first.
+    const aStatus = getOpeningHoursInfo(a).status;
+    const bStatus = getOpeningHoursInfo(b).status;
 
-    if (isAOpen && !isBOpen) {
+    if (
+      (aStatus === "open-now" || aStatus === "closes-after-midnight") &&
+      !(bStatus === "open-now" || bStatus === "closes-after-midnight")
+    ) {
       return -1;
-    } else if (!isAOpen && isBOpen) {
+    } else if (
+      !(aStatus === "open-now" || aStatus === "closes-after-midnight") &&
+      (bStatus === "open-now" || bStatus === "closes-after-midnight")
+    ) {
       return 1;
-    } else {
-      // a and b are either both open or both closed
+    }
 
-      // Restaurants with a Tracking property should be sorted above those
-      // without one. If both have a Tracking property, the restaurant with
-      // the higher number appears first
-      if (typeof a.Tracking === "number" && typeof b.Tracking !== "number") {
-        return -1;
-      } else if (
-        typeof a.Tracking !== "number" &&
-        typeof b.Tracking === "number"
-      ) {
-        return 1;
-      } else if (
-        typeof a.Tracking === "number" &&
-        typeof b.Tracking === "number"
-      ) {
-        return b.Tracking - a.Tracking;
-      }
+    if (aStatus === "open-later" && bStatus !== "open-later") {
+      return -1;
+    } else if (aStatus !== "open-later" && bStatus === "open-later") {
+      return 1;
+    }
 
-      if (a.isDeliveryAvailable && !b.isDeliveryAvailable) {
-        // Restaurants with delivery available go at the top
-        return -1;
-      } else if (!a.isDeliveryAvailable && b.isDeliveryAvailable) {
-        return 1;
-      } else if (a.isDeliveryAvailable && b.isDeliveryAvailable) {
-        if (a.distance && b.distance) {
-          return a.distance - b.distance;
-        }
-      }
+    if (aStatus === "closed-earlier" && bStatus !== "closed-earlier") {
+      return -1;
+    } else if (aStatus !== "closed-earlier" && bStatus === "closed-earlier") {
+      return 1;
+    }
 
-      if (a.isPickUpAvailable && !b.isPickUpAvailable) {
-        // Restaurants with delivery available go at the top
-        return -1;
-      } else if (!a.isPickUpAvailable && b.isPickUpAvailable) {
-        return 1;
-      } else if (a.isPickUpAvailable && b.isPickUpAvailable) {
-        if (a.distance && b.distance) {
-          return a.distance - b.distance;
-        }
-      }
+    // Both restaurants have identical statuses after this point.
+    // Restaurants with a Tracking property should be sorted above those
+    // without one. If both have a Tracking property, the restaurant with
+    // the higher number appears first
+    if (typeof a.Tracking === "number" && typeof b.Tracking !== "number") {
+      return -1;
+    } else if (
+      typeof a.Tracking !== "number" &&
+      typeof b.Tracking === "number"
+    ) {
+      return 1;
+    } else if (
+      typeof a.Tracking === "number" &&
+      typeof b.Tracking === "number"
+    ) {
+      return b.Tracking - a.Tracking;
+    }
 
+    if (a.isDeliveryAvailable && !b.isDeliveryAvailable) {
+      // Restaurants with delivery available go at the top
+      return -1;
+    } else if (!a.isDeliveryAvailable && b.isDeliveryAvailable) {
+      return 1;
+    } else if (a.isDeliveryAvailable && b.isDeliveryAvailable) {
       if (a.distance && b.distance) {
         return a.distance - b.distance;
       }
+    }
+
+    if (a.isPickUpAvailable && !b.isPickUpAvailable) {
+      // Restaurants with delivery available go at the top
+      return -1;
+    } else if (!a.isPickUpAvailable && b.isPickUpAvailable) {
+      return 1;
+    } else if (a.isPickUpAvailable && b.isPickUpAvailable) {
+      if (a.distance && b.distance) {
+        return a.distance - b.distance;
+      }
+    }
+
+    if (a.distance && b.distance) {
+      return a.distance - b.distance;
     }
 
     return 0;

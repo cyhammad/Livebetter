@@ -3,21 +3,19 @@ import Image from "next/image";
 import { collection, getDocs, query, limit, where } from "firebase/firestore";
 import { useRef } from "react";
 import classNames from "classnames";
-import { Plus, Clock, MapPin, Notebook, Phone, Browser } from "phosphor-react";
+import { Plus, Clock, MapPin, Phone, Browser } from "phosphor-react";
 import { usePosition } from "hooks/usePosition";
-import { isOpen } from "lib/isOpen";
 import haversine from "haversine-distance";
-import formatDistanceToNow from "date-fns/formatDistanceToNow";
-import { toApiMenuItem } from "lib/server/toApiMenuItem";
 
 import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { Toolbar } from "components/Toolbar";
 import type { Coordinates, Restaurant, MenuItem, ApiMenuItem } from "types";
 import { db } from "lib/server/db";
+import { toApiMenuItem } from "lib/server/toApiMenuItem";
+import { getOpeningHoursLabel } from "lib/getOpeningHoursLabel";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { urlParamToRestaurantName } from "lib/urlParamToRestaurantName";
-import { openAndCloseDates } from "lib/isOpen";
 
 interface RestaurantDetailPageProps {
   restaurant: Restaurant;
@@ -124,13 +122,12 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         ) / 100
       : null;
 
-  const [openDate, closeDate] = openAndCloseDates(restaurant);
-
-  const isOpenHoursVisible = !!closeDate;
   const isAddressVisible = !!restaurant.Address;
   const isDistanceVisible = typeof distance === "number" && !isNaN(distance);
   const isPhoneVisible = !!restaurant.Phone;
   const isWebsiteVisible = !!restaurant.Website;
+
+  const openingHoursLabel = getOpeningHoursLabel(restaurant);
 
   return (
     <>
@@ -175,7 +172,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 Info
               </h3>
               <div className="flex flex-col gap-1 sm:gap-2">
-                {!openDate && !closeDate ? (
+                {openingHoursLabel ? (
                   <div className="flex gap-2 items-start">
                     <Clock
                       className="flex-none mt-0 sm:mt-0.5 w-[16px] sm:w-[20px]"
@@ -183,23 +180,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                       color={"#000000"}
                     />
                     <p className="text-sm sm:text-base flex items-center gap-2">
-                      Closed today
-                    </p>
-                  </div>
-                ) : null}
-                {isOpenHoursVisible ? (
-                  <div className="flex gap-2 items-center">
-                    <Clock
-                      className="flex-none w-[16px] sm:w-[20px]"
-                      size={20}
-                      color={"#000000"}
-                    />
-                    <p className="text-sm sm:text-base flex items-center gap-2">
-                      {new Date() < closeDate ? (
-                        <>Open for {formatDistanceToNow(closeDate)}</>
-                      ) : (
-                        <>Closed {formatDistanceToNow(closeDate)} ago</>
-                      )}
+                      {openingHoursLabel}
                     </p>
                   </div>
                 ) : null}

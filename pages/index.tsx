@@ -15,13 +15,7 @@ import {
   useState,
   useTransition,
 } from "react";
-import {
-  dehydrate,
-  QueryClient,
-  useQuery,
-  useInfiniteQuery,
-  DehydratedState,
-} from "react-query";
+import { dehydrate, QueryClient, useQuery, DehydratedState } from "react-query";
 
 import { getApiRestaurants } from "lib/server/getApiRestaurants";
 import { fetchRestaurants } from "lib/client/fetchRestaurants";
@@ -115,28 +109,6 @@ const Home: NextPage<HomeProps> = () => {
       keepPreviousData: true,
     }
   );
-
-  // const {
-  //   data,
-  //   error,
-  //   fetchNextPage,
-  //   hasNextPage,
-  //   isFetching,
-  //   isFetchingNextPage,
-  //   status,
-  // } = useInfiniteQuery(
-  //   "projects",
-  //   () =>
-  //     fetchRestaurants({
-  //       limit,
-  //       offset,
-  //       search: searchTerm,
-  //       sortByDistanceFrom: userPosition,
-  //     }),
-  //   {
-  //     getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
-  //   }
-  // );
 
   const handleCuisineChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
