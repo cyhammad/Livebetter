@@ -1,16 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { getApiRestaurants } from "lib/server/getApiRestaurants";
-import type { ApiRestaurant } from "types";
-
-type Data = {
-  cuisines: string[];
-  restaurants: ApiRestaurant[];
-};
+import type { ApiRestaurant, GetApiRestaurantsResult } from "types";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<GetApiRestaurantsResult>
 ) {
   const limit =
     typeof req.query.limit === "string" && !isNaN(parseInt(req.query.limit))
@@ -37,7 +32,7 @@ export default async function handler(
       ? req.query.cuisines.split(",")
       : undefined;
 
-  const { cuisines, restaurants } = await getApiRestaurants({
+  const result = await getApiRestaurants({
     limit,
     offset,
     search,
@@ -46,5 +41,5 @@ export default async function handler(
     cuisines: cuisinesParam,
   });
 
-  res.status(200).json({ cuisines, restaurants });
+  res.status(200).json(result);
 }

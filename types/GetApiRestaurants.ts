@@ -9,7 +9,7 @@ interface GetApiRestaurantsOptions {
   cuisines?: string[];
 }
 
-interface GetApiRestaurantsResult {
+export interface GetApiRestaurantsResult {
   restaurants: ApiRestaurant[];
   cuisines: string[];
 }

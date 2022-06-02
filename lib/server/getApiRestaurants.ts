@@ -36,6 +36,7 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
 
     if (restaurant.Cuisine) {
       apiRestaurant.cuisines = restaurant.Cuisine.toLowerCase().split(", ");
+    }
 
       // Filter out restaurants that do not have any cuisines in common with
       // the `filteredCuisines` parameter
@@ -49,10 +50,9 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
         return;
       }
 
-      apiRestaurant.cuisines.forEach((cuisineItem) => {
+    apiRestaurant.cuisines?.forEach((cuisineItem) => {
         cuisines.add(cuisineItem);
       });
-    }
 
     if (sortByDistanceFrom && restaurant.Latitude && restaurant.Longitude) {
       const distanceInMiles =

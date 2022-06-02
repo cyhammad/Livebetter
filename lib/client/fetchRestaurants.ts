@@ -29,7 +29,7 @@ export const fetchRestaurants: GetApiRestaurants = async (options) => {
     restaurantsUrl.searchParams.set("search", search);
   }
 
-  if (cuisines) {
+  if (cuisines && cuisines.length > 0) {
     restaurantsUrl.searchParams.set("cuisines", cuisines.join(","));
   }
 

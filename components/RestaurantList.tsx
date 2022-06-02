@@ -4,24 +4,22 @@ import { RestaurantCard } from "components/RestaurantCard";
 import { ApiRestaurant } from "types";
 
 interface RestaurantListProps {
-  onUserIsApproachingEndOfList?: () => void;
+  onUserIsApproachingBottomOfList?: () => void;
   restaurants: ApiRestaurant[];
-  selectedCuisines: string[];
 }
 
 export const RestaurantList = ({
   restaurants,
-  selectedCuisines,
-  onUserIsApproachingEndOfList,
+  onUserIsApproachingBottomOfList,
 }: RestaurantListProps) => {
-  const intersectionObserverRef = useRef<HTMLDivElement | null>(null);
+  const bottomIntersectionObserverRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const ref = intersectionObserverRef.current;
+    const ref = bottomIntersectionObserverRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.intersectionRatio >= 1) {
-          onUserIsApproachingEndOfList && onUserIsApproachingEndOfList();
+          onUserIsApproachingBottomOfList && onUserIsApproachingBottomOfList();
         }
       },
       { threshold: [1] }
@@ -36,29 +34,22 @@ export const RestaurantList = ({
         observer.unobserve(ref);
       }
     };
-  }, [intersectionObserverRef, onUserIsApproachingEndOfList]);
+  }, [bottomIntersectionObserverRef, onUserIsApproachingBottomOfList]);
 
   return (
     <ul className="flex flex-col px-6 -mt-5">
-      {restaurants.map((restaurant, index) => {
-        let hasSelectedCuisine = true;
-
-        if (selectedCuisines.length > 0) {
-          hasSelectedCuisine = selectedCuisines.every(
-            (cuisineItem) => restaurant.cuisines?.includes(cuisineItem) ?? false
-          );
-        }
-
-        return hasSelectedCuisine ? (
-          <li className="flex flex-col gap-5 pt-5" key={restaurant.Restaurant}>
-            <RestaurantCard className="sm:pt-2" restaurant={restaurant} />
-            {index === restaurants.length - 1 ? null : <hr />}
-            {index === restaurants.length - 10 ? (
-              <div ref={intersectionObserverRef} />
-            ) : null}
-          </li>
-        ) : null;
-      })}
+      {restaurants.map((restaurant, index) => (
+        <li
+          className="flex flex-col gap-5 pt-5"
+          key={`${restaurant.Restaurant}${index}`}
+        >
+          <RestaurantCard className="sm:pt-2" restaurant={restaurant} />
+          {index === restaurants.length - 1 ? null : <hr />}
+          {index === restaurants.length - 10 ? (
+            <div ref={bottomIntersectionObserverRef} />
+          ) : null}
+        </li>
+      ))}
     </ul>
   );
 };

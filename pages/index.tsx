@@ -304,7 +304,7 @@ const Home: NextPage<HomeProps> = () => {
           </Toolbar>
           <div ref={restaurantListTopRef}></div>
           <RestaurantList
-            onUserIsApproachingEndOfList={() => {
+            onUserIsApproachingBottomOfList={() => {
               const nextOffset = data?.restaurants.length ?? 0;
               const nextLimit = nextOffset + PAGE_SIZE;
 
@@ -312,7 +312,6 @@ const Home: NextPage<HomeProps> = () => {
               setLimit(nextLimit);
             }}
             restaurants={data?.restaurants ?? []}
-            selectedCuisines={selectedCuisines}
           />
         </section>
       </main>
