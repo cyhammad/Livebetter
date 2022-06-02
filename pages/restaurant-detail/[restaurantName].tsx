@@ -3,7 +3,7 @@ import Image from "next/image";
 import { collection, getDocs, query, limit, where } from "firebase/firestore";
 import { useRef } from "react";
 import classNames from "classnames";
-import { Plus, Clock, MapPin, Phone, Browser } from "phosphor-react";
+import { Clock, MapPin, Phone, Browser } from "phosphor-react";
 import { usePosition } from "hooks/usePosition";
 import haversine from "haversine-distance";
 
@@ -277,13 +277,6 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                                       </span>
                                     </div>
                                   </div>
-                                  <button className="justify-self-end">
-                                    <Plus
-                                      className="flex-none w-[20px]"
-                                      size={20}
-                                      color={"#000000"}
-                                    />
-                                  </button>
                                 </li>
                               );
                             }
