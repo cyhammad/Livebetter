@@ -98,7 +98,12 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
       return 1;
     }
 
-    // Both restaurants have identical statuses after this point.
+    // Both restaurants have identical opening hours statuses after this point.
+
+    if (a.distance && b.distance) {
+      return a.distance - b.distance;
+    }
+
     // Restaurants with a Tracking property should be sorted above those
     // without one. If both have a Tracking property, the restaurant with
     // the higher number appears first
@@ -136,10 +141,6 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
       if (a.distance && b.distance) {
         return a.distance - b.distance;
       }
-    }
-
-    if (a.distance && b.distance) {
-      return a.distance - b.distance;
     }
 
     return 0;
