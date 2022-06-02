@@ -43,7 +43,7 @@ export const Toolbar = ({
   return (
     <div
       className={classNames({
-        "flex flex-col gap-4 sticky bg-white top-[57px] p-6 rounded-none sm:rounded-lg transition-shadow":
+        "flex flex-col gap-4 sticky bg-white top-[56px] p-6 rounded-none sm:rounded-lg transition-shadow z-40":
           true,
         "shadow-lg": isShadowVisible || isToolbarPinned,
       })}

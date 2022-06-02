@@ -13,9 +13,9 @@ import { Toolbar } from "components/Toolbar";
 import type { Coordinates, Restaurant, MenuItem, ApiMenuItem } from "types";
 import { db } from "lib/server/db";
 import { toApiMenuItem } from "lib/server/toApiMenuItem";
-import { getOpeningHoursLabel } from "lib/getOpeningHoursLabel";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { urlParamToRestaurantName } from "lib/urlParamToRestaurantName";
+import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
 
 interface RestaurantDetailPageProps {
   restaurant: Restaurant;
@@ -127,7 +127,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
   const isPhoneVisible = !!restaurant.Phone;
   const isWebsiteVisible = !!restaurant.Website;
 
-  const openingHoursLabel = getOpeningHoursLabel(restaurant);
+  const { label: openingHoursLabel } = getOpeningHoursInfo(restaurant);
 
   return (
     <>

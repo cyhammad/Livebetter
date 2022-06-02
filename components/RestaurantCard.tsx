@@ -6,7 +6,7 @@ import { Activity, ArrowRight, Clock, MapPin, Notebook } from "phosphor-react";
 
 import type { ApiRestaurant } from "types";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
-import { getOpeningHoursLabel } from "lib/getOpeningHoursLabel";
+import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
 
 interface RestaurantCardProps {
   className?: string;
@@ -23,13 +23,14 @@ export const RestaurantCard = ({
   const isCuisineVisible = !!restaurant.Cuisine;
   const isItemsVisible = !!restaurant.Items;
 
-  const openingHoursLabel = getOpeningHoursLabel(restaurant);
+  const { label: openingHoursLabel, status } = getOpeningHoursInfo(restaurant);
 
   return (
     <div
       className={classNames({
         [className ?? ""]: true,
         "flex flex-col sm:flex-row sm:gap-5 justify-items-stretch": true,
+        "opacity-60": ["closed-today", "closed-earlier"].includes(status),
       })}
       key={restaurant.Restaurant}
     >
