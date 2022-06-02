@@ -183,6 +183,7 @@ const Home: NextPage<HomeProps> = () => {
                     mt-0 px-0.5 mx-0.5 pl-6
                     border-0 border-b border-slate-400
                     focus:ring-0 focus:border-black
+                    text-slate-400 focus:text-black
                     placeholder:text-slate-400 focus:placeholder:text-black
                     peer
                   "
