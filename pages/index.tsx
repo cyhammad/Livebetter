@@ -145,7 +145,7 @@ const Home: NextPage<HomeProps> = () => {
               className="grid grid-cols-3 grid-rows-2 md:grid-rows-1 gap-x-3"
               style={{ gridTemplateColumns: "auto 1fr 1fr" }}
             >
-              <h2 className="text-3xl sm:text-4xl font-bold">Restaurants</h2>
+              <h2 className="text-2xl sm:text-4xl font-bold">Restaurants</h2>
               <div className="grid row-start-2 md:row-start-1 md:col-start-2 col-span-3 md:col-span-1 items-center">
                 <input
                   type="search"
@@ -182,7 +182,7 @@ const Home: NextPage<HomeProps> = () => {
                   className={classNames({
                     "animate-spin": isLoading,
                     hidden: !isLoading,
-                    "text-black": true,
+                    "text-black h-7 w-7 sm:h-8 sm:w-8": true,
                   })}
                 />
                 <button
@@ -209,6 +209,7 @@ const Home: NextPage<HomeProps> = () => {
                         shouldQueryLocation && !latitude && !longitude,
                       "text-black": !shouldQueryLocation,
                       "text-white": shouldQueryLocation,
+                      "h-7 w-7 sm:h-8 sm:w-8": true,
                     })}
                   />
                   {locationError ? (
@@ -242,6 +243,7 @@ const Home: NextPage<HomeProps> = () => {
                     className={classNames({
                       "text-black": !isSettingsVisible,
                       "text-white": isSettingsVisible,
+                      "h-7 w-7 sm:h-8 sm:w-8": true,
                     })}
                   />
                 </button>
