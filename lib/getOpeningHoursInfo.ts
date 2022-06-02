@@ -1,5 +1,6 @@
 import { openAndCloseDates } from "lib/isOpen";
 import type { Restaurant } from "types";
+import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
 
 type OpeningHoursStatus =
   | "open-now"
@@ -10,7 +11,7 @@ type OpeningHoursStatus =
 
 export const getOpeningHoursInfo = (
   restaurant: Restaurant,
-  targetDate = new Date()
+  targetDate = utcToZonedTime(new Date(), "America/New_York")
 ): {
   status: OpeningHoursStatus;
   openDate: Date | null;
