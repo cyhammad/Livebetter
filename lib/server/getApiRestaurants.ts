@@ -38,21 +38,21 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
       apiRestaurant.cuisines = restaurant.Cuisine.toLowerCase().split(", ");
     }
 
-      // Filter out restaurants that do not have any cuisines in common with
-      // the `filteredCuisines` parameter
-      if (
-        filteredCuisines &&
-        filteredCuisines.length > 0 &&
-        !filteredCuisines.every((cuisine) =>
-          apiRestaurant.cuisines?.includes(cuisine)
-        )
-      ) {
-        return;
-      }
+    // Filter out restaurants that do not have any cuisines in common with
+    // the `filteredCuisines` parameter
+    if (
+      filteredCuisines &&
+      filteredCuisines.length > 0 &&
+      !filteredCuisines.every((cuisine) =>
+        apiRestaurant.cuisines?.includes(cuisine)
+      )
+    ) {
+      return;
+    }
 
     apiRestaurant.cuisines?.forEach((cuisineItem) => {
-        cuisines.add(cuisineItem);
-      });
+      cuisines.add(cuisineItem);
+    });
 
     if (sortByDistanceFrom && restaurant.Latitude && restaurant.Longitude) {
       const distanceInMiles =
@@ -126,7 +126,7 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
   });
 
   if (limit) {
-    apiRestaurants = apiRestaurants.slice(offset, limit);
+    apiRestaurants = apiRestaurants.slice(offset, limit + offset);
   }
 
   return {
