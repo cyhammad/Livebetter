@@ -43,7 +43,7 @@ export const RestaurantList = ({
           className="flex flex-col gap-5 pt-5"
           key={`${restaurant.Restaurant}${index}`}
         >
-          <RestaurantCard className="sm:pt-2" restaurant={restaurant} />
+          <RestaurantCard restaurant={restaurant} />
           {index === restaurants.length - 1 ? null : <hr />}
           {index === restaurants.length - 10 ? (
             <div ref={bottomIntersectionObserverRef} />
