@@ -142,29 +142,41 @@ const Home: NextPage<HomeProps> = () => {
             scrollAreaTopRef={restaurantListTopRef}
           >
             <div
-              className="grid grid-cols-3 grid-rows-2 md:grid-rows-1 gap-x-3"
+              className={classNames({
+                "grid grid-cols-3 sm:grid-rows-1 gap-x-4": true,
+                "grid-rows-1": !isSettingsVisible,
+                "grid-rows-2": isSettingsVisible,
+              })}
               style={{ gridTemplateColumns: "auto 1fr 1fr" }}
             >
               <h2 className="text-2xl sm:text-4xl font-bold">Restaurants</h2>
-              <div className="grid row-start-2 md:row-start-1 md:col-start-2 col-span-3 md:col-span-1 items-center">
+              <div
+                className={classNames({
+                  "sm:grid row-start-2 sm:row-start-1 sm:col-start-2 col-span-3 sm:col-span-1 items-center":
+                    true,
+                  grid: isSettingsVisible,
+                  hidden: !isSettingsVisible,
+                })}
+              >
                 <input
                   type="search"
-                  className="
-                    w-full
-                    text-sm md:text-base
-                    mt-0 px-0.5 mx-0.5 pl-6
-                    border-0 border-b border-slate-400
-                    focus:ring-0 focus:border-black
-                    text-slate-400 focus:text-black
-                    placeholder:text-slate-400 focus:placeholder:text-black
-                    peer
-                  "
+                  className={classNames({
+                    "w-full": true,
+                    "text-sm md:text-base": true,
+                    "mt-0 px-0.5 mx-0.5 pl-6": true,
+                    "border-0 border-b border-slate-400": true,
+                    "focus:ring-0 focus:border-black": true,
+                    "text-slate-400 focus:text-black": true,
+                    "placeholder:text-slate-400 focus:placeholder:text-black":
+                      true,
+                    peer: true,
+                  })}
+                  style={{ gridArea: "1 / 1" }}
                   value={searchTerm}
                   onChange={(event) => {
                     setSearchTerm(event.target.value);
                   }}
                   placeholder="Search..."
-                  style={{ gridArea: "1 / 1" }}
                 />
                 <MagnifyingGlass
                   color="currentColor"
