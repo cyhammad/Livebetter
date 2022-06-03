@@ -5,7 +5,6 @@ interface GetApiRestaurantsOptions {
   offset?: number;
   search?: string;
   sortByDistanceFrom?: Coordinates;
-  shouldIncludeClosed?: boolean;
   cuisines?: string[];
 }
 
