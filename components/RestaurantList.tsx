@@ -37,14 +37,14 @@ export const RestaurantList = ({
   }, [bottomIntersectionObserverRef, onUserIsApproachingBottomOfList]);
 
   return (
-    <ul className="flex flex-col px-6 -mt-5">
+    <ul className="flex flex-col px-3 sm:px-6 -mt-5">
       {restaurants.map((restaurant, index) => (
         <li
           className="flex flex-col gap-5 pt-5"
           key={`${restaurant.Restaurant}${index}`}
         >
           <RestaurantCard restaurant={restaurant} />
-          {index === restaurants.length - 1 ? null : <hr />}
+          {/* {index === restaurants.length - 1 ? null : <hr />} */}
           {index === restaurants.length - 10 ? (
             <div ref={bottomIntersectionObserverRef} />
           ) : null}

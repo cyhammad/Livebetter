@@ -59,7 +59,7 @@ export const RestaurantCard = ({
           )}
         </div>
         <div className="flex flex-col gap-2 sm:gap-4 w-full">
-          <div className="flex flex-col gap-0.5 sm:gap-2">
+          <div className="flex flex-col gap-1 sm:gap-2">
             <h3 className="text-xl font-bold sm:text-2xl">
               {restaurant.Restaurant}
             </h3>

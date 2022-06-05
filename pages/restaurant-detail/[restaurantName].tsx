@@ -19,8 +19,10 @@ import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
 
 interface RestaurantDetailPageProps {
   restaurant: Restaurant;
-  menu?: ApiMenuItem[];
-  menuItemsByCategory?: Record<string, ApiMenuItem[]>;
+  menu: {
+    category: string;
+    menuItems: ApiMenuItem[];
+  }[];
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -73,26 +75,64 @@ export const getStaticProps: GetStaticProps<
 
   const menuItemsByCategory: Record<string, ApiMenuItem[]> = {};
 
-  const menu = restaurantMenuDocs.docs.map((doc) => {
-    const menuItem = toApiMenuItem(doc.id, doc.data() as MenuItem);
-    const category = menuItem.category;
+  restaurantMenuDocs.docs
+    .map((doc) => {
+      const menuItem = toApiMenuItem(doc.id, doc.data() as MenuItem);
 
-    if (category) {
-      if (!menuItemsByCategory[category]) {
-        menuItemsByCategory[category] = [];
+      return menuItem;
+    })
+    .sort((a, b) => {
+      const aCategory = a.category?.toLowerCase() ?? "";
+      const bCategory = b.category?.toLowerCase() ?? "";
+      const isANonVegan = aCategory.includes("non vegan");
+      const isBNonVegan = bCategory.includes("non vegan");
+
+      if (isANonVegan && !isBNonVegan) {
+        return 1;
       }
 
-      menuItemsByCategory[category].push(menuItem);
-    }
+      if (!isANonVegan && isBNonVegan) {
+        return -1;
+      }
 
-    return menuItem;
+      return aCategory < bCategory ? -1 : aCategory > bCategory ? 1 : 0;
+    })
+    .forEach((menuItem) => {
+      const category = menuItem.category;
+
+      if (category) {
+        if (!menuItemsByCategory[category]) {
+          menuItemsByCategory[category] = [];
+        }
+
+        menuItemsByCategory[category].push(menuItem);
+      }
+    });
+
+  const menu = Object.keys(menuItemsByCategory).map((key) => {
+    return {
+      category: key,
+      menuItems: menuItemsByCategory[key].sort((a, b) => {
+        if (a.picture && !b.picture) {
+          return -1;
+        }
+
+        if (!a.picture && b.picture) {
+          return 1;
+        }
+
+        const aTextLength = a.name.length + (a.mealDescription?.length ?? 0);
+        const bTextLength = b.name.length + (b.mealDescription?.length ?? 0);
+
+        return bTextLength - aTextLength;
+      }),
+    };
   });
 
   return {
     props: {
       restaurant: restaurantDoc.data() as Restaurant,
       menu,
-      menuItemsByCategory,
     },
     // Regenerate the page every 30 minutes (30 * 60 seconds)
     revalidate: 30 * 60,
@@ -102,7 +142,6 @@ export const getStaticProps: GetStaticProps<
 const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
   restaurant,
   menu,
-  menuItemsByCategory,
 }) => {
   const scrollAreaTopRef = useRef<HTMLDivElement | null>(null);
   const { latitude, longitude, error: locationError } = usePosition(false);
@@ -149,12 +188,27 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         <Header />
         <section className="flex flex-col gap-0 container mx-auto">
           <Toolbar scrollAreaTopRef={scrollAreaTopRef}>
-            <h2 className="text-3xl sm:text-4xl font-bold">
-              {restaurant.Restaurant}
-            </h2>
+            <div className="flex flex-col gap-1 sm:gap-2 md:flex-row justify-between">
+              <h2 className="text-2xl sm:text-4xl font-bold">
+                {restaurant.Restaurant}
+              </h2>
+              <select
+                className={classNames({
+                  "text-base bg-slate-50 rounded my-1": true,
+                  "border-0 ": true,
+                  "focus:ring-0 focus:border-black": true,
+                })}
+              >
+                {menu.map(({ category }) => (
+                  <option key="category" value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
           </Toolbar>
           <div ref={scrollAreaTopRef}></div>
-          <div className="flex flex-col gap-6 px-6">
+          <div className="flex flex-col gap-6 px-3 sm:px-6">
             {restaurant.Image && (
               <div className="w-full h-44 sm:h-80 rounded-lg overflow-hidden flex-none flex">
                 <Image
@@ -168,9 +222,6 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               </div>
             )}
             <section className="flex flex-col gap-2">
-              <h3 className="text-2xl sm:text-3xl font-bold pb-2 border-b border-slate-100">
-                Info
-              </h3>
               <div className="flex flex-col gap-1 sm:gap-2">
                 {openingHoursLabel ? (
                   <div className="flex gap-2 items-start">
@@ -217,70 +268,100 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                       size={20}
                       color={"#000000"}
                     />
-                    <p className="text-sm sm:text-base line-clamp-2">
+                    <a
+                      href={restaurant.Website}
+                      className="text-sm sm:text-base line-clamp-2 underline underline-offset-4"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {restaurant.Website}
-                    </p>
+                    </a>
                   </div>
                 ) : null}
               </div>
             </section>
             <section className="flex flex-col gap-2">
-              <h3 className="text-2xl sm:text-3xl font-bold pb-2 border-b border-slate-100">
-                Menu
-              </h3>
-              {menuItemsByCategory && (
-                <ul className="flex flex-col gap-6">
-                  {Object.keys(menuItemsByCategory).map((category) => {
+              {menu && (
+                <ul className="flex flex-col gap-7">
+                  {menu.map(({ category, menuItems }) => {
+                    let distribution = 0;
+
                     return (
-                      <li className="flex flex-col gap-2" key={category}>
-                        <h4 className="text-xl sm:text-2xl capitalize font-bold">
+                      <li className="flex flex-col gap-3" key={category}>
+                        <h4 className="text-xl sm:text-2xl uppercase font-bold">
                           {category}
                         </h4>
-                        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-                          {menuItemsByCategory[category].map(
-                            (menuItem, index) => {
-                              return (
-                                <li
-                                  className={classNames({
-                                    "flex gap-2 items-stretch flex-none border border-solid border-slate-100 rounded-lg overflow-hidden pr-3 shadow justify-between":
-                                      true,
-                                    "p-3": !menuItem.picture,
-                                  })}
-                                  key={index}
-                                >
-                                  <div className="flex gap-3 items-stretch">
-                                    {menuItem.picture ? (
-                                      <div className="flex flex-row gap-2 overflow-hidden h-32 w-32 flex-none">
-                                        <Image
-                                          alt=""
-                                          height={128}
-                                          layout="raw"
-                                          src={menuItem.picture}
-                                          width={128}
-                                          className="object-cover"
-                                        />
-                                      </div>
-                                    ) : null}
-                                    <div className="flex flex-col justify-center gap-1">
-                                      {menuItem.name ? (
-                                        <span className="text-base sm:text-lg line-clamp-2 sm:leading-6">
-                                          {menuItem.name}
-                                        </span>
-                                      ) : null}
-                                      {menuItem.mealDescription ? (
-                                        <span className="text-sm sm:text-base line-clamp-2 sm:leading-5">
-                                          {menuItem.mealDescription}
-                                        </span>
-                                      ) : null}
-                                      <span className="text-sm">
-                                        ${menuItem.mealPrice.toFixed(2)}
-                                      </span>
-                                    </div>
+                        <ul className="grid grid-cols-12 gap-3">
+                          {menuItems.map((menuItem, index) => {
+                            const hasPicture = !!menuItem.picture;
+                            const hasLongDescription =
+                              menuItem.mealDescription &&
+                              menuItem.mealDescription?.length >= 150;
+                            const hasPictureAndLongDescription =
+                              hasPicture && hasLongDescription;
+
+                            distribution += hasPictureAndLongDescription
+                              ? 1
+                              : 0.5;
+
+                            const isLastHalfItem =
+                              index === menuItems.length - 1 &&
+                              distribution - Math.floor(distribution) === 0.5;
+
+                            return (
+                              <li
+                                className={classNames({
+                                  "flex gap-3 flex-none col-span-12 sm:col-span-6":
+                                    true,
+                                  "sm:col-span-12":
+                                    hasPicture || isLastHalfItem,
+
+                                  "lg:col-span-6":
+                                    !hasPictureAndLongDescription &&
+                                    !isLastHalfItem,
+                                })}
+                                key={index}
+                              >
+                                {menuItem.picture ? (
+                                  <div
+                                    className={classNames({
+                                      "flex flex-row gap-2 overflow-hidden flex-none h-28 w-28 sm:h-48 sm:w-48 xl:h-56 xl:w-56":
+                                        true,
+                                    })}
+                                  >
+                                    <Image
+                                      alt=""
+                                      height={224}
+                                      layout="raw"
+                                      src={menuItem.picture}
+                                      width={224}
+                                      className="object-cover rounded-lg"
+                                    />
                                   </div>
-                                </li>
-                              );
-                            }
-                          )}
+                                ) : null}
+                                <div
+                                  className={classNames({
+                                    "flex flex-col justify-start gap-1": true,
+                                    "justify-center": hasPicture,
+                                  })}
+                                >
+                                  {menuItem.name ? (
+                                    <span className="text-base sm:text-xl font-bold line-clamp-2 sm:leading-6">
+                                      {menuItem.name}
+                                    </span>
+                                  ) : null}
+                                  {menuItem.mealDescription ? (
+                                    <span className="text-sm sm:text-lg line-clamp-2 sm:line-clamp-4 sm:leading-5">
+                                      {menuItem.mealDescription}
+                                    </span>
+                                  ) : null}
+                                  <span className="text-sm">
+                                    ${menuItem.mealPrice.toFixed(2)}
+                                  </span>
+                                </div>
+                              </li>
+                            );
+                          })}
                         </ul>
                       </li>
                     );

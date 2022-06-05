@@ -8,7 +8,7 @@ interface ToolbarProps {
   scrollAreaTopRef: React.MutableRefObject<HTMLElement | null>;
 }
 
-export const TOOLBAR_HEIGHT = 60;
+export const TOOLBAR_HEIGHT = 56;
 
 export const Toolbar = ({
   children,
@@ -43,9 +43,9 @@ export const Toolbar = ({
   return (
     <div
       className={classNames({
-        "flex flex-col gap-4 sticky top-[56px] py-3 px-6 sm:p-6 rounded-none sm:rounded-lg transition-shadow z-40 bg-white":
+        "flex flex-col gap-4 sticky top-[48px] sm:top-[56px] p-3 sm:p-6 rounded-none sm:rounded-lg transition-shadow z-40 bg-white":
           true,
-        "shadow-lg": isShadowVisible || isToolbarPinned,
+        "shadow sm:shadow-lg": isShadowVisible || isToolbarPinned,
       })}
     >
       {children}
