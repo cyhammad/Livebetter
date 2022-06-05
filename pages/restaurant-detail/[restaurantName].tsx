@@ -208,7 +208,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
             </div>
           </Toolbar>
           <div ref={scrollAreaTopRef}></div>
-          <div className="flex flex-col gap-6 px-3 sm:px-6">
+          <div className="flex flex-col gap-6 px-4 sm:px-6">
             {restaurant.Image && (
               <div className="w-full h-44 sm:h-80 rounded-lg overflow-hidden flex-none flex">
                 <Image

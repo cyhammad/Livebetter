@@ -37,7 +37,7 @@ export const RestaurantList = ({
   }, [bottomIntersectionObserverRef, onUserIsApproachingBottomOfList]);
 
   return (
-    <ul className="flex flex-col px-3 sm:px-6 -mt-5">
+    <ul className="flex flex-col px-4 sm:px-6 -mt-5">
       {restaurants.map((restaurant, index) => (
         <li
           className="flex flex-col gap-5 pt-5"
