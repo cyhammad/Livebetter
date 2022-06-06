@@ -291,7 +291,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                         <h4 className="text-xl sm:text-2xl uppercase font-bold">
                           {category}
                         </h4>
-                        <ul className="grid grid-cols-12 gap-3">
+                        <ul className="grid grid-cols-12 gap-4 gap-x-6">
                           {menuItems.map((menuItem, index) => {
                             const hasPicture = !!menuItem.picture;
                             const hasLongDescription =
@@ -346,12 +346,12 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                                   })}
                                 >
                                   {menuItem.name ? (
-                                    <span className="text-base sm:text-xl font-bold line-clamp-2 sm:leading-6">
+                                    <span className="text-base sm:text-lg font-bold line-clamp-2 sm:leading-6">
                                       {menuItem.name}
                                     </span>
                                   ) : null}
                                   {menuItem.mealDescription ? (
-                                    <span className="text-sm sm:text-lg line-clamp-2 sm:line-clamp-4 sm:leading-5">
+                                    <span className="text-sm sm:text-base line-clamp-2 sm:line-clamp-4 sm:leading-6">
                                       {menuItem.mealDescription}
                                     </span>
                                   ) : null}
