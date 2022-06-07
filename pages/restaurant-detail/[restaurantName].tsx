@@ -224,7 +224,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         <Header ref={headerRef} />
         <section className="flex flex-col gap-0 container mx-auto">
           <Toolbar ref={toolbarRef} scrollAreaTopRef={scrollAreaTopRef}>
-            <div className="flex flex-col gap-1 sm:gap-4 md:flex-row md:items-center">
+            <div className="flex flex-col gap-1 sm:gap-4 md:flex-row justify-between md:items-center">
               <h2 className="text-2xl sm:text-4xl font-bold">
                 {restaurant.Restaurant}
               </h2>
