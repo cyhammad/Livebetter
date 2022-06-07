@@ -273,12 +273,13 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
             {restaurant.Image && (
               <div className="w-full h-44 sm:h-80 rounded-lg overflow-hidden flex-none flex">
                 <Image
-                  className="w-full object-cover"
-                  layout="raw"
-                  height={640}
-                  width={960}
-                  src={restaurant.Image}
                   alt=""
+                  className="w-full object-cover"
+                  height={640}
+                  layout="raw"
+                  priority={true}
+                  src={restaurant.Image}
+                  width={960}
                 />
               </div>
             )}
