@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { useState, useEffect } from "react";
+import React, { forwardRef, useState, useEffect } from "react";
 
 import { HEADER_HEIGHT } from "components/Header";
 
@@ -10,11 +10,10 @@ interface ToolbarProps {
 
 export const TOOLBAR_HEIGHT = 56;
 
-export const Toolbar = ({
-  children,
-  isShadowVisible,
-  scrollAreaTopRef,
-}: React.PropsWithChildren<ToolbarProps>) => {
+export const Toolbar = forwardRef<
+  HTMLDivElement,
+  React.PropsWithChildren<ToolbarProps>
+>(function Toolbar({ children, isShadowVisible, scrollAreaTopRef }, ref) {
   const [isToolbarPinned, setIsToolbarPinned] = useState(false);
   /**
    * Update the `isPinned` state variable whenever the Toolbar becomes "pinned"
@@ -47,8 +46,9 @@ export const Toolbar = ({
           true,
         "shadow sm:shadow-lg": isShadowVisible || isToolbarPinned,
       })}
+      ref={ref}
     >
       {children}
     </div>
   );
-};
+});

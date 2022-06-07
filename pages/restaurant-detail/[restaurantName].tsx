@@ -1,11 +1,12 @@
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Image from "next/image";
 import { collection, getDocs, query, limit, where } from "firebase/firestore";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
 import { Clock, MapPin, Phone, Browser } from "phosphor-react";
 import { usePosition } from "hooks/usePosition";
 import haversine from "haversine-distance";
+import { Events, Link, Element, scrollSpy, scroller } from "react-scroll";
 
 import { Head } from "components/Head";
 import { Header } from "components/Header";
@@ -143,8 +144,15 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
   restaurant,
   menu,
 }) => {
+  const headerRef = useRef<HTMLElement | null>(null);
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
   const scrollAreaTopRef = useRef<HTMLDivElement | null>(null);
   const { latitude, longitude, error: locationError } = usePosition(false);
+  const [category, setCategory] = useState(
+    menu.find(({ category }) => !!category)?.category ?? ""
+  );
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollOffsetRef = useRef(0);
 
   const userPosition: Coordinates | undefined =
     latitude && longitude ? { latitude, longitude } : undefined;
@@ -168,6 +176,34 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
 
   const { label: openingHoursLabel } = getOpeningHoursInfo(restaurant);
 
+  const handleCategoryScrollChange = (to: string) => {
+    if (!isScrolling) {
+      setCategory(to);
+    }
+  };
+
+  useEffect(() => {
+    scrollSpy.update();
+
+    Events.scrollEvent.register("begin", function (to, element) {
+      setIsScrolling(true);
+    });
+
+    Events.scrollEvent.register("end", function (to, element) {
+      setIsScrolling(false);
+    });
+
+    scrollOffsetRef.current = -(
+      (toolbarRef.current?.getBoundingClientRect().height ?? 0) +
+      (headerRef.current?.getBoundingClientRect().height ?? 0)
+    );
+
+    return () => {
+      Events.scrollEvent.remove("begin");
+      Events.scrollEvent.remove("end");
+    };
+  }, []);
+
   return (
     <>
       <Head
@@ -185,9 +221,9 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         }}
       ></Head>
       <main className="flex flex-col mb-6">
-        <Header />
+        <Header ref={headerRef} />
         <section className="flex flex-col gap-0 container mx-auto">
-          <Toolbar scrollAreaTopRef={scrollAreaTopRef}>
+          <Toolbar ref={toolbarRef} scrollAreaTopRef={scrollAreaTopRef}>
             <div className="flex flex-col gap-1 sm:gap-2 md:flex-row justify-between">
               <h2 className="text-2xl sm:text-4xl font-bold">
                 {restaurant.Restaurant}
@@ -198,6 +234,15 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                   "border-0 ": true,
                   "focus:ring-0 focus:border-black": true,
                 })}
+                onChange={(event) => {
+                  setCategory(event.target.value);
+
+                  scroller.scrollTo(event.target.value, {
+                    smooth: true,
+                    offset: scrollOffsetRef.current,
+                  });
+                }}
+                value={category}
               >
                 {menu.map(({ category }) => (
                   <option key={category} value={category}>
@@ -206,6 +251,22 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 ))}
               </select>
             </div>
+            {menu.map(({ category }) => (
+              // These Links are only used for their `onSetActive` callback,
+              // combined with the `spy` functionality. It is the only way to
+              // get notified when the user enters a new section. In the UI,
+              // they are hidden.
+              <Link
+                className="hidden"
+                offset={scrollOffsetRef.current}
+                spy={true}
+                to={category}
+                key={category}
+                onSetActive={handleCategoryScrollChange}
+              >
+                {category}
+              </Link>
+            ))}
           </Toolbar>
           <div ref={scrollAreaTopRef}></div>
           <div className="flex flex-col gap-6 px-4 sm:px-6">
@@ -284,66 +345,69 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               <div className="flex flex-col gap-7">
                 {menu.map(({ category, menuItems }) => {
                   return (
-                    <section className="flex flex-col gap-3" key={category}>
-                      <h4 className="text-xl sm:text-3xl uppercase font-bold">
-                        {category}
-                      </h4>
-                      <ul className="grid grid-cols-12 gap-4">
-                        {menuItems.map((menuItem, index) => {
-                          const hasPicture = !!menuItem.picture;
-                          const isDescriptionEmpty = !menuItem.mealDescription;
-                          const isDescriptionShort =
-                            menuItem.mealDescription &&
-                            menuItem.mealDescription.length < 50;
+                    <section key={category}>
+                      <Element name={category} className="flex flex-col gap-3">
+                        <h4 className="text-xl sm:text-3xl uppercase font-bold">
+                          {category}
+                        </h4>
+                        <ul className="grid grid-cols-12 gap-4">
+                          {menuItems.map((menuItem, index) => {
+                            const hasPicture = !!menuItem.picture;
+                            const isDescriptionEmpty =
+                              !menuItem.mealDescription;
+                            const isDescriptionShort =
+                              menuItem.mealDescription &&
+                              menuItem.mealDescription.length < 50;
 
-                          return (
-                            <li
-                              className={classNames({
-                                "flex gap-3 pr-3 flex-none col-span-12 md:col-span-6 2xl:col-span-4 shadow-sm border border-gray-100 rounded-lg overflow-hidden":
-                                  true,
-                                "px-3": !hasPicture,
-                              })}
-                              key={index}
-                            >
-                              {menuItem.picture ? (
-                                <div className="flex flex-row gap-2 overflow-hidden flex-none h-28 w-28 sm:h-32 sm:w-32">
-                                  <Image
-                                    alt=""
-                                    height={224}
-                                    layout="raw"
-                                    src={menuItem.picture}
-                                    width={224}
-                                    className="object-cover"
-                                  />
+                            return (
+                              <li
+                                className={classNames({
+                                  "flex gap-3 pr-3 flex-none col-span-12 md:col-span-6 2xl:col-span-4 shadow-sm border border-gray-100 rounded-lg overflow-hidden":
+                                    true,
+                                  "px-3": !hasPicture,
+                                })}
+                                key={index}
+                              >
+                                {menuItem.picture ? (
+                                  <div className="flex flex-row gap-2 overflow-hidden flex-none h-28 w-28 sm:h-32 sm:w-32">
+                                    <Image
+                                      alt=""
+                                      height={224}
+                                      layout="raw"
+                                      src={menuItem.picture}
+                                      width={224}
+                                      className="object-cover"
+                                    />
+                                  </div>
+                                ) : null}
+                                <div className="flex flex-col gap-1  py-2">
+                                  {menuItem.name ? (
+                                    <span
+                                      className={classNames({
+                                        "text-base sm:text-lg font-bold leading-5 sm:leading-6":
+                                          true,
+                                        "line-clamp-1": !isDescriptionShort,
+                                        "line-clamp-2": isDescriptionShort,
+                                        "line-clamp-3": isDescriptionEmpty,
+                                      })}
+                                    >
+                                      {menuItem.name}
+                                    </span>
+                                  ) : null}
+                                  {menuItem.mealDescription ? (
+                                    <span className="text-sm line-clamp-2 sm:leading-6 text-gray-700">
+                                      {menuItem.mealDescription}
+                                    </span>
+                                  ) : null}
+                                  <span className="text-base font-medium mt-auto">
+                                    ${menuItem.mealPrice.toFixed(2)}
+                                  </span>
                                 </div>
-                              ) : null}
-                              <div className="flex flex-col gap-1  py-2">
-                                {menuItem.name ? (
-                                  <span
-                                    className={classNames({
-                                      "text-base sm:text-lg font-bold leading-5 sm:leading-6":
-                                        true,
-                                      "line-clamp-1": !isDescriptionShort,
-                                      "line-clamp-2": isDescriptionShort,
-                                      "line-clamp-3": isDescriptionEmpty,
-                                    })}
-                                  >
-                                    {menuItem.name}
-                                  </span>
-                                ) : null}
-                                {menuItem.mealDescription ? (
-                                  <span className="text-sm line-clamp-2 sm:leading-6 text-gray-700">
-                                    {menuItem.mealDescription}
-                                  </span>
-                                ) : null}
-                                <span className="text-base font-medium mt-auto">
-                                  ${menuItem.mealPrice.toFixed(2)}
-                                </span>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </Element>
                     </section>
                   );
                 })}
