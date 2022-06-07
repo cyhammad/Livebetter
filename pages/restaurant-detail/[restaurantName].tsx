@@ -280,95 +280,75 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 ) : null}
               </div>
             </section>
-            <section className="flex flex-col gap-2">
-              {menu && (
-                <ul className="flex flex-col gap-7">
-                  {menu.map(({ category, menuItems }) => {
-                    let distribution = 0;
+            {menu && (
+              <div className="flex flex-col gap-7">
+                {menu.map(({ category, menuItems }) => {
+                  return (
+                    <section className="flex flex-col gap-3" key={category}>
+                      <h4 className="text-xl sm:text-3xl uppercase font-bold">
+                        {category}
+                      </h4>
+                      <ul className="grid grid-cols-12 gap-4">
+                        {menuItems.map((menuItem, index) => {
+                          const hasPicture = !!menuItem.picture;
+                          const isDescriptionEmpty = !menuItem.mealDescription;
+                          const isDescriptionShort =
+                            menuItem.mealDescription &&
+                            menuItem.mealDescription.length < 50;
 
-                    return (
-                      <li className="flex flex-col gap-3" key={category}>
-                        <h4 className="text-xl sm:text-2xl uppercase font-bold">
-                          {category}
-                        </h4>
-                        <ul className="grid grid-cols-12 gap-4 gap-x-6">
-                          {menuItems.map((menuItem, index) => {
-                            const hasPicture = !!menuItem.picture;
-                            const hasLongDescription =
-                              menuItem.mealDescription &&
-                              menuItem.mealDescription?.length >= 150;
-                            const hasPictureAndLongDescription =
-                              hasPicture && hasLongDescription;
-
-                            distribution += hasPictureAndLongDescription
-                              ? 1
-                              : 0.5;
-
-                            const isLastHalfItem =
-                              index === menuItems.length - 1 &&
-                              distribution - Math.floor(distribution) === 0.5;
-
-                            return (
-                              <li
-                                className={classNames({
-                                  "flex gap-3 flex-none col-span-12 sm:col-span-6":
-                                    true,
-                                  "sm:col-span-12":
-                                    hasPicture || isLastHalfItem,
-
-                                  "lg:col-span-6":
-                                    !hasPictureAndLongDescription &&
-                                    !isLastHalfItem,
-                                })}
-                                key={index}
-                              >
-                                {menuItem.picture ? (
-                                  <div
+                          return (
+                            <li
+                              className={classNames({
+                                "flex gap-3 pr-3 flex-none col-span-12 md:col-span-6 2xl:col-span-4 shadow-sm border border-gray-100 rounded-lg overflow-hidden":
+                                  true,
+                                "px-3": !hasPicture,
+                              })}
+                              key={index}
+                            >
+                              {menuItem.picture ? (
+                                <div className="flex flex-row gap-2 overflow-hidden flex-none h-28 w-28 sm:h-32 sm:w-32">
+                                  <Image
+                                    alt=""
+                                    height={224}
+                                    layout="raw"
+                                    src={menuItem.picture}
+                                    width={224}
+                                    className="object-cover"
+                                  />
+                                </div>
+                              ) : null}
+                              <div className="flex flex-col gap-1  py-2">
+                                {menuItem.name ? (
+                                  <span
                                     className={classNames({
-                                      "flex flex-row gap-2 overflow-hidden flex-none h-28 w-28 sm:h-48 sm:w-48 xl:h-56 xl:w-56":
+                                      "text-base sm:text-lg font-bold sm:leading-6":
                                         true,
+                                      "line-clamp-1": !isDescriptionShort,
+                                      "line-clamp-2": isDescriptionShort,
+                                      "line-clamp-3": isDescriptionEmpty,
                                     })}
                                   >
-                                    <Image
-                                      alt=""
-                                      height={224}
-                                      layout="raw"
-                                      src={menuItem.picture}
-                                      width={224}
-                                      className="object-cover rounded-lg"
-                                    />
-                                  </div>
-                                ) : null}
-                                <div
-                                  className={classNames({
-                                    "flex flex-col justify-start gap-1": true,
-                                    "justify-center": hasPicture,
-                                  })}
-                                >
-                                  {menuItem.name ? (
-                                    <span className="text-base sm:text-lg font-bold line-clamp-2 sm:leading-6">
-                                      {menuItem.name}
-                                    </span>
-                                  ) : null}
-                                  {menuItem.mealDescription ? (
-                                    <span className="text-sm sm:text-base line-clamp-2 sm:line-clamp-4 sm:leading-6">
-                                      {menuItem.mealDescription}
-                                    </span>
-                                  ) : null}
-                                  <span className="text-sm">
-                                    ${menuItem.mealPrice.toFixed(2)}
+                                    {menuItem.name}
                                   </span>
-                                </div>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </section>
+                                ) : null}
+                                {menuItem.mealDescription ? (
+                                  <span className="text-sm line-clamp-2 sm:leading-6 text-gray-700">
+                                    {menuItem.mealDescription}
+                                  </span>
+                                ) : null}
+                                <span className="text-base font-medium mt-auto">
+                                  ${menuItem.mealPrice.toFixed(2)}
+                                </span>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </section>
+                  );
+                })}
+              </div>
+            )}
             <section>
               <h3 className="text-2xl sm:text-3xl font-bold">Reviews</h3>
             </section>
