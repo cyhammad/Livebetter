@@ -321,7 +321,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                                 {menuItem.name ? (
                                   <span
                                     className={classNames({
-                                      "text-base sm:text-lg font-bold sm:leading-6":
+                                      "text-base sm:text-lg font-bold leading-5 sm:leading-6":
                                         true,
                                       "line-clamp-1": !isDescriptionShort,
                                       "line-clamp-2": isDescriptionShort,
