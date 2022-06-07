@@ -200,7 +200,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 })}
               >
                 {menu.map(({ category }) => (
-                  <option key="category" value={category}>
+                  <option key={category} value={category}>
                     {category}
                   </option>
                 ))}
