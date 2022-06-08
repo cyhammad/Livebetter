@@ -230,7 +230,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               </h2>
               <select
                 className={classNames({
-                  "text-base md:text-lg bg-slate-50 rounded my-1": true,
+                  "text-base md:text-lg bg-slate-100 rounded my-1": true,
                   "border-0 ": true,
                   "focus:ring-0 focus:border-black": true,
                 })}
