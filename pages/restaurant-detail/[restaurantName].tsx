@@ -3,20 +3,23 @@ import Image from "next/image";
 import { collection, getDocs, query, limit, where } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { Clock, MapPin, Phone, Browser } from "phosphor-react";
+import { MapPin, Browser } from "phosphor-react";
 import { usePosition } from "hooks/usePosition";
 import haversine from "haversine-distance";
 import { Events, Link, Element, scrollSpy, scroller } from "react-scroll";
 
 import { Head } from "components/Head";
 import { Header } from "components/Header";
+import { RestaurantCuisine } from "components/RestaurantCuisine";
+import { RestaurantOpeningHours } from "components/RestaurantOpeningHours";
+import { RestaurantPickAndDelivery } from "components/RestaurantPickAndDelivery";
+import { RestaurantPhoneNumber } from "components/RestaurantPhoneNumber";
 import { Toolbar } from "components/Toolbar";
 import type { Coordinates, Restaurant, MenuItem, ApiMenuItem } from "types";
 import { db } from "lib/server/db";
 import { toApiMenuItem } from "lib/server/toApiMenuItem";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { urlParamToRestaurantName } from "lib/urlParamToRestaurantName";
-import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
 
 interface RestaurantDetailPageProps {
   restaurant: Restaurant;
@@ -171,10 +174,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
 
   const isAddressVisible = !!restaurant.Address;
   const isDistanceVisible = typeof distance === "number" && !isNaN(distance);
-  const isPhoneVisible = !!restaurant.Phone;
   const isWebsiteVisible = !!restaurant.Website;
-
-  const { label: openingHoursLabel } = getOpeningHoursInfo(restaurant);
 
   const handleCategoryScrollChange = (to: string) => {
     if (!isScrolling) {
@@ -270,78 +270,73 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
           </Toolbar>
           <div ref={scrollAreaTopRef}></div>
           <div className="flex flex-col gap-6 px-4 sm:px-6">
-            {restaurant.Image && (
-              <div className="w-full h-44 sm:h-80 rounded-lg overflow-hidden flex-none flex">
-                <Image
-                  alt=""
-                  className="w-full object-cover"
-                  height={640}
-                  layout="raw"
-                  priority={true}
-                  src={restaurant.Image}
-                  width={960}
-                />
-              </div>
-            )}
-            <section className="flex flex-col gap-2">
-              <div className="flex flex-col gap-1 sm:gap-2">
-                {openingHoursLabel ? (
-                  <div className="flex gap-2 items-start">
-                    <Clock
-                      className="flex-none mt-0 sm:mt-0.5 w-[16px] sm:w-[20px]"
-                      size={20}
-                      color={"#000000"}
-                    />
-                    <p className="text-sm sm:text-base flex items-center gap-2">
-                      {openingHoursLabel}
-                    </p>
-                  </div>
-                ) : null}
-                {isAddressVisible || isDistanceVisible ? (
-                  <div className="flex gap-2 items-center">
-                    <MapPin
-                      className="flex-none w-[16px] sm:w-[20px]"
-                      size={20}
-                      color={"#000000"}
-                    />
-                    <p className="text-sm sm:text-base flex items-center gap-2">
-                      {isDistanceVisible ? `${distance} mi` : null}
-                      {isDistanceVisible && isAddressVisible ? " ∙ " : null}
-                      {isAddressVisible ? restaurant.Address : null}
-                    </p>
-                  </div>
-                ) : null}
-                {isPhoneVisible ? (
-                  <div className="flex gap-2 items-center">
-                    <Phone
-                      className="flex-none w-[16px] sm:w-[20px]"
-                      size={20}
-                      color={"#000000"}
-                    />
-                    <p className="text-sm sm:text-base line-clamp-2">
-                      {restaurant.Phone}
-                    </p>
-                  </div>
-                ) : null}
-                {isWebsiteVisible ? (
-                  <div className="flex gap-2 items-center">
-                    <Browser
-                      className="flex-none w-[16px] sm:w-[20px]"
-                      size={20}
-                      color={"#000000"}
-                    />
-                    <a
-                      href={restaurant.Website}
-                      className="text-sm sm:text-base line-clamp-2 underline underline-offset-4"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {restaurant.Website}
-                    </a>
-                  </div>
-                ) : null}
-              </div>
-            </section>
+            <div className="grid gap-6">
+              {restaurant.Image && (
+                <div
+                  className="h-52 sm:h-80 rounded-lg overflow-hidden flex-none flex xl:flex-grow"
+                  style={{ gridArea: "1/1" }}
+                >
+                  <Image
+                    alt=""
+                    className="w-full object-cover"
+                    height={640}
+                    layout="raw"
+                    priority={true}
+                    src={restaurant.Image}
+                    width={960}
+                  />
+                </div>
+              )}
+              <section
+                className={`
+                  flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 sm:pr-5
+                  rounded-r-lg
+                  justify-center justify-self-start self-center
+                  bg-white/80 backdrop-blur
+                `}
+                style={{ gridArea: "1/1" }}
+              >
+                <div className="flex flex-col gap-1 sm:gap-2">
+                  <RestaurantOpeningHours restaurant={restaurant} />
+                  <RestaurantPickAndDelivery restaurant={restaurant} />
+                  <RestaurantCuisine restaurant={restaurant} />
+                </div>
+                <div className="flex flex-col gap-1 sm:gap-2">
+                  {isAddressVisible || isDistanceVisible ? (
+                    <div className="flex gap-2 items-center">
+                      <MapPin
+                        className="flex-none w-[16px] sm:w-[20px] text-black"
+                        size={20}
+                        color="currentColor"
+                      />
+                      <p className="text-sm sm:text-base flex items-center gap-2">
+                        {isDistanceVisible ? `${distance} mi` : null}
+                        {isDistanceVisible && isAddressVisible ? " ∙ " : null}
+                        {isAddressVisible ? restaurant.Address : null}
+                      </p>
+                    </div>
+                  ) : null}
+                  <RestaurantPhoneNumber restaurant={restaurant} />
+                  {isWebsiteVisible ? (
+                    <div className="flex gap-2 items-center">
+                      <Browser
+                        className="flex-none w-[16px] sm:w-[20px] text-black"
+                        size={20}
+                        color="currentColor"
+                      />
+                      <a
+                        href={restaurant.Website}
+                        className="text-sm sm:text-base underline underline-offset-4"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {restaurant.Website}
+                      </a>
+                    </div>
+                  ) : null}
+                </div>
+              </section>
+            </div>
             {menu && (
               <div className="flex flex-col gap-7">
                 {menu.map(({ category, menuItems }) => {

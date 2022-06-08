@@ -189,7 +189,7 @@ const Home: NextPage<HomeProps> = () => {
               <div className="flex gap-2 items-center ml-auto col-start-3">
                 <Spinner
                   size={32}
-                  color={"currentColor"}
+                  color="currentColor"
                   weight={selectedCuisines.length > 0 ? "fill" : "regular"}
                   className={classNames({
                     "animate-spin": isLoading,
@@ -213,7 +213,7 @@ const Home: NextPage<HomeProps> = () => {
                 >
                   <CrosshairSimple
                     size={32}
-                    color={"currentColor"}
+                    color="currentColor"
                     weight={selectedCuisines.length > 0 ? "fill" : "regular"}
                     style={{ gridArea: "1 / 1" }}
                     className={classNames({
@@ -227,7 +227,7 @@ const Home: NextPage<HomeProps> = () => {
                   {locationError ? (
                     <X
                       size={12}
-                      color={"currentColor"}
+                      color="currentColor"
                       weight={"bold"}
                       style={{ gridArea: "1 / 1" }}
                       className={classNames({
@@ -250,7 +250,7 @@ const Home: NextPage<HomeProps> = () => {
                 >
                   <Sliders
                     size={32}
-                    color={"currentColor"}
+                    color="currentColor"
                     weight={selectedCuisines.length > 0 ? "fill" : "regular"}
                     className={classNames({
                       "text-black": !isSettingsVisible,
