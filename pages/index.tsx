@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import type { NextPage, GetStaticProps } from "next";
 import Head from "next/head";
+
 import {
   CrosshairSimple,
   MagnifyingGlass,
@@ -19,12 +20,14 @@ import { dehydrate, QueryClient, useQuery, DehydratedState } from "react-query";
 
 import { getApiRestaurants } from "lib/server/getApiRestaurants";
 import { fetchRestaurants } from "lib/client/fetchRestaurants";
+import { HomeHero } from "components/HomeHero";
 import { Header } from "components/Header";
 import { RestaurantList } from "components/RestaurantList";
 import { Toolbar } from "components/Toolbar";
 import { useHomeContext } from "hooks/useHomeContext";
+import { useUserContext } from "hooks/useUserContext";
 import { usePosition } from "hooks/usePosition";
-import type { Coordinates, FetchApiRestaurantsQueryKey } from "types";
+import type { Coordinates, FetchApiRestaurantsQueryKey, Location } from "types";
 
 interface HomeProps {
   dehydratedState: DehydratedState;
@@ -66,7 +69,6 @@ const Home: NextPage<HomeProps> = () => {
     searchTerm,
     selectedCuisines,
     setLimit,
-    setOffset,
     setSearchTerm,
     setSelectedCuisines,
     setShouldQueryLocation,
@@ -136,6 +138,7 @@ const Home: NextPage<HomeProps> = () => {
       </Head>
       <main className="flex flex-col mb-6">
         <Header />
+        <HomeHero />
         <section className="flex flex-col gap-0 container mx-auto">
           <Toolbar
             isShadowVisible={isSettingsVisible}
@@ -162,13 +165,12 @@ const Home: NextPage<HomeProps> = () => {
                   type="search"
                   className={classNames({
                     "w-full": true,
-                    "text-sm md:text-base": true,
+                    "text-sm sm:text-base": true,
                     "mt-0 px-0.5 mx-0.5 pl-6": true,
                     "border-0 border-b border-slate-400": true,
                     "focus:ring-0 focus:border-black": true,
-                    "text-slate-400 focus:text-black": true,
-                    "placeholder:text-slate-400 focus:placeholder:text-black":
-                      true,
+                    "text-black": true,
+                    "placeholder:text-slate-300": true,
                     peer: true,
                   })}
                   style={{ gridArea: "1 / 1" }}

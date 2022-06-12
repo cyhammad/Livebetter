@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import type { Coordinates } from "types";
 
-export const usePosition = (shouldQueryLocation: boolean) => {
+export const useCurrentPosition = (shouldQueryLocation: boolean) => {
   const [position, setPosition] = useState<Coordinates | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,9 +29,7 @@ export const usePosition = (shouldQueryLocation: boolean) => {
       return;
     }
 
-    const watcher = geo.watchPosition(onChange, onError);
-
-    return () => geo.clearWatch(watcher);
+    geo.getCurrentPosition(onChange, onError, { enableHighAccuracy: true });
   }, [shouldQueryLocation]);
 
   return { ...position, error };
