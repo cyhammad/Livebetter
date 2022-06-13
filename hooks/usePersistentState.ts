@@ -4,17 +4,6 @@ import setObjectPath from "lodash.set";
 
 const ROOT_KEY = "lb";
 
-type UsePersistentState = {
-  <S>(path: string, initialState: S | (() => S)): [
-    S | undefined,
-    Dispatch<SetStateAction<S | undefined>>
-  ];
-  <S = undefined>(path: string): [
-    S | undefined,
-    Dispatch<SetStateAction<S | undefined>>
-  ];
-};
-
 export const usePersistentState = <S>(
   path: string,
   initialState: S | (() => S)

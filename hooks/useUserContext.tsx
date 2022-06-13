@@ -24,7 +24,7 @@ export const UserContextProvider = ({
   children,
 }: PropsWithChildren<unknown>) => {
   const [location, setLocation] = usePersistentState<Location | undefined>(
-    "location",
+    "user.location",
     undefined
   );
 
