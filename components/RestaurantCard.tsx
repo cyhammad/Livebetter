@@ -6,9 +6,9 @@ import { ArrowRight, MapPin } from "phosphor-react";
 import { RestaurantCuisine } from "components/RestaurantCuisine";
 import { RestaurantOpeningHours } from "components/RestaurantOpeningHours";
 import { RestaurantPickAndDelivery } from "components/RestaurantPickAndDelivery";
-import type { ApiRestaurant } from "types";
-import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
+import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
+import type { ApiRestaurant } from "types";
 
 interface RestaurantCardProps {
   className?: string;

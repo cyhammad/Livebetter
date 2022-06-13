@@ -1,5 +1,6 @@
-import type { ApiRestaurant } from "types";
 import { Phone } from "phosphor-react";
+
+import type { ApiRestaurant } from "types";
 
 interface RestaurantPhoneNumberProps {
   restaurant: ApiRestaurant;

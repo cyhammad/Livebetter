@@ -1,4 +1,4 @@
-import { Taxi, PersonSimpleWalk } from "phosphor-react";
+import { PersonSimpleWalk, Taxi } from "phosphor-react";
 
 import type { ApiRestaurant } from "types";
 

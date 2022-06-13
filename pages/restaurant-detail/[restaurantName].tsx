@@ -1,25 +1,25 @@
+import classNames from "classnames";
+import { collection, getDocs, limit, query, where } from "firebase/firestore";
+import haversine from "haversine-distance";
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Image from "next/image";
-import { collection, getDocs, query, limit, where } from "firebase/firestore";
+import { Browser, MapPin } from "phosphor-react";
 import { useEffect, useRef, useState } from "react";
-import classNames from "classnames";
-import { MapPin, Browser } from "phosphor-react";
-import { usePosition } from "hooks/usePosition";
-import haversine from "haversine-distance";
-import { Events, Link, Element, scrollSpy, scroller } from "react-scroll";
+import { Element, Events, Link, scrollSpy, scroller } from "react-scroll";
 
 import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { RestaurantCuisine } from "components/RestaurantCuisine";
 import { RestaurantOpeningHours } from "components/RestaurantOpeningHours";
-import { RestaurantPickAndDelivery } from "components/RestaurantPickAndDelivery";
 import { RestaurantPhoneNumber } from "components/RestaurantPhoneNumber";
+import { RestaurantPickAndDelivery } from "components/RestaurantPickAndDelivery";
 import { Toolbar } from "components/Toolbar";
-import type { Coordinates, Restaurant, MenuItem, ApiMenuItem } from "types";
+import { usePosition } from "hooks/usePosition";
+import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { db } from "lib/server/db";
 import { toApiMenuItem } from "lib/server/toApiMenuItem";
-import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { urlParamToRestaurantName } from "lib/urlParamToRestaurantName";
+import type { ApiMenuItem, Coordinates, MenuItem, Restaurant } from "types";
 
 interface RestaurantDetailPageProps {
   restaurant: Restaurant;

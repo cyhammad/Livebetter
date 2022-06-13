@@ -1,9 +1,9 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
 import haversineDistance from "haversine-distance";
 
-import { db } from "lib/server/db";
-import type { ApiRestaurant, Restaurant, GetApiRestaurants } from "types";
 import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
+import { db } from "lib/server/db";
+import type { ApiRestaurant, GetApiRestaurants, Restaurant } from "types";
 
 const METERS_TO_MILES_DIVISOR = 1609.344;
 

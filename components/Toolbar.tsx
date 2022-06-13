@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import React, { forwardRef, useState, useEffect } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 
 import { HEADER_HEIGHT } from "components/Header";
 

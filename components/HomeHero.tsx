@@ -5,8 +5,8 @@ import { MapPin, NavigationArrow } from "phosphor-react";
 import { useEffect, useRef, useState } from "react";
 
 import { HEADER_HEIGHT } from "components/Header";
-import { useHomeContext } from "hooks/useHomeContext";
 import { useCurrentPosition } from "hooks/useCurrentPosition";
+import { useHomeContext } from "hooks/useHomeContext";
 import { useUserContext } from "hooks/useUserContext";
 
 export const HomeHero = () => {

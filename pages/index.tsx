@@ -1,7 +1,6 @@
 import classNames from "classnames";
-import type { NextPage, GetStaticProps } from "next";
+import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
-
 import {
   CrosshairSimple,
   MagnifyingGlass,
@@ -16,16 +15,16 @@ import {
   useState,
   useTransition,
 } from "react";
-import { dehydrate, QueryClient, useQuery, DehydratedState } from "react-query";
+import { DehydratedState, QueryClient, dehydrate, useQuery } from "react-query";
 
-import { getApiRestaurants } from "lib/server/getApiRestaurants";
-import { fetchRestaurants } from "lib/client/fetchRestaurants";
-import { HomeHero } from "components/HomeHero";
 import { Header } from "components/Header";
+import { HomeHero } from "components/HomeHero";
 import { RestaurantList } from "components/RestaurantList";
 import { Toolbar } from "components/Toolbar";
 import { useHomeContext } from "hooks/useHomeContext";
 import { usePosition } from "hooks/usePosition";
+import { fetchRestaurants } from "lib/client/fetchRestaurants";
+import { getApiRestaurants } from "lib/server/getApiRestaurants";
 import type { Coordinates, FetchApiRestaurantsQueryKey } from "types";
 
 interface HomeProps {

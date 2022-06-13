@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import type { Coordinates } from "types";
 
@@ -16,6 +16,7 @@ export const useCurrentPosition = (shouldQueryLocation: boolean) => {
 
     if (!geo) {
       setError("Geolocation is not supported");
+
       return;
     }
 
@@ -30,10 +31,10 @@ export const useCurrentPosition = (shouldQueryLocation: boolean) => {
       setIsLoading(false);
     };
 
-    const errorCallback: PositionErrorCallback = (error) => {
-      setError(error.message);
+    const errorCallback: PositionErrorCallback = (positionError) => {
+      setError(positionError.message);
       setIsLoading(false);
-      alert(error.message);
+      alert(positionError.message);
     };
 
     geo.getCurrentPosition(successCallback, errorCallback, {

@@ -1,9 +1,10 @@
-import type { Restaurant, RestaurantOpenHours } from "types";
-import setHours from "date-fns/setHours";
-import setMinutes from "date-fns/setMinutes";
+import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
 import isAfter from "date-fns/isAfter";
 import isBefore from "date-fns/isBefore";
-import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
+import setHours from "date-fns/setHours";
+import setMinutes from "date-fns/setMinutes";
+
+import type { Restaurant, RestaurantOpenHours } from "types";
 
 export const openAndCloseDates = (
   restaurant: Restaurant,

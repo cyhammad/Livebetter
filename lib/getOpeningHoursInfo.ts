@@ -1,6 +1,7 @@
+import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
+
 import { openAndCloseDates } from "lib/isOpen";
 import type { Restaurant } from "types";
-import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
 
 type OpeningHoursStatus =
   | "open-now"
