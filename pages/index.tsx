@@ -25,9 +25,8 @@ import { Header } from "components/Header";
 import { RestaurantList } from "components/RestaurantList";
 import { Toolbar } from "components/Toolbar";
 import { useHomeContext } from "hooks/useHomeContext";
-import { useUserContext } from "hooks/useUserContext";
 import { usePosition } from "hooks/usePosition";
-import type { Coordinates, FetchApiRestaurantsQueryKey, Location } from "types";
+import type { Coordinates, FetchApiRestaurantsQueryKey } from "types";
 
 interface HomeProps {
   dehydratedState: DehydratedState;
@@ -76,7 +75,7 @@ const Home: NextPage<HomeProps> = () => {
   } = useHomeContext();
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const deferredSearchTerm = useDeferredValue(searchTerm);
-  const [_isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
   const {
     latitude,
@@ -97,7 +96,7 @@ const Home: NextPage<HomeProps> = () => {
     selectedCuisines,
   ];
 
-  const { isLoading, error, data } = useQuery(
+  const { isLoading, data } = useQuery(
     queryKey,
     () =>
       fetchRestaurants({

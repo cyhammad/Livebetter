@@ -150,8 +150,8 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
   const headerRef = useRef<HTMLElement | null>(null);
   const toolbarRef = useRef<HTMLDivElement | null>(null);
   const scrollAreaTopRef = useRef<HTMLDivElement | null>(null);
-  const { latitude, longitude, error: locationError } = usePosition(false);
-  const [category, setCategory] = useState(
+  const { latitude, longitude } = usePosition(false);
+  const [selectedCategory, setSelectedCategory] = useState(
     menu.find(({ category }) => !!category)?.category ?? ""
   );
   const [isScrolling, setIsScrolling] = useState(false);
@@ -178,18 +178,18 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
 
   const handleCategoryScrollChange = (to: string) => {
     if (!isScrolling) {
-      setCategory(to);
+      setSelectedCategory(to);
     }
   };
 
   useEffect(() => {
     scrollSpy.update();
 
-    Events.scrollEvent.register("begin", function (to, element) {
+    Events.scrollEvent.register("begin", () => {
       setIsScrolling(true);
     });
 
-    Events.scrollEvent.register("end", function (to, element) {
+    Events.scrollEvent.register("end", () => {
       setIsScrolling(false);
     });
 
@@ -235,14 +235,14 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                   "focus:ring-0 focus:border-black": true,
                 })}
                 onChange={(event) => {
-                  setCategory(event.target.value);
+                  setSelectedCategory(event.target.value);
 
                   scroller.scrollTo(event.target.value, {
                     smooth: true,
                     offset: scrollOffsetRef.current,
                   });
                 }}
-                value={category}
+                value={selectedCategory}
               >
                 {menu.map(({ category }) => (
                   <option key={category} value={category}>
@@ -418,4 +418,5 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
     </>
   );
 };
+
 export default RestaurantDetail;

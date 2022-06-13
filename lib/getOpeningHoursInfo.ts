@@ -27,6 +27,7 @@ export const getOpeningHoursInfo = (
         status: "open-later",
       };
     }
+
     if (!closeDate) {
       return {
         openDate,
@@ -44,6 +45,7 @@ export const getOpeningHoursInfo = (
         status: "closed-earlier",
       };
     }
+
     if (targetDate < closeDate) {
       return {
         openDate,

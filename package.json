@@ -7,6 +7,7 @@
     "build": "rm -rf .next && next build",
     "start": "next start",
     "lint": "next lint",
+    "lint:fix": "next lint --fix .",
     "format": "npx prettier --write .",
     "prepare": "husky install",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --watch"
@@ -41,6 +42,8 @@
     "@types/react": "18.0.9",
     "@types/react-dom": "18.0.4",
     "@types/react-scroll": "^1.8.3",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "@typescript-eslint/parser": "^5.27.1",
     "autoprefixer": "^10.4.7",
     "eslint": "8.16.0",
     "eslint-config-next": "12.1.6",

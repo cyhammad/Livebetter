@@ -20,7 +20,7 @@ export const Toolbar = forwardRef<
    * to the top of the viewport.
    */
   useEffect(() => {
-    const ref = scrollAreaTopRef.current;
+    const topRef = scrollAreaTopRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsToolbarPinned(entry.intersectionRatio < 1);
@@ -28,13 +28,13 @@ export const Toolbar = forwardRef<
       { rootMargin: `-${HEADER_HEIGHT + TOOLBAR_HEIGHT}px`, threshold: [1] }
     );
 
-    if (ref) {
-      observer.observe(ref);
+    if (topRef) {
+      observer.observe(topRef);
     }
 
     return () => {
-      if (ref) {
-        observer.unobserve(ref);
+      if (topRef) {
+        observer.unobserve(topRef);
       }
     };
   }, [scrollAreaTopRef]);

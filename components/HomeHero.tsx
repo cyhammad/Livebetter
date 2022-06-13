@@ -2,7 +2,7 @@ import classNames from "classnames";
 import Image from "next/image";
 import Script from "next/script";
 import { MapPin, NavigationArrow } from "phosphor-react";
-import { useEffect, useRef, useState, memo } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { HEADER_HEIGHT } from "components/Header";
 import { useHomeContext } from "hooks/useHomeContext";
@@ -26,6 +26,7 @@ export const HomeHero = () => {
   useEffect(() => {
     if (currentPositionError) {
       setShouldQueryLocation(false);
+
       return;
     }
 

@@ -1,3 +1,71 @@
 {
-  "extends": ["next", "next/core-web-vitals", "prettier"]
+  "extends": ["eslint:recommended", "next", "next/core-web-vitals", "prettier"],
+  "overrides": [
+    {
+      "extends": ["plugin:@typescript-eslint/recommended"],
+      "files": ["**/*.ts", "**/*.tsx"],
+      "parserOptions": {
+        "project": ["./tsconfig.json"]
+        // tsconfigRootDir: __dirname,
+      }
+    }
+  ],
+  "rules": {
+    "default-case": "warn",
+    "eqeqeq": ["error", "always"],
+    "linebreak-style": ["error", "unix"],
+    "no-console": "warn",
+    "no-debugger": "warn",
+    "no-duplicate-imports": "warn",
+    "no-lonely-if": "error",
+    "no-shadow": "error",
+    "no-unneeded-ternary": "error",
+    "no-useless-computed-key": "error",
+    "no-useless-rename": "error",
+    "object-shorthand": "error",
+    "padded-blocks": ["warn", "never"],
+    "padding-line-between-statements": [
+      "warn",
+      {
+        "blankLine": "always",
+        "next": "return",
+        "prev": "*"
+      },
+      {
+        "blankLine": "always",
+        "next": "block-like",
+        "prev": "*"
+      },
+      {
+        "blankLine": "always",
+        "next": "*",
+        "prev": "block-like"
+      },
+      {
+        "blankLine": "always",
+        "next": "break",
+        "prev": "*"
+      },
+      {
+        "blankLine": "always",
+        "next": "continue",
+        "prev": "*"
+      },
+      {
+        "blankLine": "never",
+        "next": ["case", "default"],
+        "prev": "case"
+      }
+    ],
+    "prefer-arrow-callback": [
+      "warn",
+      {
+        "allowNamedFunctions": true
+      }
+    ],
+    "prefer-const": "warn",
+    "prefer-object-spread": "warn",
+    "prefer-rest-params": "warn",
+    "yoda": "error"
+  }
 }

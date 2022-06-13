@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { getApiRestaurants } from "lib/server/getApiRestaurants";
-import type { ApiRestaurant, GetApiRestaurantsResult } from "types";
+import type { GetApiRestaurantsResult } from "types";
 
 export default async function handler(
   req: NextApiRequest,
