@@ -5,17 +5,7 @@ import type { Coordinates } from "types";
 export const useCurrentPosition = (shouldQueryLocation: boolean) => {
   const [position, setPosition] = useState<Coordinates | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const onChange: PositionCallback = ({ coords }) => {
-    setPosition({
-      latitude: coords.latitude,
-      longitude: coords.longitude,
-    });
-  };
-  const onError: PositionErrorCallback = (error) => {
-    setError(error.message);
-    alert(error.message);
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!shouldQueryLocation) {
@@ -29,8 +19,27 @@ export const useCurrentPosition = (shouldQueryLocation: boolean) => {
       return;
     }
 
-    geo.getCurrentPosition(onChange, onError, { enableHighAccuracy: true });
+    setIsLoading(true);
+
+    const successCallback: PositionCallback = ({ coords }) => {
+      setPosition({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+      });
+      setError(null);
+      setIsLoading(false);
+    };
+
+    const errorCallback: PositionErrorCallback = (error) => {
+      setError(error.message);
+      setIsLoading(false);
+      alert(error.message);
+    };
+
+    geo.getCurrentPosition(successCallback, errorCallback, {
+      enableHighAccuracy: true,
+    });
   }, [shouldQueryLocation]);
 
-  return { ...position, error };
+  return { ...position, error, isLoading };
 };

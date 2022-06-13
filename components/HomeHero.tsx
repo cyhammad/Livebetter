@@ -8,24 +8,27 @@ import { HEADER_HEIGHT } from "components/Header";
 import { useHomeContext } from "hooks/useHomeContext";
 import { useCurrentPosition } from "hooks/useCurrentPosition";
 import { useUserContext } from "hooks/useUserContext";
-import { Location } from "types";
 
 export const HomeHero = () => {
   const { setShouldQueryLocation, shouldQueryLocation } = useHomeContext();
   const {
     latitude,
     longitude,
-    error: locationError,
+    isLoading: isCurrentPositionLoading,
+    error: currentPositionError,
   } = useCurrentPosition(shouldQueryLocation);
   const { location, setLocation } = useUserContext();
-  const [isLoadingCurrentPosition, setIsLoadingCurrentPosition] =
-    useState(false);
   const [address, setAddress] = useState("");
   const addressInputRef = useRef<HTMLInputElement | null>(null);
   const prevLatitudeRef = useRef<number>();
   const prevLongitudeRef = useRef<number>();
 
   useEffect(() => {
+    if (currentPositionError) {
+      setShouldQueryLocation(false);
+      return;
+    }
+
     const didPositionChange =
       latitude &&
       longitude &&
@@ -33,13 +36,6 @@ export const HomeHero = () => {
       longitude !== prevLongitudeRef.current;
 
     if (!didPositionChange) {
-      setIsLoadingCurrentPosition(false);
-      return;
-    }
-
-    if (locationError) {
-      setIsLoadingCurrentPosition(false);
-      setShouldQueryLocation(false);
       return;
     }
 
@@ -56,12 +52,16 @@ export const HomeHero = () => {
         if (result) {
           const { formatted_address } = result;
 
-          // setAddress(formatted_address);
           setLocation({ latitude, longitude, address: formatted_address });
-          setIsLoadingCurrentPosition(false);
         }
       });
-  }, [latitude, longitude, locationError, setLocation, setShouldQueryLocation]);
+  }, [
+    latitude,
+    longitude,
+    currentPositionError,
+    setLocation,
+    setShouldQueryLocation,
+  ]);
 
   useEffect(() => {
     setAddress(location?.address ?? "");
@@ -174,7 +174,6 @@ export const HomeHero = () => {
                   className="justify-self-end rotate-90"
                   style={{ gridArea: "1 / 1" }}
                   onClick={() => {
-                    setIsLoadingCurrentPosition(true);
                     setShouldQueryLocation(!shouldQueryLocation);
                   }}
                 >
@@ -186,7 +185,7 @@ export const HomeHero = () => {
                     className={classNames({
                       "text-black fill-sky-600 origin-center": true,
                       "h-5 w-5 sm:h-6 sm:w-6": true,
-                      "animate-compass": isLoadingCurrentPosition,
+                      "animate-compass": isCurrentPositionLoading,
                     })}
                   />
                 </button>
