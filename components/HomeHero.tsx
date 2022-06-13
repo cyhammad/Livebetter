@@ -94,6 +94,7 @@ export const HomeHero = () => {
                 latitude: geometry.location.lat(),
                 longitude: geometry.location.lng(),
               });
+              setShouldQueryLocation(false);
             });
           }
         }}
