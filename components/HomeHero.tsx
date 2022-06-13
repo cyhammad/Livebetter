@@ -37,6 +37,12 @@ export const HomeHero = () => {
       return;
     }
 
+    if (locationError) {
+      setIsLoadingCurrentPosition(false);
+      setShouldQueryLocation(false);
+      return;
+    }
+
     prevLatitudeRef.current = latitude;
     prevLongitudeRef.current = longitude;
 
@@ -55,7 +61,7 @@ export const HomeHero = () => {
           setIsLoadingCurrentPosition(false);
         }
       });
-  }, [latitude, longitude, setLocation]);
+  }, [latitude, longitude, locationError, setLocation, setShouldQueryLocation]);
 
   useEffect(() => {
     setAddress(location?.address ?? "");
