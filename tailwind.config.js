@@ -6,25 +6,17 @@ module.exports = {
   theme: {
     extend: {
       animation: {
-        compass: "compass 2s infinite",
+        compass: "compass 1.85s infinite",
       },
       keyframes: {
         compass: {
           "0%, 100%": {
-            transform: "rotate(90deg)",
+            transform: "rotate(0deg)",
             animationTimingFunction: "cubic-bezier(0.4, 0, 0.6, 1)",
-            opacity: 1,
-          },
-          "25%": {
-            opacity: 0.75,
           },
           "50%": {
-            transform: "rotate(30deg)",
+            transform: "rotate(-20deg)",
             animationTimingFunction: "cubic-bezier(0.4, 0, 0.6, 1)",
-            opacity: 1,
-          },
-          "75%": {
-            opacity: 0.75,
           },
         },
       },

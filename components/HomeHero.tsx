@@ -135,25 +135,26 @@ export const HomeHero = () => {
                   color="currentColor"
                   fill="currentColor"
                   style={{ gridArea: "1 / 1" }}
-                  weight="light"
+                  weight={location ? "duotone" : "light"}
                   className={classNames({
-                    "text-black": true,
+                    "text-black": !location,
+                    "text-emerald-600 fill-emerald-600": !!location,
                     "h-6 w-6 sm:h-7 sm:w-7": true,
                   })}
                 />
 
                 <input
                   type="text"
-                  className={classNames({
-                    "w-full": true,
-                    "text-sm sm:text-base": true,
-                    "mt-0 px-0.5 pl-7": true,
-                    "border-0 border-b border-b-black": true,
-                    "focus:ring-0 focus:border-black": true,
-                    "text-black bg-transparent": true,
-                    "placeholder:text-gray-600": true,
-                    peer: true,
-                  })}
+                  className="
+                    w-full
+                    text-sm sm:text-base
+                    mt-0 px-0.5 pl-7 sm:pl-8
+                    border-0 border-b border-b-black
+                    focus:ring-0 focus:border-black
+                    text-black bg-transparent
+                    placeholder:text-gray-600
+                    peer
+                  "
                   ref={addressInputRef}
                   style={{ gridArea: "1 / 1" }}
                   value={address}
@@ -163,7 +164,7 @@ export const HomeHero = () => {
                   placeholder="Enter your address"
                 />
                 <button
-                  className="justify-self-end"
+                  className="justify-self-end rotate-90"
                   style={{ gridArea: "1 / 1" }}
                   onClick={() => {
                     setIsLoadingCurrentPosition(true);
@@ -176,9 +177,8 @@ export const HomeHero = () => {
                     fill="currentColor"
                     weight={shouldQueryLocation ? "fill" : "regular"}
                     className={classNames({
-                      "text-black fill-sky-600": true,
-                      "h-5 w-5 sm:h-6 sm:w-6 rotate-90 transition-transform":
-                        true,
+                      "text-black fill-sky-600 origin-center": true,
+                      "h-5 w-5 sm:h-6 sm:w-6": true,
                       "animate-compass": isLoadingCurrentPosition,
                     })}
                   />
