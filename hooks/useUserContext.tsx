@@ -4,8 +4,6 @@ import {
   SetStateAction,
   createContext,
   useContext,
-  useEffect,
-  useState,
 } from "react";
 
 import { usePersistentState } from "hooks/usePersistentState";
@@ -17,7 +15,7 @@ interface UserContextDefaultValue {
 }
 
 export const UserContext = createContext<UserContextDefaultValue>({
-  setLocation: (_) => {},
+  setLocation: () => undefined,
 });
 
 export const UserContextProvider = ({

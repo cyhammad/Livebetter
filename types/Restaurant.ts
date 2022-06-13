@@ -58,8 +58,6 @@ export interface MenuItem {
   optionalChoices?: Record<string, number>;
 }
 
-interface ApiRestaurantMenuItemChoice {}
-
 export interface ApiMenuItem {
   category: string | null;
   choices: Record<string, number> | null;

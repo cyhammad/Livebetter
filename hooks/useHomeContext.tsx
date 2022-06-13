@@ -27,11 +27,11 @@ export const HomeContext = createContext<HomeContextDefaultValue>({
   offset: 0,
   searchTerm: "",
   selectedCuisines: [],
-  setLimit: (_) => {},
-  setOffset: (_) => {},
-  setSearchTerm: (_) => {},
-  setSelectedCuisines: (_) => {},
-  setShouldQueryLocation: (_) => {},
+  setLimit: () => undefined,
+  setOffset: () => undefined,
+  setSearchTerm: () => undefined,
+  setSelectedCuisines: () => undefined,
+  setShouldQueryLocation: () => undefined,
   shouldQueryLocation: false,
 });
 

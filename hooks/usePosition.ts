@@ -6,15 +6,16 @@ export const usePosition = (shouldQueryLocation: boolean) => {
   const [position, setPosition] = useState<Coordinates | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const onChange: PositionCallback = ({ coords }) => {
+  const successCallback: PositionCallback = ({ coords }) => {
     setPosition({
       latitude: coords.latitude,
       longitude: coords.longitude,
     });
   };
-  const onError: PositionErrorCallback = (error) => {
-    setError(error.message);
-    alert(error.message);
+
+  const errorCallback: PositionErrorCallback = (positionError) => {
+    setError(positionError.message);
+    alert(positionError.message);
   };
 
   useEffect(() => {
@@ -26,10 +27,11 @@ export const usePosition = (shouldQueryLocation: boolean) => {
 
     if (!geo) {
       setError("Geolocation is not supported");
+
       return;
     }
 
-    const watcher = geo.watchPosition(onChange, onError);
+    const watcher = geo.watchPosition(successCallback, errorCallback);
 
     return () => geo.clearWatch(watcher);
   }, [shouldQueryLocation]);
