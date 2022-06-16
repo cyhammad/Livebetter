@@ -194,7 +194,7 @@ export const HomeHero = () => {
               <Link href={"/restaurants"}>
                 <a
                   className={classNames(
-                    "flex items-center gap-2 px-5 py-3 rounded-full bg-green-900 text-white font-semibold transition-opacity",
+                    "flex items-center gap-2 px-5 py-3 rounded-full bg-emerald-600 text-white font-semibold transition-opacity",
                     { "opacity-50": !location, "opacity-100": !!location }
                   )}
                 >
