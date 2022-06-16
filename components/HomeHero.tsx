@@ -134,9 +134,6 @@ export const HomeHero = () => {
               vegan food near you.
             </h2>
             <div className="flex flex-col w-full sm:max-w-none mx-auto sm:mt-0 gap-1 sm:gap-6 sm:items-center">
-              <h3 className="text-xl sm:text-2xl font-semibold sm:font-medium ml-0.5">
-                Where will we be bringing your food?
-              </h3>
               <div className="grid w-full sm:max-w-md items-center">
                 <MapPin
                   size={32}
