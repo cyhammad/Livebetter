@@ -1,7 +1,8 @@
 import classNames from "classnames";
 import Image from "next/image";
+import Link from "next/link";
 import Script from "next/script";
-import { MapPin, NavigationArrow } from "phosphor-react";
+import { ArrowRight, MapPin, NavigationArrow } from "phosphor-react";
 import { useEffect, useRef, useState } from "react";
 
 import { HEADER_HEIGHT } from "components/Header";
@@ -125,10 +126,10 @@ export const HomeHero = () => {
           <section
             className="
               w-full h-full sm:w-[680px] sm:h-auto max-w-full mx-auto
-              flex flex-col justify-evenly sm:gap-2 px-4 sm:p-10 sm:pb-12
+              flex flex-col justify-evenly sm:gap-8 px-4 sm:p-10 sm:pb-12
               bg-white/80 backdrop-blur sm:rounded-lg sm:shadow-xl"
           >
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold sm:mb-8 text-center">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center">
               Find and order
               <br />
               vegan food near you.
@@ -188,6 +189,23 @@ export const HomeHero = () => {
                   />
                 </button>
               </div>
+            </div>
+            <div className="flex justify-center">
+              <Link href={"/restaurants"}>
+                <a
+                  className={classNames(
+                    "flex items-center gap-2 px-5 py-3 rounded-full bg-green-900 text-white font-semibold transition-opacity",
+                    { "opacity-50": !location, "opacity-100": !!location }
+                  )}
+                >
+                  View all restaurants
+                  <ArrowRight
+                    size={20}
+                    color="currentColor"
+                    className="text-white"
+                  />
+                </a>
+              </Link>
             </div>
           </section>
         </div>

@@ -1,13 +1,7 @@
 import classNames from "classnames";
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
-import {
-  CrosshairSimple,
-  MagnifyingGlass,
-  Sliders,
-  Spinner,
-  X,
-} from "phosphor-react";
+import { MagnifyingGlass, Sliders, Spinner } from "phosphor-react";
 import {
   ChangeEvent,
   useDeferredValue,
@@ -21,7 +15,7 @@ import { Header } from "components/Header";
 import { RestaurantList } from "components/RestaurantList";
 import { Toolbar } from "components/Toolbar";
 import { useHomeContext } from "hooks/useHomeContext";
-import { usePosition } from "hooks/usePosition";
+import { useUserContext } from "hooks/useUserContext";
 import { fetchRestaurants } from "lib/client/fetchRestaurants";
 import { getApiRestaurants } from "lib/server/getApiRestaurants";
 import type { Coordinates, FetchApiRestaurantsQueryKey } from "types";
@@ -68,22 +62,15 @@ const Home: NextPage<HomeProps> = () => {
     setLimit,
     setSearchTerm,
     setSelectedCuisines,
-    setShouldQueryLocation,
-    shouldQueryLocation,
   } = useHomeContext();
+  const { location } = useUserContext();
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const deferredSearchTerm = useDeferredValue(searchTerm);
   const [, startTransition] = useTransition();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
-  const {
-    latitude,
-    longitude,
-    error: locationError,
-  } = usePosition(shouldQueryLocation);
+  const { latitude, longitude } = location || {};
   const userPosition: Coordinates | null =
-    latitude && longitude && shouldQueryLocation
-      ? { latitude, longitude }
-      : null;
+    latitude && longitude ? { latitude, longitude } : null;
 
   const queryKey: FetchApiRestaurantsQueryKey = [
     "restaurants",
@@ -121,10 +108,6 @@ const Home: NextPage<HomeProps> = () => {
         )
       );
     }
-  };
-
-  const handleLocationClick = () => {
-    setShouldQueryLocation(!shouldQueryLocation);
   };
 
   return (
@@ -195,46 +178,6 @@ const Home: NextPage<HomeProps> = () => {
                     "text-black h-7 w-7 sm:h-8 sm:w-8": true,
                   })}
                 />
-                <button
-                  aria-pressed={shouldQueryLocation}
-                  aria-label={
-                    latitude && longitude
-                      ? "Sorted by closest"
-                      : "Sort by closest"
-                  }
-                  onClick={handleLocationClick}
-                  className={classNames({
-                    "p-1 rounded-md grid items-center justify-items-center":
-                      true,
-                    "bg-black": shouldQueryLocation,
-                  })}
-                >
-                  <CrosshairSimple
-                    size={32}
-                    color="currentColor"
-                    weight={selectedCuisines.length > 0 ? "fill" : "regular"}
-                    style={{ gridArea: "1 / 1" }}
-                    className={classNames({
-                      "animation-spin":
-                        shouldQueryLocation && !latitude && !longitude,
-                      "text-black": !shouldQueryLocation,
-                      "text-white": shouldQueryLocation,
-                      "h-7 w-7 sm:h-8 sm:w-8": true,
-                    })}
-                  />
-                  {locationError ? (
-                    <X
-                      size={12}
-                      color="currentColor"
-                      weight={"bold"}
-                      style={{ gridArea: "1 / 1" }}
-                      className={classNames({
-                        "text-black": shouldQueryLocation && locationError,
-                        "text-white": !(shouldQueryLocation && locationError),
-                      })}
-                    ></X>
-                  ) : null}
-                </button>
                 <button
                   aria-pressed={isSettingsVisible}
                   aria-label={
