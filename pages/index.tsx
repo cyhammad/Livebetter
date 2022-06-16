@@ -10,6 +10,7 @@ import { RestaurantCard } from "components/RestaurantCard";
 import { Toolbar } from "components/Toolbar";
 import { useHomeContext } from "hooks/useHomeContext";
 import { usePosition } from "hooks/usePosition";
+import { useUserContext } from "hooks/useUserContext";
 import { fetchFeaturedRestaurants } from "lib/client/fetchFeaturedRestaurants";
 import { getSectionKeys } from "lib/getSectionKeys";
 import { getFeaturedApiRestaurants } from "lib/server/getFeaturedApiRestaurants";
@@ -67,17 +68,16 @@ const sectionKeyToHeadingMap: Record<FeaturedSection, string> = {
 };
 
 const Home: NextPage<HomeProps> = () => {
-  const { limit, offset, shouldQueryLocation } = useHomeContext();
+  const { location } = useUserContext();
+  const { limit, offset } = useHomeContext();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
   const {
     latitude,
     longitude,
     // error: locationError,
-  } = usePosition(shouldQueryLocation);
+  } = location || {};
   const userPosition: Coordinates | null =
-    latitude && longitude && shouldQueryLocation
-      ? { latitude, longitude }
-      : null;
+    latitude && longitude ? { latitude, longitude } : null;
 
   const queryKey: FetchFeaturedApiRestaurantsQueryKey = [
     "featured_restaurants",
