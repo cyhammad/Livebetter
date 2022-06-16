@@ -1,3 +1,5 @@
+import type { FeaturedSection } from "types";
+
 export interface Restaurant {
   Address: string;
   Cuisine?: string;
@@ -14,6 +16,7 @@ export interface Restaurant {
   isDeliveryAvailable?: boolean;
   isPickUpAvailable?: boolean;
   Tracking?: number;
+  featured_in?: FeaturedSection[];
 }
 
 export type RestaurantOpenHours = Record<string, string>;

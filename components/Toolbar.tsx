@@ -42,7 +42,7 @@ export const Toolbar = forwardRef<
   return (
     <div
       className={classNames({
-        "flex flex-col gap-4 sticky top-[48px] sm:top-[56px] px-4 py-3 sm:p-6 rounded-none sm:rounded-lg transition-shadow z-40 bg-white":
+        "flex flex-col gap-4 sticky top-[48px] sm:top-[56px] px-4 py-3 sm:p-6 rounded-none sm:rounded-lg transition-shadow z-40 bg-white container mx-auto":
           true,
         "shadow sm:shadow-lg": isShadowVisible || isToolbarPinned,
       })}

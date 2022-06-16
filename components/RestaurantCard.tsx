@@ -13,10 +13,12 @@ import type { ApiRestaurant } from "types";
 interface RestaurantCardProps {
   className?: string;
   restaurant: ApiRestaurant;
+  layout?: "vertical" | "auto";
 }
 
 export const RestaurantCard = ({
   className,
+  layout = "auto",
   restaurant,
 }: RestaurantCardProps) => {
   const isAddressVisible = !!restaurant.Address;
@@ -34,14 +36,26 @@ export const RestaurantCard = ({
       <a
         className={classNames({
           [className ?? ""]: true,
-          "flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-5 justify-items-stretch":
-            true,
+          "flex flex-col gap-1 justify-items-stretch": true,
+          "sm:flex-row sm:items-center sm:gap-5": layout === "auto",
           "opacity-60": ["closed-today", "closed-earlier"].includes(status),
         })}
       >
-        <div className={"flex flex-col gap-2 sm:gap-3 sm:w-52 md:w-80 lg:w-96"}>
+        <div
+          className={classNames("flex flex-col gap-2 sm:gap-3 ", {
+            "sm:w-52 md:w-80 lg:w-96": layout === "auto",
+            "w-80 sm:w-96": layout === "vertical",
+          })}
+        >
           {restaurant.Image && (
-            <div className="w-full h-44 sm:w-52 sm:h-52 md:w-80 md:h-52 lg:w-96 rounded-lg overflow-hidden flex-none flex">
+            <div
+              className={classNames(
+                "w-full h-44 sm:h-52 rounded-lg overflow-hidden flex-none flex",
+                {
+                  "md:w-80 lg:w-96": layout === "auto",
+                }
+              )}
+            >
               <Image
                 className="w-full object-cover"
                 layout="raw"

@@ -1,31 +1,18 @@
 import classNames from "classnames";
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
-import {
-  CrosshairSimple,
-  MagnifyingGlass,
-  Sliders,
-  Spinner,
-  X,
-} from "phosphor-react";
-import {
-  ChangeEvent,
-  useDeferredValue,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
+import { useRef } from "react";
 import { DehydratedState, QueryClient, dehydrate, useQuery } from "react-query";
 
 import { Header } from "components/Header";
 import { HomeHero } from "components/HomeHero";
-import { RestaurantList } from "components/RestaurantList";
+import { RestaurantCard } from "components/RestaurantCard";
 import { Toolbar } from "components/Toolbar";
 import { useHomeContext } from "hooks/useHomeContext";
 import { usePosition } from "hooks/usePosition";
-import { fetchRestaurants } from "lib/client/fetchRestaurants";
-import { getApiRestaurants } from "lib/server/getApiRestaurants";
-import type { Coordinates, FetchApiRestaurantsQueryKey } from "types";
+import { fetchFeaturedRestaurants } from "lib/client/fetchFeaturedRestaurants";
+import { getFeaturedApiRestaurants } from "lib/server/getFeaturedApiRestaurants";
+import type { Coordinates, FetchFeaturedApiRestaurantsQueryKey } from "types";
 
 interface HomeProps {
   dehydratedState: DehydratedState;
@@ -38,17 +25,20 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   const limit = PAGE_SIZE;
   const offset = 0;
 
-  const queryKey: FetchApiRestaurantsQueryKey = [
-    "restaurants",
+  const queryKey: FetchFeaturedApiRestaurantsQueryKey = [
+    "featured_restaurants",
+    ["city_favorites", "late_night"],
     limit,
     offset,
     null,
-    "",
-    [],
   ];
 
   await queryClient.prefetchQuery(queryKey, async () => {
-    return await getApiRestaurants({ limit, offset });
+    return await getFeaturedApiRestaurants({
+      limit,
+      offset,
+      sectionKeys: ["city_favorites", "late_night"],
+    });
   });
 
   return {
@@ -60,21 +50,14 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   };
 };
 
+const sectionKeyToHeadingMap: Record<string, string> = {
+  city_favorites: "City Favorites",
+  late_night: "Late Night",
+  staff_picks: "Staff Picks",
+};
+
 const Home: NextPage<HomeProps> = () => {
-  const {
-    limit,
-    offset,
-    searchTerm,
-    selectedCuisines,
-    setLimit,
-    setSearchTerm,
-    setSelectedCuisines,
-    setShouldQueryLocation,
-    shouldQueryLocation,
-  } = useHomeContext();
-  const [isSettingsVisible, setIsSettingsVisible] = useState(false);
-  const deferredSearchTerm = useDeferredValue(searchTerm);
-  const [, startTransition] = useTransition();
+  const { limit, offset, shouldQueryLocation } = useHomeContext();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
   const {
     latitude,
@@ -86,47 +69,27 @@ const Home: NextPage<HomeProps> = () => {
       ? { latitude, longitude }
       : null;
 
-  const queryKey: FetchApiRestaurantsQueryKey = [
-    "restaurants",
+  const queryKey: FetchFeaturedApiRestaurantsQueryKey = [
+    "featured_restaurants",
+    ["city_favorites", "late_night"],
     limit,
     offset,
     userPosition,
-    deferredSearchTerm,
-    selectedCuisines,
   ];
 
   const { isLoading, data } = useQuery(
     queryKey,
     () =>
-      fetchRestaurants({
+      fetchFeaturedRestaurants({
         limit,
         offset,
-        search: deferredSearchTerm,
+        sectionKeys: ["city_favorites", "late_night"],
         sortByDistanceFrom: userPosition ?? undefined,
-        cuisines: selectedCuisines,
       }),
     {
       keepPreviousData: true,
     }
   );
-
-  const handleCuisineChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
-
-    if (checked) {
-      startTransition(() => setSelectedCuisines([...selectedCuisines, value]));
-    } else {
-      startTransition(() =>
-        setSelectedCuisines(
-          selectedCuisines.filter((cuisine) => cuisine !== value)
-        )
-      );
-    }
-  };
-
-  const handleLocationClick = () => {
-    setShouldQueryLocation(!shouldQueryLocation);
-  };
 
   return (
     <>
@@ -137,170 +100,81 @@ const Home: NextPage<HomeProps> = () => {
       <main className="flex flex-col mb-6">
         <Header />
         <HomeHero />
-        <section className="flex flex-col gap-0 container mx-auto">
-          <Toolbar
-            isShadowVisible={isSettingsVisible}
-            scrollAreaTopRef={restaurantListTopRef}
+        <Toolbar scrollAreaTopRef={restaurantListTopRef}>
+          <div
+            className={classNames({
+              "grid grid-cols-3 grid-rows-1 gap-x-4": true,
+            })}
+            style={{ gridTemplateColumns: "auto 1fr 1fr" }}
           >
-            <div
-              className={classNames({
-                "grid grid-cols-3 sm:grid-rows-1 gap-x-4": true,
-                "grid-rows-1": !isSettingsVisible,
-                "grid-rows-2": isSettingsVisible,
-              })}
-              style={{ gridTemplateColumns: "auto 1fr 1fr" }}
-            >
-              <h2 className="text-2xl sm:text-4xl font-bold">Restaurants</h2>
-              <div
-                className={classNames({
-                  "sm:grid row-start-2 sm:row-start-1 sm:col-start-2 col-span-3 sm:col-span-1 items-center":
-                    true,
-                  grid: isSettingsVisible,
-                  hidden: !isSettingsVisible,
-                })}
-              >
-                <input
-                  type="search"
-                  className={classNames({
-                    "w-full": true,
-                    "text-sm sm:text-base": true,
-                    "mt-0 px-0.5 mx-0.5 pl-6": true,
-                    "border-0 border-b border-slate-400": true,
-                    "focus:ring-0 focus:border-black": true,
-                    "text-black": true,
-                    "placeholder:text-slate-300": true,
-                    peer: true,
-                  })}
-                  style={{ gridArea: "1 / 1" }}
-                  value={searchTerm}
-                  onChange={(event) => {
-                    setSearchTerm(event.target.value);
-                  }}
-                  placeholder="Search..."
-                />
-                <MagnifyingGlass
-                  color="currentColor"
-                  className="h-5 w-5 text-slate-400 peer-focus:text-black"
-                  size={20}
-                  style={{ gridArea: "1 / 1" }}
-                  weight="bold"
-                />
-              </div>
-              <div className="flex gap-2 items-center ml-auto col-start-3">
-                <Spinner
-                  size={32}
-                  color="currentColor"
-                  weight={selectedCuisines.length > 0 ? "fill" : "regular"}
-                  className={classNames({
-                    "animate-spin": isLoading,
-                    hidden: !isLoading,
-                    "text-black h-7 w-7 sm:h-8 sm:w-8": true,
-                  })}
-                />
-                <button
-                  aria-pressed={shouldQueryLocation}
-                  aria-label={
-                    latitude && longitude
-                      ? "Sorted by closest"
-                      : "Sort by closest"
-                  }
-                  onClick={handleLocationClick}
-                  className={classNames({
-                    "p-1 rounded-md grid items-center justify-items-center":
-                      true,
-                    "bg-black": shouldQueryLocation,
-                  })}
-                >
-                  <CrosshairSimple
-                    size={32}
-                    color="currentColor"
-                    weight={selectedCuisines.length > 0 ? "fill" : "regular"}
-                    style={{ gridArea: "1 / 1" }}
-                    className={classNames({
-                      "animation-spin":
-                        shouldQueryLocation && !latitude && !longitude,
-                      "text-black": !shouldQueryLocation,
-                      "text-white": shouldQueryLocation,
-                      "h-7 w-7 sm:h-8 sm:w-8": true,
-                    })}
-                  />
-                  {locationError ? (
-                    <X
-                      size={12}
-                      color="currentColor"
-                      weight={"bold"}
-                      style={{ gridArea: "1 / 1" }}
-                      className={classNames({
-                        "text-black": shouldQueryLocation && locationError,
-                        "text-white": !(shouldQueryLocation && locationError),
-                      })}
-                    ></X>
-                  ) : null}
-                </button>
-                <button
-                  aria-pressed={isSettingsVisible}
-                  aria-label={
-                    isSettingsVisible ? "Hide settings" : "Show settings"
-                  }
-                  onClick={() => setIsSettingsVisible(!isSettingsVisible)}
-                  className={classNames({
-                    "p-1 rounded-md": true,
-                    "bg-black": isSettingsVisible,
-                  })}
-                >
-                  <Sliders
-                    size={32}
-                    color="currentColor"
-                    weight={selectedCuisines.length > 0 ? "fill" : "regular"}
-                    className={classNames({
-                      "text-black": !isSettingsVisible,
-                      "text-white": isSettingsVisible,
-                      "h-7 w-7 sm:h-8 sm:w-8": true,
-                    })}
-                  />
-                </button>
-              </div>
-            </div>
-            <div
-              className={classNames({
-                hidden: !isSettingsVisible,
-                "max-h-64 overflow-auto border-t border-b border-solid border-slate-100":
-                  true,
-              })}
-            >
-              <form className="flex flex-col gap-2 capitalize py-2">
-                {data?.cuisines.map((cuisineLabel) => {
-                  return (
-                    <label
-                      className="flex gap-2 items-center"
-                      key={cuisineLabel}
-                    >
-                      <input
-                        type="checkbox"
-                        className="text-black"
-                        onChange={handleCuisineChange}
-                        value={cuisineLabel}
-                        checked={selectedCuisines.includes(cuisineLabel)}
-                      />
-                      {cuisineLabel}
-                    </label>
-                  );
-                })}
-              </form>
-            </div>
-          </Toolbar>
-          <div ref={restaurantListTopRef}></div>
-          <RestaurantList
-            onUserIsApproachingBottomOfList={() => {
-              const nextOffset = data?.restaurants.length ?? 0;
-              const nextLimit = nextOffset + PAGE_SIZE;
-
-              // setOffset(nextOffset);
-              setLimit(nextLimit);
-            }}
-            restaurants={data?.restaurants ?? []}
-          />
-        </section>
+            <h2 className="text-2xl sm:text-4xl font-bold">
+              Browse Restaurants
+            </h2>
+          </div>
+        </Toolbar>
+        <div ref={restaurantListTopRef}></div>
+        <div className="flex flex-col col-span-2 gap-8 h-full w-full">
+          {Object.entries(data?.sections ?? {}).map(
+            ([sectionKey, restaurants]) => {
+              return (
+                <section className="flex flex-col gap-2" key={sectionKey}>
+                  <h3 className="text-xl sm:text-2xl font-bold container mx-auto ">
+                    <div className="px-4 sm:px-6">
+                      {sectionKeyToHeadingMap[sectionKey]}
+                    </div>
+                  </h3>
+                  <ul
+                    className="flex overflow-auto gap-4 sm:gap-8 pl-4 sm:pl-0
+                    snap-x snap-mandatory scroll-ml-4 scroll-pl-4
+                    sm:scroll-pl-[calc(((100vw-640px)/2)+1.5rem)]
+                    sm:scroll-ml-[calc(((100vw-640px)/2)+1.5rem)]
+                    md:scroll-pl-[calc(((100vw-768px)/2)+1.5rem)]
+                    md:scroll-ml-[calc(((100vw-768px)/2)+1.5rem)]
+                    lg:scroll-pl-[calc(((100vw-1024px)/2)+1.5rem)]
+                    lg:scroll-ml-[calc(((100vw-1024px)/2)+1.5rem)]
+                    xl:scroll-pl-[calc(((100vw-1280px)/2)+1.5rem)]
+                    xl:scroll-ml-[calc(((100vw-1280px)/2)+1.5rem)]
+                    2xl:scroll-pl-[calc(((100vw-1536px)/2)+1.5rem)]
+                    2xl:scroll-ml-[calc(((100vw-1536px)/2)+1.5rem)]
+                  "
+                  >
+                    {restaurants.map((restaurant, index) => (
+                      <li
+                        className={classNames(
+                          "flex flex-col flex-none gap-5 snap-start",
+                          index === 0
+                            ? [
+                                "sm:pl-[calc(((100vw-640px)/2)+1.5rem)]",
+                                "md:pl-[calc(((100vw-768px)/2)+1.5rem)]",
+                                "lg:pl-[calc(((100vw-1024px)/2)+1.5rem)]",
+                                "xl:pl-[calc(((100vw-1280px)/2)+1.5rem)]",
+                                "2xl:pl-[calc(((100vw-1536px)/2)+1.5rem)]",
+                              ]
+                            : index === restaurants.length - 1
+                            ? [
+                                "pr-4",
+                                "sm:pr-[calc(((100vw-640px)/2)+1.5rem)]",
+                                "md:pr-[calc(((100vw-768px)/2)+1.5rem)]",
+                                "lg:pr-[calc(((100vw-1024px)/2)+1.5rem)]",
+                                "xl:pr-[calc(((100vw-1280px)/2)+1.5rem)]",
+                                "2xl:pr-[calc(((100vw-1536px)/2)+1.5rem)]",
+                              ]
+                            : []
+                        )}
+                        key={`${restaurant.Restaurant}${index}`}
+                      >
+                        <RestaurantCard
+                          layout="vertical"
+                          restaurant={restaurant}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              );
+            }
+          )}
+        </div>
       </main>
     </>
   );
