@@ -1,4 +1,11 @@
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  DocumentData,
+  QueryDocumentSnapshot,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import haversineDistance from "haversine-distance";
 
 import { db } from "lib/server/db";
@@ -15,23 +22,11 @@ const METERS_TO_MILES_DIVISOR = 1609.344;
 export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
   options
 ) => {
-  const {
-    limit,
-    offset = 0,
-    sectionKeys = [],
-    sortByDistanceFrom,
-  } = options || {};
-
-  const restaurantDocs = await getDocs(
-    query(
-      collection(db, "Restaurants Philadelphia"),
-      where("featured_in", "array-contains-any", sectionKeys)
-    )
-  );
-
+  let { sectionKeys = [] } = options || {};
+  const { limit, offset = 0, sortByDistanceFrom } = options || {};
   let apiRestaurants: ApiRestaurant[] = [];
 
-  restaurantDocs.docs.forEach((doc) => {
+  function addApiRestaurant(doc: QueryDocumentSnapshot<DocumentData>) {
     const restaurant = doc.data() as Restaurant;
     const apiRestaurant: ApiRestaurant = { ...restaurant };
 
@@ -46,7 +41,29 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
     }
 
     apiRestaurants.push(apiRestaurant);
-  });
+  }
+
+  if (sectionKeys.includes("tracking")) {
+    sectionKeys = sectionKeys.filter((sectionKey) => sectionKey !== "tracking");
+
+    const trackingRestaurantDocs = await getDocs(
+      query(
+        collection(db, "Restaurants Philadelphia"),
+        where("Tracking", ">=", 0)
+      )
+    );
+
+    trackingRestaurantDocs.docs.forEach(addApiRestaurant);
+  }
+
+  const featuredRestaurantDocs = await getDocs(
+    query(
+      collection(db, "Restaurants Philadelphia"),
+      where("featured_in", "array-contains-any", sectionKeys)
+    )
+  );
+
+  featuredRestaurantDocs.docs.forEach(addApiRestaurant);
 
   apiRestaurants = apiRestaurants.sort(sortApiRestaurants);
 
@@ -63,6 +80,12 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
 
         acc[sectionKey].push(curr);
       }
+    } else if (curr.Tracking) {
+      if (!acc["tracking"]) {
+        acc["tracking"] = [];
+      }
+
+      acc["tracking"].push(curr);
     }
 
     return acc;

@@ -73,7 +73,7 @@ const Home: NextPage<HomeProps> = () => {
   } = useHomeContext();
   const [isSettingsVisible, setIsSettingsVisible] = useState(false);
   const deferredSearchTerm = useDeferredValue(searchTerm);
-  const [_isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
   const {
     latitude,
@@ -94,7 +94,7 @@ const Home: NextPage<HomeProps> = () => {
     selectedCuisines,
   ];
 
-  const { isLoading, error, data } = useQuery(
+  const { isLoading, data } = useQuery(
     queryKey,
     () =>
       fetchRestaurants({

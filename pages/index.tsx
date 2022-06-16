@@ -11,8 +11,13 @@ import { Toolbar } from "components/Toolbar";
 import { useHomeContext } from "hooks/useHomeContext";
 import { usePosition } from "hooks/usePosition";
 import { fetchFeaturedRestaurants } from "lib/client/fetchFeaturedRestaurants";
+import { getSectionKeys } from "lib/getSectionKeys";
 import { getFeaturedApiRestaurants } from "lib/server/getFeaturedApiRestaurants";
-import type { Coordinates, FetchFeaturedApiRestaurantsQueryKey } from "types";
+import type {
+  Coordinates,
+  FeaturedSection,
+  FetchFeaturedApiRestaurantsQueryKey,
+} from "types";
 
 interface HomeProps {
   dehydratedState: DehydratedState;
@@ -27,7 +32,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
 
   const queryKey: FetchFeaturedApiRestaurantsQueryKey = [
     "featured_restaurants",
-    ["city_favorites", "late_night"],
+    getSectionKeys(),
     limit,
     offset,
     null,
@@ -37,7 +42,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
     return await getFeaturedApiRestaurants({
       limit,
       offset,
-      sectionKeys: ["city_favorites", "late_night"],
+      sectionKeys: getSectionKeys(),
     });
   });
 
@@ -50,10 +55,15 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   };
 };
 
-const sectionKeyToHeadingMap: Record<string, string> = {
+const sectionKeyToHeadingMap: Record<FeaturedSection, string> = {
+  breakfast: "Breakfast",
+  brunch: "Brunch",
   city_favorites: "City Favorites",
+  dinner: "Dinner",
   late_night: "Late Night",
+  lunch: "Lunch",
   staff_picks: "Staff Picks",
+  tracking: "Get Food Delivered",
 };
 
 const Home: NextPage<HomeProps> = () => {
@@ -62,7 +72,7 @@ const Home: NextPage<HomeProps> = () => {
   const {
     latitude,
     longitude,
-    error: locationError,
+    // error: locationError,
   } = usePosition(shouldQueryLocation);
   const userPosition: Coordinates | null =
     latitude && longitude && shouldQueryLocation
@@ -71,19 +81,19 @@ const Home: NextPage<HomeProps> = () => {
 
   const queryKey: FetchFeaturedApiRestaurantsQueryKey = [
     "featured_restaurants",
-    ["city_favorites", "late_night"],
+    getSectionKeys(),
     limit,
     offset,
     userPosition,
   ];
 
-  const { isLoading, data } = useQuery(
+  const { data } = useQuery(
     queryKey,
     () =>
       fetchFeaturedRestaurants({
         limit,
         offset,
-        sectionKeys: ["city_favorites", "late_night"],
+        sectionKeys: getSectionKeys(),
         sortByDistanceFrom: userPosition ?? undefined,
       }),
     {
@@ -120,7 +130,7 @@ const Home: NextPage<HomeProps> = () => {
                 <section className="flex flex-col gap-2" key={sectionKey}>
                   <h3 className="text-xl sm:text-2xl font-bold container mx-auto ">
                     <div className="px-4 sm:px-6">
-                      {sectionKeyToHeadingMap[sectionKey]}
+                      {sectionKeyToHeadingMap[sectionKey as FeaturedSection]}
                     </div>
                   </h3>
                   <ul

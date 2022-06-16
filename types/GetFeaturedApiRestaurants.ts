@@ -1,6 +1,14 @@
 import { ApiRestaurant, Coordinates } from "types";
 
-export type FeaturedSection = "city_favorites" | "staff_picks" | "late_night";
+export type FeaturedSection =
+  | "breakfast"
+  | "brunch"
+  | "city_favorites"
+  | "dinner"
+  | "late_night"
+  | "lunch"
+  | "staff_picks"
+  | "tracking";
 
 interface GetFeaturedApiRestaurantsOptions {
   limit?: number;
