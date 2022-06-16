@@ -1,4 +1,5 @@
 import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
+import addDays from "date-fns/addDays";
 import isAfter from "date-fns/isAfter";
 import isBefore from "date-fns/isBefore";
 import setHours from "date-fns/setHours";
@@ -64,13 +65,17 @@ export const openAndCloseDates = (
     openTimeMinutes
   );
 
-  const closeDate = setMinutes(
+  let closeDate = setMinutes(
     setHours(
       utcToZonedTime(new Date(targetDate), "America/New_York"),
       closeTimeHours
     ),
     closeTimeMinutes
   );
+
+  if (closeDate < openDate) {
+    closeDate = addDays(closeDate, 1);
+  }
 
   return [openDate, closeDate];
 };

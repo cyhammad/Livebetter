@@ -62,9 +62,29 @@ describe("asdf", () => {
       Website: "https://www.missrachelspantry.com",
     };
 
-    expect(isOpen(restaurant, new Date("2022-05-22T02:34:11.500Z"))).toBe(
+    expect(isOpen(restaurant, new Date("2022-05-21T02:34:11.500Z"))).toBe(
       false
     );
+  });
+
+  it("should return true if the restaurant is open today, and closes after midnight", () => {
+    const restaurant = {
+      MapPin: "martini_",
+      OpenHours: '{"6": "10:00/01:00", "7": "10:00/01:00"}',
+      Address: "1938 S Chadwick St Philadelphia PA 19145",
+      Image:
+        "https://firebasestorage.googleapis.com/v0/b/new-practice-6441a.appspot.com/o/stock_Restaurant_Photos%2FItalian.jpg?alt=media&token=0c938d5f-eae6-4ac4-ad11-7dc00839b36d",
+      Phone: "215-798-0053",
+      Latitude: "39.926531",
+      Restaurant: "MISS RACHEL'S PANTRY",
+      Items: "Upsacle, Date Night",
+      Longitude: "-75.173765",
+      Cuisine: "All Vegan, Caterer, Fine Dining",
+      OpenDays: "6,7",
+      Website: "https://www.missrachelspantry.com",
+    };
+
+    expect(isOpen(restaurant, new Date("2022-05-21T16:34:11.500Z"))).toBe(true);
   });
 });
 
