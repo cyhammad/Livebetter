@@ -20,6 +20,9 @@ export const HomeHero = () => {
   } = useCurrentPosition(shouldQueryLocation);
   const { location, setLocation } = useUserContext();
   const [address, setAddress] = useState("");
+  const [placesStatus, setPlacesStatus] = useState<
+    "loading" | "success" | "failure"
+  >("loading");
   const addressInputRef = useRef<HTMLInputElement | null>(null);
   const prevLatitudeRef = useRef<number>();
   const prevLongitudeRef = useRef<number>();
@@ -73,7 +76,7 @@ export const HomeHero = () => {
     <>
       <Script
         onError={() => {
-          // TODO: Report to Sentry
+          setPlacesStatus("failure");
         }}
         onLoad={() => {
           if (addressInputRef.current) {
@@ -81,6 +84,7 @@ export const HomeHero = () => {
               addressInputRef.current,
               {
                 componentRestrictions: { country: ["us"] },
+                fields: ["formatted_address", "geometry.location"],
               }
             );
 
@@ -98,6 +102,10 @@ export const HomeHero = () => {
               });
               setShouldQueryLocation(false);
             });
+
+            setPlacesStatus("success");
+          } else {
+            setPlacesStatus("failure");
           }
         }}
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDns9eCy_4Zge-qYP3Ycnp7qtLw_QsPNIE&libraries=places"
@@ -141,11 +149,15 @@ export const HomeHero = () => {
                   color="currentColor"
                   fill="currentColor"
                   style={{ gridArea: "1 / 1" }}
-                  weight={location ? "duotone" : "light"}
+                  weight="duotone"
                   className={classNames({
-                    "text-black": !location,
-                    "text-emerald-600 fill-emerald-600": !!location,
+                    "text-gray-600 fill-gray-600":
+                      !location && placesStatus !== "failure",
+                    "text-emerald-600 fill-emerald-600":
+                      placesStatus !== "failure" && !!location,
+                    "text-amber-600 fill-amber-600": placesStatus === "failure",
                     "h-6 w-6 sm:h-7 sm:w-7": true,
+                    "animate-pulse": placesStatus === "loading",
                   })}
                 />
 
