@@ -37,10 +37,6 @@ export const sortApiRestaurants = (
 
   // Both restaurants have identical opening hours statuses after this point.
 
-  if (a.distance && b.distance) {
-    return a.distance - b.distance;
-  }
-
   // Restaurants with a Tracking property should be sorted above those
   // without one. If both have a Tracking property, the restaurant with
   // the higher number appears first
@@ -72,6 +68,10 @@ export const sortApiRestaurants = (
     if (a.distance && b.distance) {
       return a.distance - b.distance;
     }
+  }
+
+  if (a.distance && b.distance) {
+    return a.distance - b.distance;
   }
 
   return 0;
