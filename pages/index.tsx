@@ -8,7 +8,6 @@ import { Header } from "components/Header";
 import { HomeHero } from "components/HomeHero";
 import { RestaurantCard } from "components/RestaurantCard";
 import { Toolbar } from "components/Toolbar";
-import { useHomeContext } from "hooks/useHomeContext";
 import { useUserContext } from "hooks/useUserContext";
 import { fetchFeaturedRestaurants } from "lib/client/fetchFeaturedRestaurants";
 import { getSectionKeys } from "lib/getSectionKeys";
@@ -23,25 +22,17 @@ interface HomeProps {
   dehydratedState: DehydratedState;
 }
 
-const PAGE_SIZE = 20;
-
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   const queryClient = new QueryClient();
-  const limit = PAGE_SIZE;
-  const offset = 0;
 
   const queryKey: FetchFeaturedApiRestaurantsQueryKey = [
     "featured_restaurants",
     getSectionKeys(),
-    limit,
-    offset,
     null,
   ];
 
   await queryClient.prefetchQuery(queryKey, async () => {
     return await getFeaturedApiRestaurants({
-      limit,
-      offset,
       sectionKeys: getSectionKeys(),
     });
   });
@@ -68,7 +59,6 @@ const sectionKeyToHeadingMap: Record<FeaturedSection, string> = {
 
 const Home: NextPage<HomeProps> = () => {
   const { location } = useUserContext();
-  const { limit, offset } = useHomeContext();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
   const {
     latitude,
@@ -81,8 +71,6 @@ const Home: NextPage<HomeProps> = () => {
   const queryKey: FetchFeaturedApiRestaurantsQueryKey = [
     "featured_restaurants",
     getSectionKeys(),
-    limit,
-    offset,
     userPosition,
   ];
 
@@ -90,8 +78,6 @@ const Home: NextPage<HomeProps> = () => {
     queryKey,
     () =>
       fetchFeaturedRestaurants({
-        limit,
-        offset,
         sectionKeys: getSectionKeys(),
         sortByDistanceFrom: userPosition ?? undefined,
       }),

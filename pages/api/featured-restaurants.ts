@@ -7,14 +7,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<GetFeaturedApiRestaurantsResult>
 ) {
-  const limit =
-    typeof req.query.limit === "string" && !isNaN(parseInt(req.query.limit))
-      ? parseInt(req.query.limit)
-      : undefined;
-  const offset =
-    typeof req.query.offset === "string" && !isNaN(parseInt(req.query.offset))
-      ? parseInt(req.query.offset)
-      : undefined;
   const latitude =
     typeof req.query.latitude === "string" &&
     !isNaN(parseFloat(req.query.latitude))
@@ -33,8 +25,6 @@ export default async function handler(
   ) as FeaturedSection[];
 
   const result = await getFeaturedApiRestaurants({
-    limit,
-    offset,
     sectionKeys,
     sortByDistanceFrom:
       latitude && longitude ? { latitude, longitude } : undefined,

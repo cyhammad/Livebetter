@@ -4,20 +4,12 @@ import type { GetFeaturedApiRestaurants } from "types";
 export const fetchFeaturedRestaurants: GetFeaturedApiRestaurants = async (
   options
 ) => {
-  const {
-    sectionKeys,
-    limit = 20,
-    offset = 0,
-    sortByDistanceFrom,
-  } = options || {};
+  const { sectionKeys, sortByDistanceFrom } = options || {};
 
   const restaurantsUrl = new URL(
     "/api/featured-restaurants",
     process.env.NEXT_PUBLIC_BASE_URL
   );
-
-  restaurantsUrl.searchParams.set("limit", `${limit}`);
-  restaurantsUrl.searchParams.set("offset", `${offset}`);
 
   if (sortByDistanceFrom) {
     const { latitude, longitude } = sortByDistanceFrom;
