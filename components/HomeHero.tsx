@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import { ArrowRight, MapPin, NavigationArrow } from "phosphor-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { HEADER_HEIGHT } from "components/Header";
 import { useCurrentPosition } from "hooks/useCurrentPosition";
@@ -11,7 +11,12 @@ import { useHomeContext } from "hooks/useHomeContext";
 import { useUserContext } from "hooks/useUserContext";
 
 export const HomeHero = () => {
-  const { setShouldQueryLocation, shouldQueryLocation } = useHomeContext();
+  const {
+    mapsApiStatus,
+    setMapsApiStatus,
+    setShouldQueryLocation,
+    shouldQueryLocation,
+  } = useHomeContext();
   const {
     latitude,
     longitude,
@@ -20,12 +25,49 @@ export const HomeHero = () => {
   } = useCurrentPosition(shouldQueryLocation);
   const { location, setLocation } = useUserContext();
   const [address, setAddress] = useState("");
-  const [placesStatus, setPlacesStatus] = useState<
-    "loading" | "success" | "failure"
-  >("loading");
   const addressInputRef = useRef<HTMLInputElement | null>(null);
   const prevLatitudeRef = useRef<number>();
   const prevLongitudeRef = useRef<number>();
+
+  const initPlacesAutocomplete = useCallback(() => {
+    if (addressInputRef.current) {
+      const autoComplete = new window.google.maps.places.Autocomplete(
+        addressInputRef.current,
+        {
+          componentRestrictions: { country: ["us"] },
+          fields: ["formatted_address", "geometry.location"],
+        }
+      );
+
+      autoComplete.addListener("place_changed", () => {
+        const { formatted_address, geometry } = autoComplete.getPlace();
+
+        if (!formatted_address || !geometry?.location) {
+          return;
+        }
+
+        setLocation({
+          address: formatted_address,
+          latitude: geometry.location.lat(),
+          longitude: geometry.location.lng(),
+        });
+        setShouldQueryLocation(false);
+      });
+
+      setMapsApiStatus("success");
+    } else {
+      setMapsApiStatus("failure");
+    }
+  }, [setLocation, setMapsApiStatus, setShouldQueryLocation]);
+
+  useEffect(() => {
+    if (mapsApiStatus !== "loading") {
+      initPlacesAutocomplete();
+    }
+    // We don't want to run this function when mapsApiStatus changes. Only on
+    // mount or when the init function changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initPlacesAutocomplete]);
 
   useEffect(() => {
     if (currentPositionError) {
@@ -76,37 +118,10 @@ export const HomeHero = () => {
     <>
       <Script
         onError={() => {
-          setPlacesStatus("failure");
+          setMapsApiStatus("failure");
         }}
         onLoad={() => {
-          if (addressInputRef.current) {
-            const autoComplete = new window.google.maps.places.Autocomplete(
-              addressInputRef.current,
-              {
-                componentRestrictions: { country: ["us"] },
-                fields: ["formatted_address", "geometry.location"],
-              }
-            );
-
-            autoComplete.addListener("place_changed", () => {
-              const { formatted_address, geometry } = autoComplete.getPlace();
-
-              if (!formatted_address || !geometry?.location) {
-                return;
-              }
-
-              setLocation({
-                address: formatted_address,
-                latitude: geometry.location.lat(),
-                longitude: geometry.location.lng(),
-              });
-              setShouldQueryLocation(false);
-            });
-
-            setPlacesStatus("success");
-          } else {
-            setPlacesStatus("failure");
-          }
+          initPlacesAutocomplete();
         }}
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDns9eCy_4Zge-qYP3Ycnp7qtLw_QsPNIE&libraries=places"
       />
@@ -152,12 +167,13 @@ export const HomeHero = () => {
                   weight="duotone"
                   className={classNames({
                     "text-gray-600 fill-gray-600":
-                      !location && placesStatus !== "failure",
+                      !location && mapsApiStatus !== "failure",
                     "text-emerald-600 fill-emerald-600":
-                      placesStatus !== "failure" && !!location,
-                    "text-amber-600 fill-amber-600": placesStatus === "failure",
+                      mapsApiStatus !== "failure" && !!location,
+                    "text-amber-600 fill-amber-600":
+                      mapsApiStatus === "failure",
                     "h-6 w-6 sm:h-7 sm:w-7": true,
-                    "animate-pulse": placesStatus === "loading",
+                    "animate-pulse": mapsApiStatus === "loading",
                   })}
                 />
 
@@ -166,7 +182,7 @@ export const HomeHero = () => {
                   className="
                     w-full
                     text-sm sm:text-base
-                    mt-0 px-0.5 pl-7 sm:pl-8
+                    mt-0 px-7 sm:px-8
                     border-0 border-b border-b-black
                     focus:ring-0 focus:border-black
                     text-black bg-transparent
