@@ -22,7 +22,7 @@ export const RestaurantPickAndDelivery = ({
             size={20}
             color="currentColor"
           />
-          <p className=" flex items-center gap-2">
+          <p className="flex items-center gap-2">
             {restaurant.distance
               ? restaurant.distance <= 3
                 ? "Delivery"

@@ -38,6 +38,7 @@ export const RestaurantCard = ({
           [className ?? ""]: true,
           "flex flex-col gap-1 justify-items-stretch": true,
           "sm:flex-row sm:items-center sm:gap-5": layout === "auto",
+          "w-80 sm:w-96": layout === "vertical",
           "opacity-60": ["closed-today", "closed-earlier"].includes(status),
         })}
       >
@@ -71,6 +72,13 @@ export const RestaurantCard = ({
           <div className="flex flex-col gap-1 sm:gap-2">
             <h3 className="text-xl font-bold sm:text-2xl -mb-0.5 sm:mb-0">
               {restaurant.Restaurant}
+              {process.env.NODE_ENV === "development" ? (
+                <small>
+                  <sup>
+                    {restaurant.Tracking ? `(${restaurant.Tracking})` : null}
+                  </sup>
+                </small>
+              ) : null}
             </h3>
             <RestaurantOpeningHours restaurant={restaurant} />
             <RestaurantPickAndDelivery restaurant={restaurant} />
@@ -81,7 +89,7 @@ export const RestaurantCard = ({
                   size={20}
                   color="currentColor"
                 />
-                <p className="text-sm sm:text-base flex items-center gap-2">
+                <p className="text-sm sm:text-base flex items-center gap-2 line-clamp-1">
                   {isDistanceVisible ? `${restaurant.distance} mi` : null}
                   {isDistanceVisible && isAddressVisible ? " ∙ " : null}
                   {isAddressVisible ? restaurant.Address : null}
