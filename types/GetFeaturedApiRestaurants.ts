@@ -11,8 +11,6 @@ export type FeaturedSection =
   | "tracking";
 
 interface GetFeaturedApiRestaurantsOptions {
-  limit?: number;
-  offset?: number;
   sectionKeys: FeaturedSection[];
   sortByDistanceFrom?: Coordinates;
 }
@@ -28,7 +26,5 @@ export type GetFeaturedApiRestaurants = (
 export type FetchFeaturedApiRestaurantsQueryKey = [
   "featured_restaurants",
   FeaturedSection[],
-  number,
-  number,
   Coordinates | null
 ];

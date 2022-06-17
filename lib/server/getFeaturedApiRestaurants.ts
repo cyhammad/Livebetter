@@ -23,8 +23,8 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
   options
 ) => {
   let { sectionKeys = [] } = options || {};
-  const { limit, offset = 0, sortByDistanceFrom } = options || {};
-  let apiRestaurants: ApiRestaurant[] = [];
+  const { sortByDistanceFrom } = options || {};
+  const apiRestaurantsMap = new Map<string, ApiRestaurant>();
 
   function addApiRestaurant(doc: QueryDocumentSnapshot<DocumentData>) {
     const restaurant = doc.data() as Restaurant;
@@ -40,7 +40,7 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
       apiRestaurant.distance = Math.floor(distanceInMiles * 100) / 100;
     }
 
-    apiRestaurants.push(apiRestaurant);
+    apiRestaurantsMap.set(doc.id, apiRestaurant);
   }
 
   if (sectionKeys.includes("tracking")) {
@@ -49,7 +49,7 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
     const trackingRestaurantDocs = await getDocs(
       query(
         collection(db, "Restaurants Philadelphia"),
-        where("Tracking", ">=", 0)
+        where("isDeliveryAvailable", "==", true)
       )
     );
 
@@ -65,31 +65,29 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
 
   featuredRestaurantDocs.docs.forEach(addApiRestaurant);
 
-  apiRestaurants = apiRestaurants.sort(sortApiRestaurants);
+  const sections = [...apiRestaurantsMap.values()]
+    .sort(sortApiRestaurants)
+    .reduce((acc, curr) => {
+      if (curr.featured_in) {
+        for (const sectionKey of curr.featured_in) {
+          if (!acc[sectionKey]) {
+            acc[sectionKey] = [];
+          }
 
-  if (limit) {
-    apiRestaurants = apiRestaurants.slice(offset, limit + offset);
-  }
+          acc[sectionKey].push(curr);
+        }
+      }
 
-  const sections = apiRestaurants.reduce((acc, curr) => {
-    if (curr.featured_in) {
-      for (const sectionKey of curr.featured_in) {
-        if (!acc[sectionKey]) {
-          acc[sectionKey] = [];
+      if (curr.isDeliveryAvailable) {
+        if (!acc["tracking"]) {
+          acc["tracking"] = [];
         }
 
-        acc[sectionKey].push(curr);
-      }
-    } else if (curr.Tracking) {
-      if (!acc["tracking"]) {
-        acc["tracking"] = [];
+        acc["tracking"].push(curr);
       }
 
-      acc["tracking"].push(curr);
-    }
-
-    return acc;
-  }, {} as Record<FeaturedSection, ApiRestaurant[]>);
+      return acc;
+    }, {} as Record<FeaturedSection, ApiRestaurant[]>);
 
   return {
     sections,

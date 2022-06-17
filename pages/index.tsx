@@ -9,7 +9,6 @@ import { HomeHero } from "components/HomeHero";
 import { RestaurantCard } from "components/RestaurantCard";
 import { Toolbar } from "components/Toolbar";
 import { useHomeContext } from "hooks/useHomeContext";
-import { usePosition } from "hooks/usePosition";
 import { useUserContext } from "hooks/useUserContext";
 import { fetchFeaturedRestaurants } from "lib/client/fetchFeaturedRestaurants";
 import { getSectionKeys } from "lib/getSectionKeys";
