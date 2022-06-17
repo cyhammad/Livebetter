@@ -108,7 +108,7 @@ const Home: NextPage<HomeProps> = () => {
           </div>
         </Toolbar>
         <div ref={restaurantListTopRef}></div>
-        <div className="flex flex-col col-span-2 gap-8 h-full w-full">
+        <div className="flex flex-col col-span-2 h-full w-full">
           {getSectionKeys().map((sectionKey) => {
             const restaurants = data?.sections[sectionKey];
 
@@ -124,18 +124,18 @@ const Home: NextPage<HomeProps> = () => {
                   </div>
                 </h3>
                 <ul
-                  className="flex overflow-auto gap-4 sm:gap-8 pl-4 sm:pl-0
+                  className="flex overflow-auto gap-4 sm:gap-8 pl-4 sm:pl-0 pb-4 mb-4
                   snap-x snap-mandatory scroll-ml-4 scroll-pl-4
-                  sm:scroll-pl-[calc(((100vw-640px)/2)+1.5rem)]
-                  sm:scroll-ml-[calc(((100vw-640px)/2)+1.5rem)]
-                  md:scroll-pl-[calc(((100vw-768px)/2)+1.5rem)]
-                  md:scroll-ml-[calc(((100vw-768px)/2)+1.5rem)]
-                  lg:scroll-pl-[calc(((100vw-1024px)/2)+1.5rem)]
-                  lg:scroll-ml-[calc(((100vw-1024px)/2)+1.5rem)]
-                  xl:scroll-pl-[calc(((100vw-1280px)/2)+1.5rem)]
-                  xl:scroll-ml-[calc(((100vw-1280px)/2)+1.5rem)]
-                  2xl:scroll-pl-[calc(((100vw-1536px)/2)+1.5rem)]
-                  2xl:scroll-ml-[calc(((100vw-1536px)/2)+1.5rem)]
+                  sm:scroll-pl-[calc(((100vw-640px)/2)+1rem)]
+                  sm:scroll-ml-[calc(((100vw-640px)/2)+1rem)]
+                  md:scroll-pl-[calc(((100vw-768px)/2)+1rem)]
+                  md:scroll-ml-[calc(((100vw-768px)/2)+1rem)]
+                  lg:scroll-pl-[calc(((100vw-1024px)/2)+1rem)]
+                  lg:scroll-ml-[calc(((100vw-1024px)/2)+1rem)]
+                  xl:scroll-pl-[calc(((100vw-1280px)/2)+1rem)]
+                  xl:scroll-ml-[calc(((100vw-1280px)/2)+1rem)]
+                  2xl:scroll-pl-[calc(((100vw-1536px)/2)+1rem)]
+                  2xl:scroll-ml-[calc(((100vw-1536px)/2)+1rem)]
                 "
                 >
                   {restaurants.map((restaurant, index) => (
@@ -144,20 +144,20 @@ const Home: NextPage<HomeProps> = () => {
                         "flex flex-col flex-none gap-5 snap-start",
                         index === 0
                           ? [
-                              "sm:pl-[calc(((100vw-640px)/2)+1.5rem)]",
-                              "md:pl-[calc(((100vw-768px)/2)+1.5rem)]",
-                              "lg:pl-[calc(((100vw-1024px)/2)+1.5rem)]",
-                              "xl:pl-[calc(((100vw-1280px)/2)+1.5rem)]",
-                              "2xl:pl-[calc(((100vw-1536px)/2)+1.5rem)]",
+                              "sm:pl-[calc(((100vw-640px)/2)+1rem)]",
+                              "md:pl-[calc(((100vw-768px)/2)+1rem)]",
+                              "lg:pl-[calc(((100vw-1024px)/2)+1rem)]",
+                              "xl:pl-[calc(((100vw-1280px)/2)+1rem)]",
+                              "2xl:pl-[calc(((100vw-1536px)/2)+1rem)]",
                             ]
                           : index === restaurants.length - 1
                           ? [
                               "pr-4",
-                              "sm:pr-[calc(((100vw-640px)/2)+1.5rem)]",
-                              "md:pr-[calc(((100vw-768px)/2)+1.5rem)]",
-                              "lg:pr-[calc(((100vw-1024px)/2)+1.5rem)]",
-                              "xl:pr-[calc(((100vw-1280px)/2)+1.5rem)]",
-                              "2xl:pr-[calc(((100vw-1536px)/2)+1.5rem)]",
+                              "sm:pr-[calc(((100vw-640px)/2)+1rem)]",
+                              "md:pr-[calc(((100vw-768px)/2)+1rem)]",
+                              "lg:pr-[calc(((100vw-1024px)/2)+1rem)]",
+                              "xl:pr-[calc(((100vw-1280px)/2)+1rem)]",
+                              "2xl:pr-[calc(((100vw-1536px)/2)+1rem)]",
                             ]
                           : []
                       )}
