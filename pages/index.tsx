@@ -108,7 +108,7 @@ const Home: NextPage<HomeProps> = () => {
           </div>
         </Toolbar>
         <div ref={restaurantListTopRef}></div>
-        <div className="flex flex-col col-span-2 h-full w-full">
+        <div className="flex flex-col col-span-2 h-full w-full gap-8">
           {getSectionKeys().map((sectionKey) => {
             const restaurants = data?.sections[sectionKey];
 
@@ -124,7 +124,7 @@ const Home: NextPage<HomeProps> = () => {
                   </div>
                 </h3>
                 <ul
-                  className="flex overflow-auto gap-4 sm:gap-8 pl-4 sm:pl-0 pb-4 mb-4
+                  className="flex overflow-auto gap-4 sm:gap-8 pl-4 sm:pl-0
                   snap-x snap-mandatory scroll-ml-4 scroll-pl-4
                   sm:scroll-pl-[calc(((100vw-640px)/2)+1rem)]
                   sm:scroll-ml-[calc(((100vw-640px)/2)+1rem)]
@@ -136,6 +136,7 @@ const Home: NextPage<HomeProps> = () => {
                   xl:scroll-ml-[calc(((100vw-1280px)/2)+1rem)]
                   2xl:scroll-pl-[calc(((100vw-1536px)/2)+1rem)]
                   2xl:scroll-ml-[calc(((100vw-1536px)/2)+1rem)]
+                  no-scrollbars
                 "
                 >
                   {restaurants.map((restaurant, index) => (

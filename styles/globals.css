@@ -5,3 +5,12 @@
 html {
   -webkit-tap-highlight-color: transparent;
 }
+
+.no-scrollbars {
+  scrollbar-width: none;
+}
+
+.no-scrollbars::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
