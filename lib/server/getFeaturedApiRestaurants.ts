@@ -78,7 +78,10 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
         }
       }
 
-      if (curr.isDeliveryAvailable) {
+      if (
+        curr.isDeliveryAvailable &&
+        (typeof curr.distance === "number" ? curr.distance <= 3 : true)
+      ) {
         if (!acc["tracking"]) {
           acc["tracking"] = [];
         }
