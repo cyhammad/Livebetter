@@ -117,11 +117,15 @@ export const getStaticProps: GetStaticProps<
     return {
       category: key,
       menuItems: menuItemsByCategory[key].sort((a, b) => {
-        if (a.picture && !b.picture) {
+        if (a.outOfStock && !b.outOfStock) {
+          return 1;
+        } else if (!a.outOfStock && b.outOfStock) {
           return -1;
         }
 
-        if (!a.picture && b.picture) {
+        if (a.picture && !b.picture) {
+          return -1;
+        } else if (!a.picture && b.picture) {
           return 1;
         }
 
@@ -361,6 +365,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                                   "flex gap-3 pr-3 flex-none col-span-12 md:col-span-6 2xl:col-span-4 shadow-sm border border-gray-100 rounded-lg overflow-hidden":
                                     true,
                                   "px-3": !hasPicture,
+                                  "opacity-50": !!menuItem.outOfStock,
                                 })}
                                 key={index}
                               >
@@ -395,8 +400,15 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                                       {menuItem.mealDescription}
                                     </span>
                                   ) : null}
-                                  <span className="text-base font-medium mt-auto">
-                                    ${menuItem.mealPrice.toFixed(2)}
+                                  <span className="flex justify-between items-end text-base font-medium mt-auto">
+                                    <span>
+                                      ${menuItem.mealPrice.toFixed(2)}
+                                    </span>
+                                    {menuItem.outOfStock ? (
+                                      <small className="leading-tight px-2 py-1 bg-amber-600 text-white rounded-sm">
+                                        Out of stock
+                                      </small>
+                                    ) : null}
                                   </span>
                                 </div>
                               </li>
