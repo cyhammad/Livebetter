@@ -93,6 +93,13 @@ export const RestaurantMenuItemModal = ({
 
   const [isFormValid, formValidationMessage]: [boolean, string | null] =
     useMemo(() => {
+      if (!isDeliveryAvailable && !isPickUpAvailable) {
+        return [
+          false,
+          "Unfortunately pick-up and delivery are unavailable for this restaurant.",
+        ];
+      }
+
       if (!isRestaurantOpen) {
         return [false, "Unfortunately the restaurant is currently closed."];
       }
