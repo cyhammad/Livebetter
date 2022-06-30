@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 
 import type { Coordinates } from "types";
 
-export const usePosition = (shouldQueryLocation: boolean) => {
+/**
+ * Uses navigator.geolocation.watchPosition to update the returned `position`
+ * property continuously as the user's position changes
+ */
+export const useWatchPosition = (shouldQueryLocation: boolean) => {
   const [position, setPosition] = useState<Coordinates | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,19 +23,18 @@ export const usePosition = (shouldQueryLocation: boolean) => {
   };
 
   useEffect(() => {
-    if (!shouldQueryLocation) {
-      return;
-    }
-
+    let watcher = 0;
     const geo = navigator.geolocation;
 
-    if (!geo) {
-      setError("Geolocation is not supported");
+    if (shouldQueryLocation) {
+      if (!geo) {
+        setError("Geolocation is not supported");
 
-      return;
+        return;
+      }
+
+      watcher = geo.watchPosition(successCallback, errorCallback);
     }
-
-    const watcher = geo.watchPosition(successCallback, errorCallback);
 
     return () => geo.clearWatch(watcher);
   }, [shouldQueryLocation]);

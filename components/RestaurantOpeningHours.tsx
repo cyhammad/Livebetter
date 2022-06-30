@@ -12,9 +12,8 @@ interface RestaurantOpeningHoursProps {
 export const RestaurantOpeningHours = ({
   restaurant,
 }: RestaurantOpeningHoursProps) => {
-  const { status, openDate, closeDate } = getOpeningHoursInfo(restaurant);
-
-  const isOpen = ["open-now", "closes-after-midnight"].includes(status);
+  const { status, openDate, closeDate, isOpen } =
+    getOpeningHoursInfo(restaurant);
 
   return (
     <div

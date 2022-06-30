@@ -1,28 +1,31 @@
-import classNames from "classnames";
 import { collection, getDocs, limit, query, where } from "firebase/firestore";
-import haversine from "haversine-distance";
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Image from "next/image";
 import { Browser, MapPin } from "phosphor-react";
 import { useEffect, useRef, useState } from "react";
 import { Element, Events, Link, scrollSpy, scroller } from "react-scroll";
 
+import { Cart } from "components/Cart";
 import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { RestaurantCuisine } from "components/RestaurantCuisine";
+import { RestaurantMenuItem } from "components/RestaurantMenuItem";
+import { RestaurantMenuItemModal } from "components/RestaurantMenuItemModal";
 import { RestaurantOpeningHours } from "components/RestaurantOpeningHours";
 import { RestaurantPhoneNumber } from "components/RestaurantPhoneNumber";
 import { RestaurantPickAndDelivery } from "components/RestaurantPickAndDelivery";
+import { Select } from "components/Select";
 import { Toolbar } from "components/Toolbar";
-import { usePosition } from "hooks/usePosition";
+import { useUserContext } from "hooks/useUserContext";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { db } from "lib/server/db";
 import { toApiMenuItem } from "lib/server/toApiMenuItem";
+import { toApiRestaurant } from "lib/server/toApiRestaurant";
 import { urlParamToRestaurantName } from "lib/urlParamToRestaurantName";
-import type { ApiMenuItem, Coordinates, MenuItem, Restaurant } from "types";
+import type { ApiMenuItem, ApiRestaurant, MenuItem, Restaurant } from "types";
 
 interface RestaurantDetailPageProps {
-  restaurant: Restaurant;
+  restaurant: ApiRestaurant;
   menu: {
     category: string;
     menuItems: ApiMenuItem[];
@@ -137,9 +140,11 @@ export const getStaticProps: GetStaticProps<
     };
   });
 
+  const restaurant = restaurantDoc.data() as Restaurant;
+
   return {
     props: {
-      restaurant: restaurantDoc.data() as Restaurant,
+      restaurant: toApiRestaurant(restaurant),
       menu,
     },
     // Regenerate the page every 30 minutes (30 * 60 seconds)
@@ -154,27 +159,21 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
   const headerRef = useRef<HTMLElement | null>(null);
   const toolbarRef = useRef<HTMLDivElement | null>(null);
   const scrollAreaTopRef = useRef<HTMLDivElement | null>(null);
-  const { latitude, longitude } = usePosition(false);
+  const { getDistanceToCoordinates } = useUserContext();
   const [selectedCategory, setSelectedCategory] = useState(
     menu.find(({ category }) => !!category)?.category ?? ""
   );
   const [isScrolling, setIsScrolling] = useState(false);
+  const [isMenuItemModalOpen, setIsMenuItemModalOpen] = useState(false);
+  const [selectedMenuItem, setSelectedMenuItem] = useState<ApiMenuItem>();
   const scrollOffsetRef = useRef(0);
 
-  const userPosition: Coordinates | undefined =
-    latitude && longitude ? { latitude, longitude } : undefined;
+  const distance = getDistanceToCoordinates({
+    latitude: parseFloat(restaurant.Latitude),
+    longitude: parseFloat(restaurant.Longitude),
+  });
 
-  const distance: number | null =
-    userPosition && restaurant.Latitude && restaurant.Longitude
-      ? Math.floor(
-          (haversine(userPosition, {
-            latitude: parseFloat(restaurant.Latitude),
-            longitude: parseFloat(restaurant.Longitude),
-          }) /
-            1609.344) *
-            100
-        ) / 100
-      : null;
+  restaurant.distance = distance ?? undefined;
 
   const isAddressVisible = !!restaurant.Address;
   const isDistanceVisible = typeof distance === "number" && !isNaN(distance);
@@ -232,12 +231,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               <h2 className="text-2xl sm:text-4xl font-bold">
                 {restaurant.Restaurant}
               </h2>
-              <select
-                className={classNames({
-                  "text-base md:text-lg bg-slate-100 rounded my-1": true,
-                  "border-0 ": true,
-                  "focus:ring-0 focus:border-black": true,
-                })}
+              <Select
                 onChange={(event) => {
                   setSelectedCategory(event.target.value);
 
@@ -253,7 +247,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                     {category}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
             {menu.map(({ category }) => (
               // These Links are only used for their `onSetActive` callback,
@@ -351,69 +345,16 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                           {category}
                         </h4>
                         <ul className="grid grid-cols-12 gap-4">
-                          {menuItems.map((menuItem, index) => {
-                            const hasPicture = !!menuItem.picture;
-                            const isDescriptionEmpty =
-                              !menuItem.mealDescription;
-                            const isDescriptionShort =
-                              menuItem.mealDescription &&
-                              menuItem.mealDescription.length < 50;
-
-                            return (
-                              <li
-                                className={classNames({
-                                  "flex gap-3 pr-3 flex-none col-span-12 md:col-span-6 2xl:col-span-4 shadow-sm border border-gray-100 rounded-lg overflow-hidden":
-                                    true,
-                                  "px-3": !hasPicture,
-                                  "opacity-50": !!menuItem.outOfStock,
-                                })}
-                                key={index}
-                              >
-                                {menuItem.picture ? (
-                                  <div className="flex flex-row gap-2 overflow-hidden flex-none h-28 w-28 sm:h-32 sm:w-32">
-                                    <Image
-                                      alt=""
-                                      height={224}
-                                      layout="raw"
-                                      src={menuItem.picture}
-                                      width={224}
-                                      className="object-cover"
-                                    />
-                                  </div>
-                                ) : null}
-                                <div className="flex flex-col gap-1  py-2">
-                                  {menuItem.name ? (
-                                    <span
-                                      className={classNames({
-                                        "text-base sm:text-lg font-bold leading-5 sm:leading-6":
-                                          true,
-                                        "line-clamp-1": !isDescriptionShort,
-                                        "line-clamp-2": isDescriptionShort,
-                                        "line-clamp-3": isDescriptionEmpty,
-                                      })}
-                                    >
-                                      {menuItem.name}
-                                    </span>
-                                  ) : null}
-                                  {menuItem.mealDescription ? (
-                                    <span className="text-sm line-clamp-2 sm:leading-6 text-gray-700">
-                                      {menuItem.mealDescription}
-                                    </span>
-                                  ) : null}
-                                  <span className="flex justify-between items-end text-base font-medium mt-auto">
-                                    <span>
-                                      ${menuItem.mealPrice.toFixed(2)}
-                                    </span>
-                                    {menuItem.outOfStock ? (
-                                      <small className="leading-tight px-2 py-1 bg-amber-600 text-white rounded-sm">
-                                        Out of stock
-                                      </small>
-                                    ) : null}
-                                  </span>
-                                </div>
-                              </li>
-                            );
-                          })}
+                          {menuItems.map((menuItem, index) => (
+                            <RestaurantMenuItem
+                              key={index}
+                              menuItem={menuItem}
+                              onClick={() => {
+                                setSelectedMenuItem(menuItem);
+                                setIsMenuItemModalOpen(true);
+                              }}
+                            />
+                          ))}
                         </ul>
                       </Element>
                     </section>
@@ -421,12 +362,18 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 })}
               </div>
             )}
-            <section>
-              <h3 className="text-2xl sm:text-3xl font-bold">Reviews</h3>
-            </section>
           </div>
         </section>
+        <Cart />
       </main>
+      <RestaurantMenuItemModal
+        restaurant={restaurant}
+        menuItem={selectedMenuItem}
+        isOpen={isMenuItemModalOpen}
+        onRequestClose={() => {
+          setIsMenuItemModalOpen(false);
+        }}
+      />
     </>
   );
 };

@@ -17,6 +17,7 @@ export const getOpeningHoursInfo = (
   status: OpeningHoursStatus;
   openDate: Date | null;
   closeDate: Date | null;
+  isOpen: boolean;
 } => {
   const [openDate, closeDate] = openAndCloseDates(restaurant, targetDate);
 
@@ -26,6 +27,7 @@ export const getOpeningHoursInfo = (
         openDate,
         closeDate,
         status: "open-later",
+        isOpen: false,
       };
     }
 
@@ -34,6 +36,7 @@ export const getOpeningHoursInfo = (
         openDate,
         closeDate,
         status: "closes-after-midnight",
+        isOpen: true,
       };
     }
   }
@@ -44,6 +47,7 @@ export const getOpeningHoursInfo = (
         openDate,
         closeDate,
         status: "closed-earlier",
+        isOpen: false,
       };
     }
 
@@ -52,6 +56,7 @@ export const getOpeningHoursInfo = (
         openDate,
         closeDate,
         status: "open-now",
+        isOpen: true,
       };
     }
   }
@@ -60,5 +65,6 @@ export const getOpeningHoursInfo = (
     openDate,
     closeDate,
     status: "closed-today",
+    isOpen: false,
   };
 };

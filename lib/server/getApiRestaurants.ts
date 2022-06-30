@@ -5,6 +5,8 @@ import { db } from "lib/server/db";
 import { sortApiRestaurants } from "lib/sortApiRestaurants";
 import type { ApiRestaurant, GetApiRestaurants, Restaurant } from "types";
 
+import { toApiRestaurant } from "./toApiRestaurant";
+
 const METERS_TO_MILES_DIVISOR = 1609.344;
 
 export const getApiRestaurants: GetApiRestaurants = async (options) => {
@@ -32,11 +34,7 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
 
   restaurantDocs.docs.forEach((doc) => {
     const restaurant = doc.data() as Restaurant;
-    const apiRestaurant: ApiRestaurant = { ...restaurant };
-
-    if (restaurant.Cuisine) {
-      apiRestaurant.cuisines = restaurant.Cuisine.toLowerCase().split(", ");
-    }
+    const apiRestaurant = toApiRestaurant(restaurant, sortByDistanceFrom);
 
     // Filter out restaurants that do not have any cuisines in common with
     // the `filteredCuisines` parameter
@@ -53,16 +51,6 @@ export const getApiRestaurants: GetApiRestaurants = async (options) => {
     apiRestaurant.cuisines?.forEach((cuisineItem) => {
       cuisines.add(cuisineItem);
     });
-
-    if (sortByDistanceFrom && restaurant.Latitude && restaurant.Longitude) {
-      const distanceInMiles =
-        haversineDistance(sortByDistanceFrom, {
-          latitude: parseFloat(restaurant.Latitude),
-          longitude: parseFloat(restaurant.Longitude),
-        }) / METERS_TO_MILES_DIVISOR;
-
-      apiRestaurant.distance = Math.floor(distanceInMiles * 100) / 100;
-    }
 
     apiRestaurants.push(apiRestaurant);
   });
