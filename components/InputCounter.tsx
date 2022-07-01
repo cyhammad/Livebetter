@@ -21,7 +21,7 @@ export const InputCounter = ({ onChange, value }: InputCounterProps) => {
       <input
         className="
           w-10 appearance-none bg-slate-100 border-0 text-center input-number-no-buttons
-          px-1
+          px-1 text-sm sm:text-base
         "
         min={0}
         step={1}

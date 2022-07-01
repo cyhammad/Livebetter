@@ -117,7 +117,11 @@ export const RestaurantMenuItemModal = ({
       }
 
       if (!selectedShippingMethod) {
-        return [false, 'Please select either "Pickup" or "Delivery".'];
+        return [
+          false,
+          null,
+          // 'Please select either "Pickup" or "Delivery".'
+        ];
       }
 
       const distanceFromCustomer = getDistanceToCoordinates({
@@ -215,7 +219,7 @@ export const RestaurantMenuItemModal = ({
 
   return (
     <Modal
-      className="flex flex-col gap-6 overflow-auto"
+      className="flex flex-col overflow-auto"
       isOpen={isOpen}
       onRequestClose={(event) => {
         onRequestClose && onRequestClose(event);
@@ -235,182 +239,177 @@ export const RestaurantMenuItemModal = ({
               />
             </div>
           ) : null}
-          <h2
-            className={classNames(
-              "z-10 bg-white text-2xl font-bold py-1 px-4 sm:px-6 sticky",
-              {
-                "top-56 sm:top-80 md:top-96": !!menuItem.picture,
-                "top-0 pt-4 sm:pt-6": !menuItem.picture,
-              }
-            )}
-          >
-            {menuItem.name}
-          </h2>
-          {menuItem.mealDescription ? (
-            <p className="text-base px-4 sm:px-6">{menuItem.mealDescription}</p>
-          ) : null}
-          {menuItem &&
-          menuItem.choices &&
-          !hasNoChoices &&
-          menuItem.quantity &&
-          menuItem.quantity > 0 ? (
-            <>
-              {Object.entries(menuItem.choices).map(([category, options]) => {
-                return (
-                  <section className="flex flex-col gap-4" key={category}>
-                    <h3
-                      className={classNames(
-                        "z-0 text-xl font-bold sticky px-4 sm:px-6 bg-white flex justify-between items-center gap-1",
-                        {
-                          "top-64 sm:top-[360px] md:top-[420px]":
-                            !!menuItem.picture,
-                          "top-12 sm:top-14": !menuItem.picture,
-                        }
-                      )}
-                    >
-                      {category}
-                      <span className="block text-sm font-bold text-neutral-500">
-                        required
-                      </span>
-                    </h3>
-                    {shouldUseDropdownForChoices ? (
-                      <Select
-                        className="mx-4 sm:ml-6 sm:mr-auto"
-                        value={options.findIndex(
-                          ({ name }) =>
-                            name === selectedChoices?.[category]?.[0]?.name
-                        )}
-                        onChange={(event) => {
-                          const index = parseInt(event.target.value);
-                          const selectedChoice =
-                            options[isNaN(index) ? 0 : index];
-
-                          setSelectedChoices((prevSelectedChoices) => ({
-                            ...prevSelectedChoices,
-                            [category]: [
-                              {
-                                name: selectedChoice.name,
-                                price: selectedChoice.price,
-                                count: 1,
-                              },
-                            ],
-                          }));
-                        }}
-                      >
-                        {options.map(({ name, price }, index) => {
-                          return (
-                            <option key={name} value={index}>
-                              {name}
-                              {price > 0 ? <>, ${price.toFixed(2)}</> : null}
-                            </option>
-                          );
-                        })}
-                      </Select>
-                    ) : (
-                      <div>
-                        {options.map(({ name, price }) => {
-                          const isChecked = !!selectedChoices?.[category]?.find(
-                            ({ name: selectedName, count }) =>
-                              name === selectedName && (count ?? 0) > 0
-                          );
-
-                          return (
-                            <label
-                              className="flex items-center gap-2 px-4 sm:px-6"
-                              key={name}
-                            >
-                              <Checkbox
-                                disabled={
-                                  getChoicesCount(selectedChoices) >=
-                                    (menuItem.quantity ?? 0) && !isChecked
-                                }
-                                checked={isChecked}
-                                onChange={(event) => {
-                                  setSelectedChoices((prevSelectedChoices) => ({
-                                    ...prevSelectedChoices,
-                                    [category]: [
-                                      {
-                                        name,
-                                        price,
-                                        count: event.target.checked ? 1 : 0,
-                                      },
-                                    ],
-                                  }));
-                                }}
-                              />
-                              {name}, ${price.toFixed(2)}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </section>
-                );
-              })}
-            </>
-          ) : null}
-          {menuItem.optionalChoices ? (
-            <>
-              {Object.entries(menuItem.optionalChoices).map(
-                ([category, options]) => {
+          <section className="z-20 flex flex-col bg-white py-4 gap-4">
+            <h2 className="z-10 bg-white text-2xl font-bold py-1 px-4 sm:px-6 sticky top-0">
+              {menuItem.name}
+            </h2>
+            {menuItem.mealDescription ? (
+              <p className="text-sm sm:text-base px-4 sm:px-6">
+                {menuItem.mealDescription}
+              </p>
+            ) : null}
+            {menuItem &&
+            menuItem.choices &&
+            !hasNoChoices &&
+            menuItem.quantity &&
+            menuItem.quantity > 0 ? (
+              <>
+                {Object.entries(menuItem.choices).map(([category, options]) => {
                   return (
-                    <section
-                      className="px-4 sm:px-6 gap-2 flex flex-col"
-                      key={category}
-                    >
+                    <section className="flex flex-col gap-2" key={category}>
                       <h3
-                        className={classNames(
-                          "z-0 text-xl font-bold sticky bg-white flex justify-between items-center gap-1",
-                          {
-                            "top-64 sm:top-[360px] md:top-[420px]":
-                              !!menuItem.picture,
-                            "top-12 sm:top-14": !menuItem.picture,
-                          }
-                        )}
+                        className="
+                          z-0 flex justify-between items-center gap-1
+                          sticky top-10 px-4 sm:px-6 text-xl font-bold bg-white
+                        "
                       >
                         {category}
+                        <span className="block text-sm font-bold text-neutral-500">
+                          required
+                        </span>
                       </h3>
-                      {options.map(({ name, price }) => {
-                        const value =
-                          selectedOptionalChoices?.[category]?.find(
-                            ({ name: selectedName }) => name === selectedName
-                          )?.count ?? null;
+                      {shouldUseDropdownForChoices ? (
+                        <Select
+                          className="mx-4 sm:ml-6 sm:mr-auto"
+                          value={options.findIndex(
+                            ({ name }) =>
+                              name === selectedChoices?.[category]?.[0]?.name
+                          )}
+                          onChange={(event) => {
+                            const index = parseInt(event.target.value);
+                            const selectedChoice =
+                              options[isNaN(index) ? 0 : index];
 
-                        return (
-                          <p
-                            className="flex justify-between items-center"
-                            key={name}
-                          >
-                            {name}
-                            <span className="flex gap-3 tabular-nums items-center">
-                              ${price.toFixed(2)}
-                              <InputCounter
-                                value={value}
-                                onChange={(nextValue) => {
-                                  setSelectedOptionalChoices(
-                                    (prevSelectedOptionalChoices) => {
-                                      const nextSelectedOptionalChoices = {
-                                        ...prevSelectedOptionalChoices,
-                                      };
+                            setSelectedChoices((prevSelectedChoices) => ({
+                              ...prevSelectedChoices,
+                              [category]: [
+                                {
+                                  name: selectedChoice.name,
+                                  price: selectedChoice.price,
+                                  count: 1,
+                                },
+                              ],
+                            }));
+                          }}
+                        >
+                          {options.map(({ name, price }, index) => {
+                            return (
+                              <option key={name} value={index}>
+                                {name}
+                                {price > 0 ? <>, ${price.toFixed(2)}</> : null}
+                              </option>
+                            );
+                          })}
+                        </Select>
+                      ) : (
+                        <div>
+                          {options.map(({ name, price }) => {
+                            const isChecked = !!selectedChoices?.[
+                              category
+                            ]?.find(
+                              ({ name: selectedName, count }) =>
+                                name === selectedName && (count ?? 0) > 0
+                            );
 
-                                      if (
-                                        !nextSelectedOptionalChoices?.[category]
-                                      ) {
-                                        nextSelectedOptionalChoices[category] =
-                                          [];
-                                      }
+                            return (
+                              <label
+                                className="flex items-center gap-2 px-4 sm:px-6"
+                                key={name}
+                              >
+                                <Checkbox
+                                  disabled={
+                                    getChoicesCount(selectedChoices) >=
+                                      (menuItem.quantity ?? 0) && !isChecked
+                                  }
+                                  checked={isChecked}
+                                  onChange={(event) => {
+                                    setSelectedChoices(
+                                      (prevSelectedChoices) => ({
+                                        ...prevSelectedChoices,
+                                        [category]: [
+                                          {
+                                            name,
+                                            price,
+                                            count: event.target.checked ? 1 : 0,
+                                          },
+                                        ],
+                                      })
+                                    );
+                                  }}
+                                />
+                                {name}, ${price.toFixed(2)}
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </section>
+                  );
+                })}
+              </>
+            ) : null}
+            {menuItem.optionalChoices ? (
+              <>
+                {Object.entries(menuItem.optionalChoices).map(
+                  ([category, options]) => {
+                    return (
+                      <section
+                        className="px-4 sm:px-6 gap-2 flex flex-col"
+                        key={category}
+                      >
+                        <h3
+                          className="
+                            z-0 flex justify-between items-center gap-1
+                            sticky top-10 text-xl font-bold bg-white
+                          "
+                        >
+                          {category}
+                        </h3>
+                        {options.map(({ name, price }) => {
+                          const value =
+                            selectedOptionalChoices?.[category]?.find(
+                              ({ name: selectedName }) => name === selectedName
+                            )?.count ?? null;
 
-                                      const previouslySelectedChoice =
-                                        nextSelectedOptionalChoices[
-                                          category
-                                        ]?.find(
-                                          ({ name: selectedName }) =>
-                                            name === selectedName
-                                        );
+                          return (
+                            <p
+                              className="flex justify-between items-center text-sm sm:text-base"
+                              key={name}
+                            >
+                              {name}
+                              <span className="flex gap-3 tabular-nums items-center">
+                                ${price.toFixed(2)}
+                                <InputCounter
+                                  value={value}
+                                  onChange={(nextValue) => {
+                                    setSelectedOptionalChoices(
+                                      (prevSelectedOptionalChoices) => {
+                                        const nextSelectedOptionalChoices = {
+                                          ...prevSelectedOptionalChoices,
+                                        };
 
-                                      if (!previouslySelectedChoice) {
-                                        nextSelectedOptionalChoices[category] =
-                                          [
+                                        if (
+                                          !nextSelectedOptionalChoices?.[
+                                            category
+                                          ]
+                                        ) {
+                                          nextSelectedOptionalChoices[
+                                            category
+                                          ] = [];
+                                        }
+
+                                        const previouslySelectedChoice =
+                                          nextSelectedOptionalChoices[
+                                            category
+                                          ]?.find(
+                                            ({ name: selectedName }) =>
+                                              name === selectedName
+                                          );
+
+                                        if (!previouslySelectedChoice) {
+                                          nextSelectedOptionalChoices[
+                                            category
+                                          ] = [
                                             ...nextSelectedOptionalChoices[
                                               category
                                             ],
@@ -420,9 +419,10 @@ export const RestaurantMenuItemModal = ({
                                               name,
                                             },
                                           ];
-                                      } else {
-                                        nextSelectedOptionalChoices[category] =
+                                        } else {
                                           nextSelectedOptionalChoices[
+                                            category
+                                          ] = nextSelectedOptionalChoices[
                                             category
                                           ].map((choice) => ({
                                             name: choice.name,
@@ -432,36 +432,42 @@ export const RestaurantMenuItemModal = ({
                                                 : choice.count,
                                             price: choice.price,
                                           }));
-                                      }
+                                        }
 
-                                      return {
-                                        ...nextSelectedOptionalChoices,
-                                      };
-                                    }
-                                  );
-                                }}
-                              />
-                            </span>
-                          </p>
-                        );
-                      })}
-                    </section>
-                  );
-                }
-              )}
-            </>
-          ) : null}
-          <div className="flex flex-col gap-4 bg-white border-t border-gray-300 sticky bottom-0 p-4 sm:p-6 justify-between">
+                                        return {
+                                          ...nextSelectedOptionalChoices,
+                                        };
+                                      }
+                                    );
+                                  }}
+                                />
+                              </span>
+                            </p>
+                          );
+                        })}
+                      </section>
+                    );
+                  }
+                )}
+              </>
+            ) : null}
+          </section>
+          <div
+            className="
+            z-30 flex flex-col gap-3 justify-between pt-3 p-4 sm:p-6
+            bg-white sticky
+            bottom-0 border-t border-gray-200"
+          >
             {!isFormValid || shouldShowShippingMethodOptions ? (
-              <div className="flex flex-col gap-3">
-                {!isFormValid ? (
+              <div className="flex flex-col gap-2">
+                {!isFormValid && formValidationMessage ? (
                   <p className="text-amber-600 text-sm sm:text-base font-semibold">
                     {formValidationMessage}
                   </p>
                 ) : null}
                 {shouldShowShippingMethodOptions ? (
                   <div className="flex flex-grow md:justify-end">
-                    <div className="flex flex-col gap-1 w-full">
+                    <div className="flex flex-col gap-0 w-full">
                       {isPickUpAvailable ? (
                         <label className="flex items-center gap-2 text-sm sm:text-base">
                           <Radio
