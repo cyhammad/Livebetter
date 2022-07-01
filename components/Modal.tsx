@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { HTMLMotionProps, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import ReactModal from "react-modal";
 
@@ -33,6 +34,11 @@ export const Modal = ({
         },
         className
       )}
+      contentElement={(contentElementProps, children) => (
+        <motion.div {...(contentElementProps as HTMLMotionProps<"div">)}>
+          {children}
+        </motion.div>
+      )}
       isOpen={isOpen}
       onRequestClose={(event) => {
         setIsAfterOpen(false);
@@ -50,6 +56,11 @@ export const Modal = ({
           "opacity-0 ease-in": (!isAfterOpen && isOpen) || !isOpen,
         },
         overlayClassName
+      )}
+      overlayElement={(overlayElementProps, contentElement) => (
+        <motion.div {...(overlayElementProps as HTMLMotionProps<"div">)}>
+          {contentElement}
+        </motion.div>
       )}
     />
   );
