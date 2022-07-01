@@ -96,12 +96,12 @@ export const RestaurantMenuItemModal = ({
       if (!isDeliveryAvailable && !isPickUpAvailable) {
         return [
           false,
-          "Unfortunately pick-up and delivery are unavailable for this restaurant.",
+          "Pick-up and delivery are unavailable for this restaurant.",
         ];
       }
 
       if (!isRestaurantOpen) {
-        return [false, "Unfortunately the restaurant is currently closed."];
+        return [false, "This restaurant is currently closed."];
       }
 
       if (!menuItem) return [false, null];
@@ -137,7 +137,7 @@ export const RestaurantMenuItemModal = ({
         if (!isDeliveryWithinRange) {
           return [
             false,
-            "Unfortunately your location is outside of our delivery range for this restaurant.",
+            "Your location is outside of our delivery range for this restaurant.",
           ];
         }
       }
