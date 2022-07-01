@@ -162,7 +162,7 @@ export const InputPlacesAutocomplete = ({
             "text-emerald-600 fill-emerald-600":
               mapsApiStatus !== "failure" && !!location,
             "text-amber-600 fill-amber-600": mapsApiStatus === "failure",
-            "h-6 w-6 sm:h-7 sm:w-7": true,
+            "h-5 w-5 sm:h-7 sm:w-7": true,
             "animate-pulse": mapsApiStatus === "loading",
           })}
         />
@@ -172,15 +172,15 @@ export const InputPlacesAutocomplete = ({
           className={classNames(
             inputClassName,
             `
-                w-full
-                text-sm sm:text-base
-                mt-0 px-7 sm:px-8
-                border-0 border-b border-b-black
-                focus:ring-0 focus:border-black
-                text-black bg-transparent
-                placeholder:text-gray-600
-                peer
-              `
+              w-full
+              text-sm sm:text-base
+              mt-0 px-6 sm:px-8
+              border-0 border-b border-b-black
+              focus:ring-0 focus:border-black
+              text-black bg-transparent
+              placeholder:text-gray-600
+              peer
+            `
           )}
           ref={addressInputRef}
           style={{ gridArea: "1 / 1" }}
