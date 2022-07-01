@@ -1,14 +1,19 @@
-import { motion } from "framer-motion";
+import classNames from "classnames";
+import { HTMLMotionProps, motion } from "framer-motion";
 import { Tote } from "phosphor-react";
 
 import { useCartContext } from "hooks/useCartContext";
 
-export const Cart = () => {
+export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
   const { cart, count, total } = useCartContext();
 
   return count > 0 ? (
     <motion.div
-      className="sticky bottom-4 container mx-auto px-4 sm:px-6"
+      {...props}
+      className={classNames(
+        className,
+        "sticky bottom-4 container mx-auto px-4 sm:px-6"
+      )}
       animate={{
         y: 0,
         opacity: 1,

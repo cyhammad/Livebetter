@@ -363,7 +363,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
             )}
           </div>
         </section>
-        <Cart />
+        <Cart className="mt-4" />
       </main>
       <RestaurantMenuItemModal
         restaurant={restaurant}
