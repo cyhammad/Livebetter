@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import Image from "next/image";
+import Image from "next/future/image";
 import {
   ChangeEventHandler,
   useEffect,
@@ -229,7 +229,6 @@ export const RestaurantMenuItemModal = ({
               <Image
                 alt=""
                 height={320}
-                layout="raw"
                 src={menuItem.picture}
                 width={768}
                 className="object-cover"

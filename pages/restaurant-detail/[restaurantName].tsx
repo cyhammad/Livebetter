@@ -1,6 +1,6 @@
 import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
-import Image from "next/image";
+import Image from "next/future/image";
 import { Browser, MapPin } from "phosphor-react";
 import { useEffect, useRef, useState } from "react";
 import { Element, Events, Link, scrollSpy, scroller } from "react-scroll";
@@ -278,7 +278,6 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                     alt=""
                     className="w-full object-cover"
                     height={640}
-                    layout="raw"
                     priority={true}
                     src={restaurant.Image}
                     width={960}

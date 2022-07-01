@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import Image from "next/image";
+import Image from "next/future/image";
 import Link from "next/link";
 import { MapPin } from "phosphor-react";
 import { forwardRef } from "react";
@@ -26,7 +26,6 @@ export const Header = forwardRef<HTMLElement>(function Header(_, ref) {
                 alt="Live Better logo"
                 className="h-8 w-8 sm:h-10 sm:w-10"
                 height={40}
-                layout="raw"
                 priority={true}
                 src="/logo.png"
                 width={40}

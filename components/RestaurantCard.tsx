@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import Image from "next/image";
+import Image from "next/future/image";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "phosphor-react";
 
@@ -59,7 +59,6 @@ export const RestaurantCard = ({
             >
               <Image
                 className="w-full object-cover"
-                layout="raw"
                 height={155}
                 width={320}
                 src={restaurant.Image}

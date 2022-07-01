@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import Image from "next/image";
+import Image from "next/future/image";
 import { MouseEventHandler } from "react";
 
 import type { ApiMenuItem } from "types";
@@ -34,7 +34,6 @@ export const RestaurantMenuItem = ({
           <Image
             alt=""
             height={224}
-            layout="raw"
             src={menuItem.picture}
             width={224}
             className="object-cover"
