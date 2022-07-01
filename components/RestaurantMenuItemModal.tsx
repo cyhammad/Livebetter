@@ -258,21 +258,21 @@ export const RestaurantMenuItemModal = ({
               {Object.entries(menuItem.choices).map(([category, options]) => {
                 return (
                   <section className="flex flex-col gap-4" key={category}>
-                    <h4
+                    <h3
                       className={classNames(
                         "z-0 text-xl font-bold sticky px-4 sm:px-6 bg-white flex justify-between items-center gap-1",
                         {
-                          "top-64 sm:top-[352px] md:top-[416px]":
+                          "top-64 sm:top-[360px] md:top-[420px]":
                             !!menuItem.picture,
                           "top-12 sm:top-14": !menuItem.picture,
                         }
                       )}
                     >
                       {category}
-                      <span className="block text-sm font-bold text-rose-400">
+                      <span className="block text-sm font-bold text-neutral-500">
                         required
                       </span>
-                    </h4>
+                    </h3>
                     {shouldUseDropdownForChoices ? (
                       <Select
                         className="mx-4 sm:ml-6 sm:mr-auto"
@@ -358,21 +358,18 @@ export const RestaurantMenuItemModal = ({
                       className="px-4 sm:px-6 gap-2 flex flex-col"
                       key={category}
                     >
-                      <h4
+                      <h3
                         className={classNames(
                           "z-0 text-xl font-bold sticky bg-white flex justify-between items-center gap-1",
                           {
-                            "top-64 sm:top-[352px] md:top-[416px]":
+                            "top-64 sm:top-[360px] md:top-[420px]":
                               !!menuItem.picture,
                             "top-12 sm:top-14": !menuItem.picture,
                           }
                         )}
                       >
                         {category}
-                        <span className="block text-sm font-bold text-rose-400">
-                          optional
-                        </span>
-                      </h4>
+                      </h3>
                       {options.map(({ name, price }) => {
                         const value =
                           selectedOptionalChoices?.[category]?.find(
@@ -458,13 +455,15 @@ export const RestaurantMenuItemModal = ({
             {!isFormValid || shouldShowShippingMethodOptions ? (
               <div className="flex flex-col gap-3">
                 {!isFormValid ? (
-                  <p className="text-amber-900">{formValidationMessage}</p>
+                  <p className="text-amber-600 text-sm sm:text-base font-semibold">
+                    {formValidationMessage}
+                  </p>
                 ) : null}
                 {shouldShowShippingMethodOptions ? (
                   <div className="flex flex-grow md:justify-end">
                     <div className="flex flex-col gap-1 w-full">
                       {isPickUpAvailable ? (
-                        <label className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 text-sm sm:text-base">
                           <Radio
                             value="pickup"
                             checked={selectedShippingMethod === "pickup"}
@@ -474,7 +473,7 @@ export const RestaurantMenuItemModal = ({
                         </label>
                       ) : null}
                       {isDeliveryAvailable ? (
-                        <label className="flex items-center gap-2">
+                        <label className="flex items-center gap-2 text-sm sm:text-base">
                           <Radio
                             value="delivery"
                             checked={selectedShippingMethod === "delivery"}
