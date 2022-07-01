@@ -23,3 +23,11 @@ html {
 .input-number-no-buttons::-webkit-inner-spin-button {
   -webkit-appearance: none;
 }
+
+/* Fixes issues with focusing inputs within the `fixed` modal */
+.ReactModal__Body--open,
+.ReactModal__Html--open {
+  -webkit-overflow-scrolling: touch;
+  overflow: auto;
+  height: 100%;
+}
