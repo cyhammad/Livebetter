@@ -144,14 +144,16 @@ export const RestaurantMenuItemModal = ({
 
       return [true, null];
     }, [
+      getDistanceToCoordinates,
+      hasNoChoices,
+      isDeliveryAvailable,
+      isPickUpAvailable,
+      isRestaurantOpen,
       Latitude,
       Longitude,
-      getDistanceToCoordinates,
-      isRestaurantOpen,
       menuItem,
       selectedChoices,
       selectedShippingMethod,
-      hasNoChoices,
     ]);
 
   /**
