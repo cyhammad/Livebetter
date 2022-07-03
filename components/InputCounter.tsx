@@ -3,16 +3,21 @@ import { Minus, Plus } from "phosphor-react";
 interface InputCounterProps {
   onChange: (value: number | null) => void;
   value: number | null;
+  min?: number;
 }
 
-export const InputCounter = ({ onChange, value }: InputCounterProps) => {
-  const defaultedValue = value ?? 0;
+export const InputCounter = ({
+  onChange,
+  value,
+  min = 0,
+}: InputCounterProps) => {
+  const defaultedValue = value ?? min;
 
   return (
     <span className="flex px-2 gap-1 bg-slate-100 rounded-sm">
       <button
         aria-label={`Decrease count to ${defaultedValue - 1}`}
-        disabled={value === 0}
+        disabled={value === min}
         onClick={() => onChange(defaultedValue - 1)}
         type="button"
       >
@@ -23,7 +28,7 @@ export const InputCounter = ({ onChange, value }: InputCounterProps) => {
           w-10 appearance-none bg-slate-100 border-0 text-center input-number-no-buttons
           px-1 text-sm sm:text-base
         "
-        min={0}
+        min={min}
         step={1}
         type="number"
         placeholder="0"
