@@ -65,11 +65,18 @@ export const RestaurantMenuItemModal = ({
         : null
     );
 
+  const allowedShippingMethods = [
+    isDeliveryAvailable ? "delivery" : null,
+    isPickUpAvailable ? "pickup" : null,
+  ].filter(Boolean);
+
   const didRestaurantChange =
     !cart?.restaurant || cart?.restaurant !== restaurantName;
 
   const [shouldShowShippingMethodOptions, setShouldShowShippingMethodOptions] =
-    useState(didRestaurantChange || cartCount === 0 || !shippingMethod);
+    useState(
+      !shippingMethod || !allowedShippingMethods.includes(shippingMethod)
+    );
 
   const prevIsOpenRef = useRef(isOpen);
 
@@ -90,6 +97,51 @@ export const RestaurantMenuItemModal = ({
     .reduce((acc, curr) => acc + curr, 0);
   const { isOpen: isRestaurantOpen } = getOpeningHoursInfo(restaurant);
   const hasNoChoices = Object.keys(menuItem?.choices ?? {}).length === 0;
+
+  const [isShippingMethodValid, shippingMethodValidationMessage]: [
+    boolean,
+    string | null
+  ] = useMemo(() => {
+    if (!menuItem) return [false, null];
+
+    if (!selectedShippingMethod) {
+      return [
+        false,
+        null,
+        // 'Please select either "Pickup" or "Delivery".'
+      ];
+    }
+
+    const distanceFromCustomer = getDistanceToCoordinates({
+      latitude: parseFloat(Latitude),
+      longitude: parseFloat(Longitude),
+    });
+
+    if (selectedShippingMethod === "delivery") {
+      if (distanceFromCustomer === null) {
+        return [false, "Please enter your delivery address."];
+      }
+
+      const isDeliveryWithinRange = !!(
+        distanceFromCustomer && distanceFromCustomer <= 3
+      );
+
+      if (!isDeliveryWithinRange) {
+        return [
+          false,
+          "Your location is outside of our delivery range for this restaurant.",
+        ];
+      }
+    }
+
+    return [true, null];
+  }, [
+    getDistanceToCoordinates,
+    Latitude,
+    Longitude,
+    menuItem,
+    selectedShippingMethod,
+  ]);
 
   const [isFormValid, formValidationMessage]: [boolean, string | null] =
     useMemo(() => {
@@ -116,48 +168,14 @@ export const RestaurantMenuItemModal = ({
         ];
       }
 
-      if (!selectedShippingMethod) {
-        return [
-          false,
-          null,
-          // 'Please select either "Pickup" or "Delivery".'
-        ];
-      }
-
-      const distanceFromCustomer = getDistanceToCoordinates({
-        latitude: parseFloat(Latitude),
-        longitude: parseFloat(Longitude),
-      });
-
-      if (selectedShippingMethod === "delivery") {
-        if (distanceFromCustomer === null) {
-          return [false, "Please enter your delivery address."];
-        }
-
-        const isDeliveryWithinRange = !!(
-          distanceFromCustomer && distanceFromCustomer <= 3
-        );
-
-        if (!isDeliveryWithinRange) {
-          return [
-            false,
-            "Your location is outside of our delivery range for this restaurant.",
-          ];
-        }
-      }
-
       return [true, null];
     }, [
-      getDistanceToCoordinates,
       hasNoChoices,
       isDeliveryAvailable,
       isPickUpAvailable,
       isRestaurantOpen,
-      Latitude,
-      Longitude,
       menuItem,
       selectedChoices,
-      selectedShippingMethod,
     ]);
 
   /**
@@ -191,16 +209,28 @@ export const RestaurantMenuItemModal = ({
           : undefined
       );
       setSelectedOptionalChoices(undefined);
+      setSelectedShippingMethod(
+        isDeliveryAvailable &&
+          (shippingMethod === "delivery" || !isPickUpAvailable)
+          ? "delivery"
+          : isPickUpAvailable &&
+            (shippingMethod === "pickup" || !isDeliveryAvailable)
+          ? "pickup"
+          : null
+      );
       setShouldShowShippingMethodOptions(
-        didRestaurantChange || cartCount === 0 || !shippingMethod
+        !shippingMethod || !allowedShippingMethods.includes(shippingMethod)
       );
     }
 
     prevIsOpenRef.current = isOpen;
   }, [
+    allowedShippingMethods,
     cartCount,
     didRestaurantChange,
+    isDeliveryAvailable,
     isOpen,
+    isPickUpAvailable,
     menuItem?.choices,
     menuItem?.quantity,
     shippingMethod,
@@ -458,14 +488,20 @@ export const RestaurantMenuItemModal = ({
             bg-white sticky
             bottom-0 border-t border-gray-200"
           >
-            {!isFormValid || shouldShowShippingMethodOptions ? (
+            {!isFormValid ||
+            !isShippingMethodValid ||
+            shouldShowShippingMethodOptions ? (
               <div className="flex flex-col gap-2">
-                {!isFormValid && formValidationMessage ? (
+                {!isShippingMethodValid && shippingMethodValidationMessage ? (
+                  <p className="text-amber-600 text-sm sm:text-base font-semibold">
+                    {shippingMethodValidationMessage}
+                  </p>
+                ) : !isFormValid && formValidationMessage ? (
                   <p className="text-amber-600 text-sm sm:text-base font-semibold">
                     {formValidationMessage}
                   </p>
                 ) : null}
-                {shouldShowShippingMethodOptions ? (
+                {shouldShowShippingMethodOptions || !isShippingMethodValid ? (
                   <div className="flex flex-grow md:justify-end">
                     <div className="flex flex-col gap-0 w-full">
                       {isPickUpAvailable ? (

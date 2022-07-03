@@ -1,13 +1,10 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
-import haversineDistance from "haversine-distance";
 
 import { db } from "lib/server/db";
 import { sortApiRestaurants } from "lib/sortApiRestaurants";
 import type { ApiRestaurant, GetApiRestaurants, Restaurant } from "types";
 
 import { toApiRestaurant } from "./toApiRestaurant";
-
-const METERS_TO_MILES_DIVISOR = 1609.344;
 
 export const getApiRestaurants: GetApiRestaurants = async (options) => {
   const {
