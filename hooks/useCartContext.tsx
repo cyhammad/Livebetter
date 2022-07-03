@@ -28,6 +28,7 @@ interface CartContextDefaultValue {
   count: number;
   emptyCart: () => void;
   setCart: Dispatch<SetStateAction<Cart | undefined>>;
+  setMenuItemCount: (menuItemIndex: number, count: number) => void;
   /**
    * The total price of the cart
    */
@@ -39,6 +40,7 @@ export const CartContext = createContext<CartContextDefaultValue>({
   count: 0,
   emptyCart: () => undefined,
   setCart: () => undefined,
+  setMenuItemCount: () => undefined,
   total: 0,
 });
 
@@ -49,6 +51,24 @@ export const CartContextProvider = ({
     "cart",
     undefined
   );
+
+  const setMenuItemCount: CartContextDefaultValue["setMenuItemCount"] = (
+    menuItemIndex,
+    nextCount
+  ) => {
+    setCart((prevCart) => {
+      if (prevCart) {
+        return {
+          ...prevCart,
+          items:
+            prevCart?.items.map((item, index) => ({
+              ...item,
+              count: index === menuItemIndex ? nextCount : count,
+            })) ?? [],
+        };
+      }
+    });
+  };
 
   const addToCart: CartContextDefaultValue["addToCart"] = (
     restaurant,
@@ -90,8 +110,9 @@ export const CartContextProvider = ({
   const total = useMemo(
     () =>
       cart?.items.reduce(
-        (acc, { mealPrice, choices, optionalChoices }) =>
-          acc + getCartMenuItemTotal(mealPrice, choices, optionalChoices),
+        (acc, { count, mealPrice, choices, optionalChoices }) =>
+          acc +
+          getCartMenuItemTotal(mealPrice, count, choices, optionalChoices),
         0
       ) ?? 0,
     [cart?.items]
@@ -107,6 +128,7 @@ export const CartContextProvider = ({
         count,
         emptyCart,
         setCart,
+        setMenuItemCount,
         total,
       }}
     >
