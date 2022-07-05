@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 html {
+  --modal-padding-bottom: max(
+    16px,
+    calc(env(safe-area-inset-bottom, 16px) * 3)
+  );
+
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -22,6 +27,10 @@ html {
 .input-number-no-buttons::-webkit-outer-spin-button,
 .input-number-no-buttons::-webkit-inner-spin-button {
   -webkit-appearance: none;
+}
+
+.ReactModal__Overlay {
+  padding-bottom: var(--modal-padding-bottom);
 }
 
 /* Fixes issues with focusing inputs within the `fixed` modal */

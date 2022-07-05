@@ -12,7 +12,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
 
   const variants = {
     hidden: {
-      y: 64,
+      y: "var(--modal-padding-bottom)",
       opacity: 0,
       padding: "0px",
     },
@@ -27,7 +27,12 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
     <>
       <AnimatePresence>
         {count > 0 ? (
-          <div className="sticky bottom-4 mx-4 sm:mx-6">
+          <div
+            className="sticky mx-4 sm:mx-6"
+            style={{
+              bottom: "var(--modal-padding-bottom)",
+            }}
+          >
             <motion.div
               {...props}
               className={classNames(

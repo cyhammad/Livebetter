@@ -40,24 +40,16 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
     <Modal isOpen={isOpen} onRequestClose={onRequestClose}>
       <div className="flex flex-col gap-2 py-4 sm:py-6 px-4 sm:px-6">
         <h5 className="text-2xl font-bold">Cart</h5>
-        <ul className="flex flex-col gap-1 pr-3">
+        <ul className="flex flex-col gap-1">
           {cart?.items.map((item, index) => (
             <motion.li
-              className="flex justify-between items-center"
+              className="grid justify-between items-center"
+              style={{ gridTemplateColumns: "1fr auto auto" }}
               key={index}
             >
               <b>{item.name}</b>
-              <div className="flex items-center gap-2">
-                <button onClick={() => removeMenuItem(index)} type="button">
-                  <Trash
-                    alt={`Remove item (${item.name})`}
-                    size={16}
-                    color="currentColor"
-                    weight="duotone"
-                    className="text-rose-800 w-4 h-4"
-                  />
-                </button>
-                <InputCounter
+
+              {/* <InputCounter
                   min={1}
                   onChange={(value) => {
                     if (value !== null) {
@@ -65,21 +57,33 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
                     }
                   }}
                   value={item.count}
+                /> */}
+              <button
+                className="self"
+                onClick={() => removeMenuItem(index)}
+                type="button"
+              >
+                <Trash
+                  alt={`Remove item (${item.name})`}
+                  size={16}
+                  color="currentColor"
+                  weight="duotone"
+                  className="text-rose-800 w-4 h-4"
                 />
-                <p className="min-w-[60px] text-right tabular-nums">
-                  ${(item.mealPrice * item.count).toFixed(2)}
-                </p>
-              </div>
+              </button>
+              <p className="min-w-[60px] text-right tabular-nums">
+                ${(item.mealPrice * item.count).toFixed(2)}
+              </p>
             </motion.li>
           ))}
         </ul>
-        <p className="text-right tabular-nums flex justify-between pr-3">
+        <p className="text-right tabular-nums flex justify-between">
           <b>Subtotal:</b> ${subtotal.toFixed(2)}
         </p>
         <p className="text-right tabular-nums flex justify-between items-center">
           <b>Tip:</b>
           <InputText
-            className="text-right tabular-nums input-number-no-buttons"
+            className="text-right tabular-nums input-number-no-buttons w-20"
             onChange={(event) => {
               const nextTip = event.target.valueAsNumber;
 
@@ -99,7 +103,7 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
             min={0}
           />
         </p>
-        <div className="flex flex-col gap-0 pr-3">
+        <div className="flex flex-col gap-0">
           {serviceFee ? (
             <p className="text-sm sm:text-base text-right tabular-nums flex justify-between">
               <span>Service fee:</span> ${serviceFee.toFixed(2)}
@@ -136,7 +140,7 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
                   weight="bold"
                   className="w-6 h-6"
                 />
-                <span>Check out</span>
+                <span className="flex-none">Check out</span>
               </span>
               <span className="bg-white/20 px-2 py-1 rounded">
                 ${total.toFixed(2)}
