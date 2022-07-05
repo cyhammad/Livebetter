@@ -16,17 +16,16 @@ export const InputCounter = ({
   return (
     <span className="flex px-2 gap-1 bg-slate-100 rounded-sm">
       <button
-        aria-label={`Decrease count to ${defaultedValue - 1}`}
         disabled={value === min}
         onClick={() => onChange(defaultedValue - 1)}
         type="button"
       >
-        <Minus size={20} />
+        <Minus alt={`Decrease count to ${defaultedValue - 1}`} size={20} />
       </button>
       <input
         className="
-          w-10 appearance-none bg-slate-100 border-0 text-center input-number-no-buttons
-          px-1 text-sm sm:text-base
+          w-6 sm:w-10 appearance-none bg-slate-100 border-0 text-center input-number-no-buttons
+          px-0 sm:px-1 text-sm sm:text-base
         "
         min={min}
         step={1}
@@ -45,12 +44,8 @@ export const InputCounter = ({
           }
         }}
       />
-      <button
-        aria-label={`Increase count to ${defaultedValue + 1}`}
-        type="button"
-        onClick={() => onChange(defaultedValue + 1)}
-      >
-        <Plus size={20} />
+      <button type="button" onClick={() => onChange(defaultedValue + 1)}>
+        <Plus alt={`Increase count to ${defaultedValue + 1}`} size={20} />
       </button>
     </span>
   );

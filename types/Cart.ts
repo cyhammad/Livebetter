@@ -41,4 +41,5 @@ export type ShippingMethod = "delivery" | "pickup";
 export interface Cart {
   items: CartMenuItem[];
   restaurant: string;
+  tip: number;
 }

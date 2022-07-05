@@ -13,6 +13,7 @@ import { Checkbox } from "components/Checkbox";
 import { InputCounter } from "components/InputCounter";
 import { InputPlacesAutocomplete } from "components/InputPlacesAutocomplete";
 import { Modal } from "components/Modal";
+import { ModalButtons } from "components/ModalButtons";
 import { Radio } from "components/Radio";
 import { Select } from "components/Select";
 import { useCartContext } from "hooks/useCartContext";
@@ -102,8 +103,6 @@ export const RestaurantMenuItemModal = ({
     boolean,
     string | null
   ] = useMemo(() => {
-    if (!menuItem) return [false, null];
-
     if (!selectedShippingMethod) {
       return [
         false,
@@ -135,13 +134,7 @@ export const RestaurantMenuItemModal = ({
     }
 
     return [true, null];
-  }, [
-    getDistanceToCoordinates,
-    Latitude,
-    Longitude,
-    menuItem,
-    selectedShippingMethod,
-  ]);
+  }, [getDistanceToCoordinates, Latitude, Longitude, selectedShippingMethod]);
 
   const [isFormValid, formValidationMessage]: [boolean, string | null] =
     useMemo(() => {
@@ -530,31 +523,16 @@ export const RestaurantMenuItemModal = ({
                 ) : null}
               </div>
             ) : null}
-            <div className="flex items-center gap-4 sm:justify-end">
-              <button
-                className={classNames(
-                  `
-                    bg-gray-600 text-white py-3 px-4 rounded font-bold
-                  `
-                )}
-                onClick={onRequestClose}
-              >
-                Cancel
-              </button>
-              <button
-                className={classNames(
-                  `
-                    bg-emerald-600 text-white py-2 pr-2 pl-4 rounded font-bold
-                    flex gap-2 sm:gap-4 items-center justify-between
-                    w-full transition-opacity
-                  `,
-                  {
-                    "bg-amber-600": menuItem.outOfStock,
-                    "opacity-50": !isFormValid,
-                  }
-                )}
-                disabled={menuItem.outOfStock || !isFormValid}
-                onClick={(event) => {
+            <ModalButtons
+              secondaryButtonLabel="Cancel"
+              secondaryButtonProps={{ onClick: onRequestClose }}
+              primaryButtonProps={{
+                className: classNames({
+                  "bg-amber-600": menuItem.outOfStock,
+                  "opacity-50": !isFormValid,
+                }),
+                disabled: menuItem.outOfStock || !isFormValid,
+                onClick: (event) => {
                   if (!selectedShippingMethod) {
                     return;
                   }
@@ -575,21 +553,24 @@ export const RestaurantMenuItemModal = ({
                       : undefined
                   );
                   onRequestClose && onRequestClose(event);
-                }}
-              >
-                <span>
-                  {menuItem.outOfStock ? "Out of stock" : "Add to cart"}
-                </span>
-                <span className="bg-white/20 px-2 py-1 rounded">
-                  $
-                  {(
-                    menuItem.mealPrice +
-                    choicesTotal +
-                    optionalChoicesTotal
-                  ).toFixed(2)}
-                </span>
-              </button>
-            </div>
+                },
+              }}
+              primaryButtonLabel={
+                <>
+                  <span>
+                    {menuItem.outOfStock ? "Out of stock" : "Add to cart"}
+                  </span>
+                  <span className="bg-white/20 px-2 py-1 rounded">
+                    $
+                    {(
+                      menuItem.mealPrice +
+                      choicesTotal +
+                      optionalChoicesTotal
+                    ).toFixed(2)}
+                  </span>
+                </>
+              }
+            />
           </div>
         </>
       )}

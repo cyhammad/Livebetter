@@ -362,8 +362,8 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               </div>
             )}
           </div>
+          <Cart className="mt-4" />
         </section>
-        <Cart className="mt-4" />
       </main>
       <RestaurantMenuItemModal
         restaurant={restaurant}
