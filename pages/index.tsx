@@ -116,7 +116,7 @@ const Home: NextPage<HomeProps> = () => {
               <section className="flex flex-col gap-2" key={sectionKey}>
                 <h3 className="text-xl sm:text-2xl font-bold container mx-auto ">
                   <div className="px-4 sm:px-6">
-                    {sectionKeyToHeadingMap[sectionKey as FeaturedSection]}
+                    {sectionKeyToHeadingMap[sectionKey]}
                   </div>
                 </h3>
                 <ul
