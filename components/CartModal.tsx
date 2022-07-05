@@ -20,7 +20,7 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
     processingFee,
     removeMenuItem,
     serviceFee,
-    setMenuItemCount,
+    // setMenuItemCount,
     setTip,
     smallOrderFee,
     subtotal,
@@ -34,6 +34,8 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
     if (cartCount === 0 && prevCartCountRef.current !== 0) {
       onRequestClose && onRequestClose();
     }
+
+    prevCartCountRef.current = cartCount;
   }, [cartCount, onRequestClose]);
 
   return (
