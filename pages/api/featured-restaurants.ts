@@ -1,9 +1,10 @@
+import { withSentry } from "@sentry/nextjs";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { getFeaturedApiRestaurants } from "lib/server/getFeaturedApiRestaurants";
 import type { FeaturedSection, GetFeaturedApiRestaurantsResult } from "types";
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
   res: NextApiResponse<GetFeaturedApiRestaurantsResult>
 ) {
@@ -32,3 +33,5 @@ export default async function handler(
 
   res.status(200).json(result);
 }
+
+export default withSentry(handler);
