@@ -76,7 +76,7 @@ export const CartModal = ({
             />
             <span>
               <span className="capitalize">
-                {cart?.restaurant.Restaurant.toLocaleLowerCase()}
+                {cart?.restaurant?.Restaurant.toLowerCase()}
               </span>
             </span>
           </span>

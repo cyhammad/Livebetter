@@ -78,7 +78,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                   />
                   <span>
                     <span className="capitalize">
-                      {cart?.restaurant.Restaurant.toLocaleLowerCase()}
+                      {cart?.restaurant?.Restaurant.toLowerCase()}
                     </span>{" "}
                     <small>({cart?.items.length ?? 0})</small>
                   </span>
