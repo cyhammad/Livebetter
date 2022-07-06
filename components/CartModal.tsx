@@ -18,6 +18,7 @@ import { useCartContext } from "hooks/useCartContext";
 import { useRestaurantOrderValidation } from "hooks/useRestaurantOrderValidation";
 import { useShippingMethodValidation } from "hooks/useShippingMethodValidation";
 import { useUserContext } from "hooks/useUserContext";
+import { getChoicesLabel } from "lib/getChoicesLabel";
 
 interface CartModalProps extends ReactModal.Props {
   onRequestClose?: (event?: MouseEvent | KeyboardEvent) => void;
@@ -83,16 +84,44 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
     >
       <div className="flex flex-col gap-2 py-4 sm:py-6 px-4 sm:px-6">
         <h5 className="text-2xl font-bold">Cart</h5>
-        <ul className="flex flex-col gap-1">
-          {cart?.items.map((item, index) => (
-            <motion.li
-              className="grid justify-between items-center"
-              style={{ gridTemplateColumns: "1fr auto auto" }}
-              key={index}
-            >
-              <b>{item.name}</b>
+        <ul className="flex flex-col gap-2">
+          {cart?.items.map((item, index) => {
+            const choicesLabel = getChoicesLabel(item.choices);
+            const optionalChoicesLabel = getChoicesLabel(item.optionalChoices);
 
-              {/* <InputCounter
+            return (
+              <motion.li className="" key={index}>
+                <div
+                  className="grid justify-between items-start"
+                  style={{ gridTemplateColumns: "1fr auto auto" }}
+                >
+                  <b>{item.name}</b>
+                  <button
+                    className="py-1"
+                    onClick={() => removeMenuItem(index)}
+                    type="button"
+                  >
+                    <Trash
+                      alt={`Remove item (${item.name})`}
+                      size={16}
+                      color="currentColor"
+                      weight="duotone"
+                      className="text-rose-800 w-4 h-4"
+                    />
+                  </button>
+                  <p className="min-w-[60px] text-right tabular-nums">
+                    ${(item.mealPrice * item.count).toFixed(2)}
+                  </p>
+                </div>
+                {choicesLabel ? (
+                  <p className="text-sm text-gray-600">{choicesLabel}</p>
+                ) : null}
+                {optionalChoicesLabel ? (
+                  <p className="text-sm text-gray-600">
+                    {optionalChoicesLabel}
+                  </p>
+                ) : null}
+                {/* <InputCounter
                   min={1}
                   onChange={(value) => {
                     if (value !== null) {
@@ -101,24 +130,9 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
                   }}
                   value={item.count}
                 /> */}
-              <button
-                className="self"
-                onClick={() => removeMenuItem(index)}
-                type="button"
-              >
-                <Trash
-                  alt={`Remove item (${item.name})`}
-                  size={16}
-                  color="currentColor"
-                  weight="duotone"
-                  className="text-rose-800 w-4 h-4"
-                />
-              </button>
-              <p className="min-w-[60px] text-right tabular-nums">
-                ${(item.mealPrice * item.count).toFixed(2)}
-              </p>
-            </motion.li>
-          ))}
+              </motion.li>
+            );
+          })}
         </ul>
         <p className="text-right tabular-nums flex justify-between">
           <b>Subtotal:</b> ${subtotal.toFixed(2)}
@@ -171,48 +185,45 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
             <span>Tax:</span> ${tax.toFixed(2)}
           </p>
         </div>
-        {!isShippingMethodValid ||
-        !isRestaurantOrderValid ||
-        shouldShowShippingMethodOptions ? (
-          <div className="flex flex-col gap-2">
-            {!isRestaurantOrderValid && restaurantOrderValidationMessage ? (
-              <p className="text-amber-600 text-sm sm:text-base font-semibold">
-                {restaurantOrderValidationMessage}
-              </p>
-            ) : !isShippingMethodValid && shippingMethodValidationMessage ? (
-              <p className="text-amber-600 text-sm sm:text-base font-semibold">
-                {shippingMethodValidationMessage}
-              </p>
-            ) : null}
-            {shouldShowShippingMethodOptions || !isShippingMethodValid ? (
-              <div className="flex flex-grow md:justify-end">
-                <div className="flex flex-col gap-0 w-full">
-                  {isPickUpAvailable ? (
-                    <label className="flex items-center gap-2 text-sm sm:text-base">
-                      <Radio
-                        value="pickup"
-                        checked={shippingMethod === "pickup"}
-                        onChange={handleShippingMethodChange}
-                      />
-                      Pickup
-                    </label>
-                  ) : null}
-                  {isDeliveryAvailable ? (
-                    <label className="flex items-center gap-2 text-sm sm:text-base">
-                      <Radio
-                        value="delivery"
-                        checked={shippingMethod === "delivery"}
-                        onChange={handleShippingMethodChange}
-                      />
-                      <span className="whitespace-nowrap">Delivery to</span>
-                      <InputPlacesAutocomplete />
-                    </label>
-                  ) : null}
-                </div>
-              </div>
-            ) : null}
+
+        <div className="flex flex-col gap-2">
+          {!isRestaurantOrderValid && restaurantOrderValidationMessage ? (
+            <p className="text-amber-600 text-sm sm:text-base font-semibold">
+              {restaurantOrderValidationMessage}
+            </p>
+          ) : !isShippingMethodValid && shippingMethodValidationMessage ? (
+            <p className="text-amber-600 text-sm sm:text-base font-semibold">
+              {shippingMethodValidationMessage}
+            </p>
+          ) : null}
+          {/* {shouldShowShippingMethodOptions || !isShippingMethodValid ? (
+            ) : null} */}
+          <div className="flex flex-grow md:justify-end">
+            <div className="flex flex-col gap-0 w-full">
+              {isPickUpAvailable ? (
+                <label className="flex items-center gap-2 text-sm sm:text-base">
+                  <Radio
+                    value="pickup"
+                    checked={shippingMethod === "pickup"}
+                    onChange={handleShippingMethodChange}
+                  />
+                  Pickup
+                </label>
+              ) : null}
+              {isDeliveryAvailable ? (
+                <label className="flex items-center gap-2 text-sm sm:text-base">
+                  <Radio
+                    value="delivery"
+                    checked={shippingMethod === "delivery"}
+                    onChange={handleShippingMethodChange}
+                  />
+                  <span className="whitespace-nowrap">Delivery to</span>
+                  <InputPlacesAutocomplete />
+                </label>
+              ) : null}
+            </div>
           </div>
-        ) : null}
+        </div>
         <ModalButtons
           secondaryButtonLabel="Cancel"
           secondaryButtonProps={{ onClick: onRequestClose }}
