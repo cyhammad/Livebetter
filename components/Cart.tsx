@@ -112,8 +112,14 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
           setIsCheckoutModalVisible(false);
           setIsCartModalVisible(true);
         }}
-        onRequestClose={() => setIsCheckoutModalVisible(false)}
-        origin={"carousel-right"}
+        onRequestClose={() => {
+          setIsCheckoutModalVisible(false);
+        }}
+        origin={
+          !isCartModalVisible && !isCheckoutModalVisible
+            ? "default"
+            : "carousel-right"
+        }
       />
     </>
   );
