@@ -1,19 +1,12 @@
 import classNames from "classnames";
 import { motion } from "framer-motion";
 import { CreditCard, Trash } from "phosphor-react";
-import {
-  ChangeEventHandler,
-  KeyboardEvent,
-  MouseEvent,
-  useEffect,
-  useRef,
-} from "react";
+import { KeyboardEvent, MouseEvent, useEffect, useRef } from "react";
 
-import { InputPlacesAutocomplete } from "components/InputPlacesAutocomplete";
 import { InputText } from "components/InputText";
 import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";
-import { Radio } from "components/Radio";
+import { SelectShippingMethod } from "components/SelectShippingMethod";
 import { useCartContext } from "hooks/useCartContext";
 import { useRestaurantOrderValidation } from "hooks/useRestaurantOrderValidation";
 import { useShippingMethodValidation } from "hooks/useShippingMethodValidation";
@@ -51,30 +44,11 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
     prevCartCountRef.current = cartCount;
   }, [cartCount, onRequestClose]);
 
-  const {
-    isShippingMethodValid,
-    shippingMethodValidationMessage,
-    shouldShowShippingMethodOptions,
-  } = useShippingMethodValidation(cart?.restaurant, shippingMethod);
+  const { isShippingMethodValid, shippingMethodValidationMessage } =
+    useShippingMethodValidation(cart?.restaurant, shippingMethod);
 
   const { isRestaurantOrderValid, restaurantOrderValidationMessage } =
     useRestaurantOrderValidation(cart?.restaurant);
-
-  const { isDeliveryAvailable, isPickUpAvailable } = cart?.restaurant || {};
-
-  const handleShippingMethodChange: ChangeEventHandler<HTMLInputElement> = (
-    event
-  ) => {
-    const value = event.target.value;
-
-    setShippingMethod(
-      value === "delivery"
-        ? "delivery"
-        : value === "pickup"
-        ? "pickup"
-        : undefined
-    );
-  };
 
   return (
     <Modal
@@ -185,7 +159,6 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
             <span>Tax:</span> ${tax.toFixed(2)}
           </p>
         </div>
-
         <div className="flex flex-col gap-2">
           {!isRestaurantOrderValid && restaurantOrderValidationMessage ? (
             <p className="text-amber-600 text-sm sm:text-base font-semibold">
@@ -196,33 +169,11 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
               {shippingMethodValidationMessage}
             </p>
           ) : null}
-          {/* {shouldShowShippingMethodOptions || !isShippingMethodValid ? (
-            ) : null} */}
-          <div className="flex flex-grow md:justify-end">
-            <div className="flex flex-col gap-0 w-full">
-              {isPickUpAvailable ? (
-                <label className="flex items-center gap-2 text-sm sm:text-base">
-                  <Radio
-                    value="pickup"
-                    checked={shippingMethod === "pickup"}
-                    onChange={handleShippingMethodChange}
-                  />
-                  Pickup
-                </label>
-              ) : null}
-              {isDeliveryAvailable ? (
-                <label className="flex items-center gap-2 text-sm sm:text-base">
-                  <Radio
-                    value="delivery"
-                    checked={shippingMethod === "delivery"}
-                    onChange={handleShippingMethodChange}
-                  />
-                  <span className="whitespace-nowrap">Delivery to</span>
-                  <InputPlacesAutocomplete />
-                </label>
-              ) : null}
-            </div>
-          </div>
+          <SelectShippingMethod
+            value={shippingMethod}
+            onChange={setShippingMethod}
+            restaurant={cart?.restaurant}
+          />
         </div>
         <ModalButtons
           secondaryButtonLabel="Cancel"

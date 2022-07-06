@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useUserContext } from "hooks/useUserContext";
+import { notNullOrUndefined } from "lib/notNullOrUndefined";
 import { ApiRestaurant, ShippingMethod } from "types";
 
 export const useShippingMethodValidation = (
@@ -12,7 +13,7 @@ export const useShippingMethodValidation = (
   const allowedShippingMethods = [
     isDeliveryAvailable ? "delivery" : null,
     isPickUpAvailable ? "pickup" : null,
-  ].filter(Boolean);
+  ].filter(notNullOrUndefined);
 
   const { getDistanceToCoordinates } = useUserContext();
   const [shouldShowShippingMethodOptions, setShouldShowShippingMethodOptions] =

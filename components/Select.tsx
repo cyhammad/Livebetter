@@ -8,7 +8,7 @@ export const Select = ({
   return (
     <select
       className={classNames(
-        "text-base md:text-lg bg-slate-100 rounded my-1 border-0 focus:ring-0 focus:border-black",
+        "text-base md:text-lg bg-slate-100 rounded border-0 focus:ring-0 focus:border-black",
         className
       )}
       {...props}
