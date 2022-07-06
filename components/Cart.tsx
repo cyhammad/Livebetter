@@ -1,14 +1,22 @@
 import classNames from "classnames";
 import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion";
 import { Tote } from "phosphor-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { CartModal } from "components/CartModal";
+import { CheckoutModal } from "components/CheckoutModal";
 import { useCartContext } from "hooks/useCartContext";
 
 export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
   const { cart, count, total } = useCartContext();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isCartModalVisible, setIsCartModalVisible] = useState(false);
+  const [isCheckoutModalVisible, setIsCheckoutModalVisible] = useState(false);
+
+  const wasCheckoutModalVisibleRef = useRef(isCheckoutModalVisible);
+
+  useEffect(() => {
+    wasCheckoutModalVisibleRef.current = isCheckoutModalVisible;
+  }, [isCheckoutModalVisible]);
 
   const variants = {
     hidden: {
@@ -42,7 +50,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                   gap-2 flex flex-col max-w-3xl
                 `
               )}
-              animate={isModalVisible ? "hidden" : "banner"}
+              animate={isCartModalVisible ? "hidden" : "banner"}
               initial={"hidden"}
               exit={"hidden"}
               transition={{
@@ -52,7 +60,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
               variants={variants}
             >
               <button
-                onClick={() => setIsModalVisible(true)}
+                onClick={() => setIsCartModalVisible(true)}
                 className={classNames(
                   `
                     bg-emerald-700 rounded text-white py-2 pr-2 pl-4 font-bold
@@ -84,8 +92,28 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
         ) : null}
       </AnimatePresence>
       <CartModal
-        isOpen={isModalVisible}
-        onRequestClose={() => setIsModalVisible(false)}
+        isOpen={isCartModalVisible}
+        onRequestClose={() => setIsCartModalVisible(false)}
+        onRequestNext={() => {
+          setIsCartModalVisible(false);
+          setIsCheckoutModalVisible(true);
+        }}
+        origin={
+          isCheckoutModalVisible
+            ? "carousel-left"
+            : wasCheckoutModalVisibleRef.current
+            ? "carousel-left"
+            : "default"
+        }
+      />
+      <CheckoutModal
+        isOpen={isCheckoutModalVisible}
+        onRequestPrevious={() => {
+          setIsCheckoutModalVisible(false);
+          setIsCartModalVisible(true);
+        }}
+        onRequestClose={() => setIsCheckoutModalVisible(false)}
+        origin={"carousel-right"}
       />
     </>
   );

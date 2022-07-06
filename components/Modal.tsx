@@ -3,13 +3,16 @@ import { HTMLMotionProps, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import ReactModal from "react-modal";
 
+import type { ModalProps } from "types";
+
 export const Modal = ({
   className,
+  origin = "default",
   overlayClassName,
   isOpen,
   onRequestClose,
   ...props
-}: ReactModal.Props) => {
+}: ModalProps) => {
   const [isAfterOpen, setIsAfterOpen] = useState(false);
 
   useEffect(() => {
@@ -28,9 +31,18 @@ export const Modal = ({
             shadow-xl max-h-full
           `,
         {
-          "translate-y-0 scale-100 ease-out": isAfterOpen,
+          "translate-y-0 translate-x-0 scale-100": isAfterOpen,
           "translate-y-4 sm:translate-y-0 sm:scale-95 ease-in":
-            (!isAfterOpen && isOpen) || !isOpen,
+            origin === "default" && ((!isAfterOpen && isOpen) || !isOpen),
+          "translate-x-full sm:translate-x-0 sm:scale-95 sm:ease-in":
+            origin === "carousel-right" &&
+            ((!isAfterOpen && isOpen) || !isOpen),
+          "-translate-x-full sm:translate-x-0 sm:scale-95 sm:ease-in":
+            origin === "carousel-left" && ((!isAfterOpen && isOpen) || !isOpen),
+
+          "ease-out": origin === "default" && isAfterOpen,
+          "ease-in-out":
+            origin === "carousel-left" || origin === "carousel-right",
         },
         className
       )}

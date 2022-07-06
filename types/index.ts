@@ -5,4 +5,5 @@ export * from "./GetApiRestaurants";
 export * from "./GetFeaturedApiRestaurants";
 export * from "./Head";
 export * from "./MenuItem";
+export * from "./Modal";
 export * from "./Restaurant";

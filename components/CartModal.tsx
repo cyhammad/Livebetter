@@ -12,12 +12,19 @@ import { useCartContext } from "hooks/useCartContext";
 import { useRestaurantOrderValidation } from "hooks/useRestaurantOrderValidation";
 import { useShippingMethodValidation } from "hooks/useShippingMethodValidation";
 import { useUserContext } from "hooks/useUserContext";
+import type { ModalProps } from "types";
 
-interface CartModalProps extends ReactModal.Props {
+interface CartModalProps extends ModalProps {
   onRequestClose?: (event?: MouseEvent | KeyboardEvent) => void;
+  onRequestNext?: (event?: MouseEvent | KeyboardEvent) => void;
 }
 
-export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
+export const CartModal = ({
+  isOpen,
+  onRequestClose,
+  onRequestNext,
+  ...restProps
+}: CartModalProps) => {
   const {
     cart,
     count: cartCount,
@@ -52,6 +59,7 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
 
   return (
     <Modal
+      {...restProps}
       className="sm:max-w-xl md:max-w-xl"
       isOpen={isOpen}
       onRequestClose={onRequestClose}
@@ -197,6 +205,7 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
               "opacity-50": !isRestaurantOrderValid || !isShippingMethodValid,
             }),
             disabled: !isRestaurantOrderValid || !isShippingMethodValid,
+            onClick: onRequestNext,
           }}
         />
       </div>
