@@ -17,7 +17,7 @@ export const getChoicesLabel = (choices?: CartMenuItemChoices): string => {
             (option) =>
               // Only show `count` and `price` if they matter
               `${option.name}${option.count > 1 ? ` x${option.count}` : ""}${
-                option.price > 0 ? ` $${option.price.toFixed(2)}` : ""
+                option.price > 0 ? ` ($${option.price.toFixed(2)})` : ""
               }`
           )
           .join(", ")
