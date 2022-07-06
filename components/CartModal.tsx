@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { CreditCard, Tote, Trash } from "phosphor-react";
 import { KeyboardEvent, MouseEvent, useEffect, useRef } from "react";
 
+import { CartChoicesList } from "components/CartChoicesList";
 import { InputText } from "components/InputText";
 import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";
@@ -11,7 +12,6 @@ import { useCartContext } from "hooks/useCartContext";
 import { useRestaurantOrderValidation } from "hooks/useRestaurantOrderValidation";
 import { useShippingMethodValidation } from "hooks/useShippingMethodValidation";
 import { useUserContext } from "hooks/useUserContext";
-import { getChoicesLabel } from "lib/getChoicesLabel";
 
 interface CartModalProps extends ReactModal.Props {
   onRequestClose?: (event?: MouseEvent | KeyboardEvent) => void;
@@ -75,11 +75,8 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
         </h5>
         <ul className="flex flex-col gap-2">
           {cart?.items.map((item, index) => {
-            const choicesLabel = getChoicesLabel(item.choices);
-            const optionalChoicesLabel = getChoicesLabel(item.optionalChoices);
-
             return (
-              <motion.li className="" key={index}>
+              <motion.li className="flex flex-col gap-1" key={index}>
                 <div
                   className="grid justify-between items-start"
                   style={{ gridTemplateColumns: "1fr auto auto" }}
@@ -102,29 +99,15 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
                     ${(item.mealPrice * item.count).toFixed(2)}
                   </p>
                 </div>
-                {choicesLabel ? (
-                  <p className="text-sm text-gray-600">{choicesLabel}</p>
-                ) : null}
-                {optionalChoicesLabel ? (
-                  <p className="text-sm text-gray-600">
-                    {optionalChoicesLabel}
-                  </p>
-                ) : null}
-                {/* <InputCounter
-                  min={1}
-                  onChange={(value) => {
-                    if (value !== null) {
-                      setMenuItemCount(index, value);
-                    }
-                  }}
-                  value={item.count}
-                /> */}
+                <CartChoicesList choices={item.choices} />
+                <CartChoicesList choices={item.optionalChoices} />
               </motion.li>
             );
           })}
         </ul>
         <p className="text-right tabular-nums flex justify-between">
-          <b>Subtotal:</b> ${subtotal.toFixed(2)}
+          <b>Subtotal:</b>{" "}
+          <b className="font-semibold">${subtotal.toFixed(2)}</b>
         </p>
         <p className="text-right tabular-nums flex justify-between items-center">
           <b>Tip:</b>
