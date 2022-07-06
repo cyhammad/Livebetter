@@ -1,6 +1,8 @@
+import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
+
 import { isOpen } from "lib/isOpen";
 
-describe("asdf", () => {
+describe("isOpen", () => {
   it("should return true if the restaurant is open", () => {
     const restaurant = {
       MapPin: "indian9",
@@ -20,7 +22,12 @@ describe("asdf", () => {
       Website: "https://www.thanalphilly.com",
     };
 
-    expect(isOpen(restaurant, new Date("2022-05-22T00:34:11.500Z"))).toBe(true);
+    expect(
+      isOpen(
+        restaurant,
+        utcToZonedTime(new Date("2022-05-22T00:34:11.500Z"), "America/New_York")
+      )
+    ).toBe(true);
   });
 
   it("should return false if the restaurant is closed today", () => {
