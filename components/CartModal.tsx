@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { motion } from "framer-motion";
-import { CreditCard, Trash } from "phosphor-react";
+import { CreditCard, Tote, Trash } from "phosphor-react";
 import { KeyboardEvent, MouseEvent, useEffect, useRef } from "react";
 
 import { InputText } from "components/InputText";
@@ -56,8 +56,23 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
       isOpen={isOpen}
       onRequestClose={onRequestClose}
     >
-      <div className="flex flex-col gap-2 py-4 sm:py-6 px-4 sm:px-6">
-        <h5 className="text-2xl font-bold">Cart</h5>
+      <div className="flex flex-col gap-3 py-4 sm:py-6 px-4 sm:px-6">
+        <h5 className="text-2xl font-bold">
+          <span className="flex gap-2 items-center">
+            <Tote
+              alt=""
+              size={32}
+              color="currentColor"
+              className="text-emerald-600"
+              weight="duotone"
+            />
+            <span>
+              <span className="capitalize">
+                {cart?.restaurant.Restaurant.toLocaleLowerCase()}
+              </span>
+            </span>
+          </span>
+        </h5>
         <ul className="flex flex-col gap-2">
           {cart?.items.map((item, index) => {
             const choicesLabel = getChoicesLabel(item.choices);
@@ -176,7 +191,7 @@ export const CartModal = ({ isOpen, onRequestClose }: CartModalProps) => {
           />
         </div>
         <ModalButtons
-          secondaryButtonLabel="Cancel"
+          secondaryButtonLabel="Back"
           secondaryButtonProps={{ onClick: onRequestClose }}
           primaryButtonLabel={
             <>
