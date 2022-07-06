@@ -28,7 +28,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
       <AnimatePresence>
         {count > 0 ? (
           <div
-            className="sticky mx-4 sm:mx-6"
+            className="sticky mx-4 sm:mx-6 "
             style={{
               bottom: "var(--modal-padding-bottom)",
             }}
@@ -38,7 +38,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
               className={classNames(
                 className,
                 `
-                  container mx-auto px-4 sm:px-6 rounded
+                  container mx-auto px-4 sm:px-6 rounded shadow-xl
                   gap-2 flex flex-col max-w-3xl
                 `
               )}
@@ -70,7 +70,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                   />
                   <span>
                     <span className="capitalize">
-                      {cart?.restaurant.toLocaleLowerCase()}
+                      {cart?.restaurant.Restaurant.toLocaleLowerCase()}
                     </span>{" "}
                     <small>({cart?.items.length ?? 0})</small>
                   </span>

@@ -17,9 +17,10 @@ import { ModalButtons } from "components/ModalButtons";
 import { Radio } from "components/Radio";
 import { Select } from "components/Select";
 import { useCartContext } from "hooks/useCartContext";
+import { useRestaurantOrderValidation } from "hooks/useRestaurantOrderValidation";
+import { useShippingMethodValidation } from "hooks/useShippingMethodValidation";
 import { useUserContext } from "hooks/useUserContext";
 import { getChoicesCount } from "lib/getChoicesCount";
-import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
 import { toCartMenuItemChoices } from "lib/toCartMenuItemChoices";
 import type {
   ApiMenuItem,
@@ -44,13 +45,10 @@ export const RestaurantMenuItemModal = ({
     isDeliveryAvailable = false,
     isPickUpAvailable = false,
     Restaurant: restaurantName,
-    Latitude,
-    Longitude,
   } = restaurant;
 
   const { cart, addToCart, count: cartCount } = useCartContext();
-  const { getDistanceToCoordinates, shippingMethod, setShippingMethod } =
-    useUserContext();
+  const { shippingMethod, setShippingMethod } = useUserContext();
   const [selectedChoices, setSelectedChoices] =
     useState<CartMenuItemChoicesInput>();
   const [selectedOptionalChoices, setSelectedOptionalChoices] =
@@ -66,18 +64,9 @@ export const RestaurantMenuItemModal = ({
         : null
     );
 
-  const allowedShippingMethods = [
-    isDeliveryAvailable ? "delivery" : null,
-    isPickUpAvailable ? "pickup" : null,
-  ].filter(Boolean);
-
   const didRestaurantChange =
-    !cart?.restaurant || cart?.restaurant !== restaurantName;
-
-  const [shouldShowShippingMethodOptions, setShouldShowShippingMethodOptions] =
-    useState(
-      !shippingMethod || !allowedShippingMethods.includes(shippingMethod)
-    );
+    !cart?.restaurant.Restaurant ||
+    cart?.restaurant.Restaurant !== restaurantName;
 
   const prevIsOpenRef = useRef(isOpen);
 
@@ -96,59 +85,21 @@ export const RestaurantMenuItemModal = ({
       return choices.map(({ price, count }) => price * (count ?? 0));
     })
     .reduce((acc, curr) => acc + curr, 0);
-  const { isOpen: isRestaurantOpen } = getOpeningHoursInfo(restaurant);
   const hasNoChoices = Object.keys(menuItem?.choices ?? {}).length === 0;
 
-  const [isShippingMethodValid, shippingMethodValidationMessage]: [
-    boolean,
-    string | null
-  ] = useMemo(() => {
-    if (!selectedShippingMethod) {
-      return [
-        false,
-        null,
-        // 'Please select either "Pickup" or "Delivery".'
-      ];
-    }
+  const {
+    allowedShippingMethods,
+    isShippingMethodValid,
+    shippingMethodValidationMessage,
+    shouldShowShippingMethodOptions,
+    setShouldShowShippingMethodOptions,
+  } = useShippingMethodValidation(restaurant, selectedShippingMethod);
 
-    const distanceFromCustomer = getDistanceToCoordinates({
-      latitude: parseFloat(Latitude),
-      longitude: parseFloat(Longitude),
-    });
-
-    if (selectedShippingMethod === "delivery") {
-      if (distanceFromCustomer === null) {
-        return [false, "Please enter your delivery address."];
-      }
-
-      const isDeliveryWithinRange = !!(
-        distanceFromCustomer && distanceFromCustomer <= 3
-      );
-
-      if (!isDeliveryWithinRange) {
-        return [
-          false,
-          "Your location is outside of our delivery range for this restaurant.",
-        ];
-      }
-    }
-
-    return [true, null];
-  }, [getDistanceToCoordinates, Latitude, Longitude, selectedShippingMethod]);
+  const { isRestaurantOrderValid, restaurantOrderValidationMessage } =
+    useRestaurantOrderValidation(restaurant);
 
   const [isFormValid, formValidationMessage]: [boolean, string | null] =
     useMemo(() => {
-      if (!isDeliveryAvailable && !isPickUpAvailable) {
-        return [
-          false,
-          "Pick-up and delivery are unavailable for this restaurant.",
-        ];
-      }
-
-      if (!isRestaurantOpen) {
-        return [false, "This restaurant is currently closed."];
-      }
-
       if (!menuItem) return [false, null];
 
       const hasSelectedEnoughChoices =
@@ -162,14 +113,7 @@ export const RestaurantMenuItemModal = ({
       }
 
       return [true, null];
-    }, [
-      hasNoChoices,
-      isDeliveryAvailable,
-      isPickUpAvailable,
-      isRestaurantOpen,
-      menuItem,
-      selectedChoices,
-    ]);
+    }, [hasNoChoices, menuItem, selectedChoices]);
 
   /**
    * Reset state when modal is reopened. We only need to do this because we
@@ -211,9 +155,6 @@ export const RestaurantMenuItemModal = ({
           ? "pickup"
           : null
       );
-      setShouldShowShippingMethodOptions(
-        !shippingMethod || !allowedShippingMethods.includes(shippingMethod)
-      );
     }
 
     prevIsOpenRef.current = isOpen;
@@ -227,6 +168,7 @@ export const RestaurantMenuItemModal = ({
     menuItem?.choices,
     menuItem?.quantity,
     shippingMethod,
+    setShouldShowShippingMethodOptions,
     shouldUseDropdownForChoices,
   ]);
 
@@ -483,9 +425,15 @@ export const RestaurantMenuItemModal = ({
           >
             {!isFormValid ||
             !isShippingMethodValid ||
+            !isRestaurantOrderValid ||
             shouldShowShippingMethodOptions ? (
               <div className="flex flex-col gap-2">
-                {!isShippingMethodValid && shippingMethodValidationMessage ? (
+                {!isRestaurantOrderValid && restaurantOrderValidationMessage ? (
+                  <p className="text-amber-600 text-sm sm:text-base font-semibold">
+                    {restaurantOrderValidationMessage}
+                  </p>
+                ) : !isShippingMethodValid &&
+                  shippingMethodValidationMessage ? (
                   <p className="text-amber-600 text-sm sm:text-base font-semibold">
                     {shippingMethodValidationMessage}
                   </p>
@@ -529,9 +477,16 @@ export const RestaurantMenuItemModal = ({
               primaryButtonProps={{
                 className: classNames({
                   "bg-amber-600": menuItem.outOfStock,
-                  "opacity-50": !isFormValid,
+                  "opacity-50":
+                    !isFormValid ||
+                    !isShippingMethodValid ||
+                    !isRestaurantOrderValid,
                 }),
-                disabled: menuItem.outOfStock || !isFormValid,
+                disabled:
+                  menuItem.outOfStock ||
+                  !isFormValid ||
+                  !isShippingMethodValid ||
+                  !isRestaurantOrderValid,
                 onClick: (event) => {
                   if (!selectedShippingMethod) {
                     return;
@@ -540,7 +495,7 @@ export const RestaurantMenuItemModal = ({
                   setShippingMethod(selectedShippingMethod);
 
                   addToCart(
-                    restaurantName,
+                    restaurant,
                     menuItem.name,
                     menuItem.mealPrice,
                     menuItem.category,

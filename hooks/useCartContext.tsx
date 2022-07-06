@@ -9,13 +9,18 @@ import {
 
 import { usePersistentState } from "hooks/usePersistentState";
 import { getCartMenuItemTotal } from "lib/getCartMenuItemTotal";
-import type { Cart, CartMenuItem, CartMenuItemChoices } from "types";
+import type {
+  ApiRestaurant,
+  Cart,
+  CartMenuItem,
+  CartMenuItemChoices,
+} from "types";
 
 import { useUserContext } from "./useUserContext";
 
 interface CartContextDefaultValue {
   addToCart: (
-    restaurant: string,
+    restaurant: ApiRestaurant,
     menuItemName: string,
     menuItemPrice: number,
     menuItemCategory: string | null,
@@ -137,7 +142,8 @@ export const CartContextProvider = ({
       };
 
       const didRestaurantChange =
-        !prevCart?.restaurant || prevCart?.restaurant !== restaurant;
+        !prevCart?.restaurant.Restaurant ||
+        prevCart?.restaurant.Restaurant !== restaurant.Restaurant;
 
       return {
         ...prevCart,

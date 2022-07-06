@@ -10,16 +10,10 @@ export const InputText = ({
       className={classNames(
         className,
         `
-          bg-slate-100
+          border-0 border-b border-b-black
           text-black
-          border-transparent
-          shadow-sm
-          focus:border-slate-300
-          focus:ring
-          focus:ring-offset-0
-          focus:ring-slate-200
-          focus:ring-opacity-50
-          rounded
+          focus:ring-0 focus:border-black
+          mt-0
         `
       )}
       {...props}

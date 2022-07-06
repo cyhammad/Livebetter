@@ -1,4 +1,4 @@
-import type { ApiMenuItemChoice } from "types";
+import type { ApiMenuItemChoice, ApiRestaurant } from "types";
 
 export interface CartMenuItemChoiceInput extends ApiMenuItemChoice {
   count: number | null;
@@ -40,6 +40,6 @@ export type ShippingMethod = "delivery" | "pickup";
 
 export interface Cart {
   items: CartMenuItem[];
-  restaurant: string;
+  restaurant: ApiRestaurant;
   tip: number;
 }
