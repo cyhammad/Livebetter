@@ -49,10 +49,12 @@ export const RestaurantMenuItemModal = ({
   const [selectedShippingMethod, setSelectedShippingMethod] =
     useState<ShippingMethod | null>(
       isDeliveryAvailable &&
-        (shippingMethod === "delivery" || !isPickUpAvailable)
+        (shippingMethod === "delivery" || !isPickUpAvailable || !shippingMethod)
         ? "delivery"
         : isPickUpAvailable &&
-          (shippingMethod === "pickup" || !isDeliveryAvailable)
+          (shippingMethod === "pickup" ||
+            !isDeliveryAvailable ||
+            !shippingMethod)
         ? "pickup"
         : null
     );
@@ -141,10 +143,14 @@ export const RestaurantMenuItemModal = ({
       setSelectedOptionalChoices(undefined);
       setSelectedShippingMethod(
         isDeliveryAvailable &&
-          (shippingMethod === "delivery" || !isPickUpAvailable)
+          (shippingMethod === "delivery" ||
+            !isPickUpAvailable ||
+            !shippingMethod)
           ? "delivery"
           : isPickUpAvailable &&
-            (shippingMethod === "pickup" || !isDeliveryAvailable)
+            (shippingMethod === "pickup" ||
+              !isDeliveryAvailable ||
+              !shippingMethod)
           ? "pickup"
           : null
       );
