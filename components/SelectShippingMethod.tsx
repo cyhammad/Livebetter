@@ -20,6 +20,10 @@ export const SelectShippingMethod = ({
     isPickUpAvailable ? "pickup" : null,
   ].filter(notNullOrUndefined);
 
+  if (allowedShippingMethods.length === 0) {
+    return null;
+  }
+
   return (
     <div className="flex flex-grow md:justify-end">
       <div className="flex gap-2 w-full items-center text-sm">
@@ -50,27 +54,6 @@ export const SelectShippingMethod = ({
             to <InputPlacesAutocomplete />{" "}
           </>
         ) : null}
-        {/* {isPickUpAvailable ? (
-          <label className="flex items-center gap-2 text-sm sm:text-base">
-            <Radio
-              value="pickup"
-              checked={shippingMethod === "pickup"}
-              onChange={handleShippingMethodChange}
-            />
-            Pickup
-          </label>
-        ) : null}
-        {isDeliveryAvailable ? (
-          <label className="flex items-center gap-2 text-sm sm:text-base">
-            <Radio
-              value="delivery"
-              checked={shippingMethod === "delivery"}
-              onChange={handleShippingMethodChange}
-            />
-            <span className="whitespace-nowrap">Delivery to</span>
-            <InputPlacesAutocomplete />
-          </label>
-        ) : null} */}
       </div>
     </div>
   );
