@@ -19,6 +19,8 @@ export const Modal = ({
     setIsAfterOpen(isOpen);
   }, [isOpen]);
 
+  const isHidden = (!isAfterOpen && isOpen) || !isOpen;
+
   return (
     <ReactModal
       closeTimeoutMS={300}
@@ -31,15 +33,14 @@ export const Modal = ({
           `,
         {
           "translate-y-0 translate-x-0 scale-100": isAfterOpen,
-          "translate-y-4 sm:translate-y-0 sm:scale-95 ease-in":
-            origin === "default" && ((!isAfterOpen && isOpen) || !isOpen),
-          "translate-x-full sm:translate-x-0 sm:scale-95 sm:ease-in":
-            origin === "carousel-right" &&
-            ((!isAfterOpen && isOpen) || !isOpen),
-          "-translate-x-full sm:translate-x-0 sm:scale-95 sm:ease-in":
-            origin === "carousel-left" && ((!isAfterOpen && isOpen) || !isOpen),
+          "translate-y-4 sm:translate-y-0 sm:scale-95":
+            isHidden && origin === "default",
+          "translate-x-full": isHidden && origin === "carousel-right",
+          "-translate-x-full": isHidden && origin === "carousel-left",
 
-          "ease-out": origin === "default" && isAfterOpen,
+          "ease-in": isHidden && origin === "default",
+          "ease-out": isAfterOpen && origin === "default",
+
           "ease-in-out":
             origin === "carousel-left" || origin === "carousel-right",
         },
@@ -64,7 +65,7 @@ export const Modal = ({
           `,
         {
           "opacity-100 ease-out": isAfterOpen,
-          "opacity-0 ease-in": (!isAfterOpen && isOpen) || !isOpen,
+          "opacity-0 ease-in": isHidden,
         },
         overlayClassName
       )}
