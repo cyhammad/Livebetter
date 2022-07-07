@@ -47,7 +47,7 @@ export const ModalGroupOverlay = ({
       }}
       overlayClassName={classNames(
         `
-            z-50 fixed top-0 left-0 right-0 bottom-0 bg-black/50
+            z-40 fixed top-0 left-0 right-0 bottom-0 bg-black/50
             transition-opacity duration-300
             flex p-4 sm:p-6
             overflow-auto h-full overscroll-contain backdrop-blur-sm

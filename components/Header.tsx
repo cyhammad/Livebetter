@@ -16,7 +16,7 @@ export const Header = forwardRef<HTMLElement>(function Header(_, ref) {
   return (
     <header
       ref={ref}
-      className="w-full sticky top-0 bg-white sm:bg-white/80 sm:backdrop-blur z-40"
+      className="w-full sticky top-0 bg-white sm:bg-white/80 sm:backdrop-blur z-30"
     >
       <div className="container mx-auto flex justify-between items-center py-2 px-4 sm:px-6">
         <Link href="/">
