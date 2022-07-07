@@ -3,16 +3,28 @@ import { HTMLMotionProps, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import ReactModal from "react-modal";
 
-import type { ModalProps } from "types";
+import type { ModalGroupProps } from "types";
 
-export const Modal = ({
-  className,
-  origin = "default",
+/**
+ * This modal is _only_ the overlay, and _no content_. It is meant to be used as
+ * the backdrop for a group of modals that needs to be chained together. Modals
+ * that are used with this overlay instead of their own should set their `style`
+ * property to:
+ * ```js
+ * {
+ *   overlay: {
+ *     background: "transparent",
+ *     backdropFilter: "none",
+ *   },
+ * }
+ * ```
+ */
+export const ModalGroupOverlay = ({
   overlayClassName,
   isOpen,
   onRequestClose,
   ...props
-}: ModalProps) => {
+}: ModalGroupProps) => {
   const [isAfterOpen, setIsAfterOpen] = useState(false);
 
   useEffect(() => {
@@ -22,29 +34,7 @@ export const Modal = ({
   return (
     <ReactModal
       closeTimeoutMS={300}
-      className={classNames(
-        `
-            container md:max-w-3xl mt-auto mx-auto sm:m-auto bg-white
-            overflow-auto rounded-lg outline-none
-            transition-transform duration-300
-            shadow-xl max-h-full
-          `,
-        {
-          "translate-y-0 translate-x-0 scale-100": isAfterOpen,
-          "translate-y-4 sm:translate-y-0 sm:scale-95 ease-in":
-            origin === "default" && ((!isAfterOpen && isOpen) || !isOpen),
-          "translate-x-full sm:translate-x-0 sm:scale-95 sm:ease-in":
-            origin === "carousel-right" &&
-            ((!isAfterOpen && isOpen) || !isOpen),
-          "-translate-x-full sm:translate-x-0 sm:scale-95 sm:ease-in":
-            origin === "carousel-left" && ((!isAfterOpen && isOpen) || !isOpen),
-
-          "ease-out": origin === "default" && isAfterOpen,
-          "ease-in-out":
-            origin === "carousel-left" || origin === "carousel-right",
-        },
-        className
-      )}
+      className={"hidden"}
       contentElement={(contentElementProps, children) => (
         <motion.div {...(contentElementProps as HTMLMotionProps<"div">)}>
           {children}

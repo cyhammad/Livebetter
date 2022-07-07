@@ -25,6 +25,12 @@ export const CheckoutModal = ({
       className="sm:max-w-xl md:max-w-xl"
       isOpen={isOpen}
       onRequestClose={onRequestClose}
+      style={{
+        overlay: {
+          background: "transparent",
+          backdropFilter: "none",
+        },
+      }}
       {...restProps}
     >
       <div className="flex flex-col gap-3 py-4 sm:py-6 px-4 sm:px-6">

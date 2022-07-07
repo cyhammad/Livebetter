@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { CartModal } from "components/CartModal";
 import { CheckoutModal } from "components/CheckoutModal";
+import { ModalGroupOverlay } from "components/ModalGroupOverlay";
 import { useCartContext } from "hooks/useCartContext";
 
 export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
@@ -50,7 +51,11 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                   gap-2 flex flex-col max-w-3xl
                 `
               )}
-              animate={isCartModalVisible ? "hidden" : "banner"}
+              animate={
+                isCartModalVisible || isCheckoutModalVisible
+                  ? "hidden"
+                  : "banner"
+              }
               initial={"hidden"}
               exit={"hidden"}
               transition={{
@@ -91,6 +96,13 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
           </div>
         ) : null}
       </AnimatePresence>
+      <ModalGroupOverlay
+        isOpen={isCartModalVisible || isCheckoutModalVisible}
+        onRequestClose={() => {
+          setIsCartModalVisible(false);
+          setIsCheckoutModalVisible(false);
+        }}
+      />
       <CartModal
         isOpen={isCartModalVisible}
         onRequestClose={() => setIsCartModalVisible(false)}

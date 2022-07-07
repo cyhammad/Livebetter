@@ -61,6 +61,12 @@ export const CartModal = ({
     <Modal
       {...restProps}
       className="sm:max-w-xl md:max-w-xl"
+      style={{
+        overlay: {
+          background: "transparent",
+          backdropFilter: "none",
+        },
+      }}
       isOpen={isOpen}
       onRequestClose={onRequestClose}
     >
