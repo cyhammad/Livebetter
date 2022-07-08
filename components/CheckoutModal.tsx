@@ -123,9 +123,9 @@ export const CheckoutModal = ({
           }
           primaryButtonProps={{
             className: classNames({
-              "opacity-50": false,
+              "opacity-50": true,
             }),
-            disabled: false,
+            disabled: true,
           }}
         />
       </div>
