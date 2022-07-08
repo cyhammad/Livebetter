@@ -22,6 +22,7 @@ export const ModalButtons = ({
   return (
     <div className="flex items-center gap-4 sm:justify-end">
       <button
+        type="button"
         className={classNames(
           secondaryButtonClassName,
           `
@@ -33,6 +34,7 @@ export const ModalButtons = ({
         {secondaryButtonLabel}
       </button>
       <button
+        type="button"
         className={classNames(
           primaryButtonClassName,
           `

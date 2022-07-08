@@ -1,7 +1,10 @@
+import { getCartItemsSubtotal } from "lib/getCartItemsSubtotal";
 import type { CreatePaymentIntentCart } from "types";
 
 export const getCartPaymentIntentInfo = (
-  _cartPaymentIntent: CreatePaymentIntentCart
+  cart: CreatePaymentIntentCart
 ): { amount: number } => {
-  return { amount: 0 };
+  const subtotal = getCartItemsSubtotal(cart.items);
+
+  return { amount: subtotal * 100 };
 };

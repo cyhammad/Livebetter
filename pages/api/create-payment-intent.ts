@@ -2,7 +2,7 @@ import { withSentry } from "@sentry/nextjs";
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
-import { getCartItemsSubtotal } from "lib/getCartItemsSubtotal";
+import { getCartPaymentIntentInfo } from "lib/server/getCartPaymentIntentInfo";
 import type {
   CreatePaymentIntentCart,
   GetCreatePaymentIntentResult,
@@ -19,14 +19,14 @@ async function handler(
 ) {
   const cart: CreatePaymentIntentCart = req.body.cart;
 
-  const subtotal = getCartItemsSubtotal(cart.items);
+  const { amount } = getCartPaymentIntentInfo(cart);
 
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: subtotal * 100,
-    currency: "usd",
+    amount,
     automatic_payment_methods: {
       enabled: true,
     },
+    currency: "usd",
   });
 
   const result: GetCreatePaymentIntentResult = {
