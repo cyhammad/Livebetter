@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import { usePersistentState } from "hooks/usePersistentState";
-import { getCartMenuItemTotal } from "lib/getCartMenuItemTotal";
+import { getCartItemsSubtotal } from "lib/getCartItemsSubtotal";
 import type {
   ApiRestaurant,
   Cart,
@@ -162,13 +162,7 @@ export const CartContextProvider = ({
   }
 
   const subtotal = useMemo(
-    () =>
-      cart?.items.reduce(
-        (acc, { count, mealPrice, choices, optionalChoices }) =>
-          acc +
-          getCartMenuItemTotal(mealPrice, count, choices, optionalChoices),
-        0
-      ) ?? 0,
+    () => getCartItemsSubtotal(cart?.items),
     [cart?.items]
   );
 

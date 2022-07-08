@@ -31,6 +31,8 @@ export const ModalGroupOverlay = ({
     setIsAfterOpen(isOpen);
   }, [isOpen]);
 
+  const isHidden = (!isAfterOpen && isOpen) || !isOpen;
+
   return (
     <ReactModal
       closeTimeoutMS={300}
@@ -54,7 +56,7 @@ export const ModalGroupOverlay = ({
           `,
         {
           "opacity-100 ease-out": isAfterOpen,
-          "opacity-0 ease-in": (!isAfterOpen && isOpen) || !isOpen,
+          "opacity-0 ease-in": isHidden,
         },
         overlayClassName
       )}

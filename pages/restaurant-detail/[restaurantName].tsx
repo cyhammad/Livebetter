@@ -216,8 +216,8 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
           title: restaurant.Restaurant,
           image: restaurant.Image ?? "",
           type: "website",
-          url: `${
-            process.env.NEXT_PUBLIC_BASE_URL
+          url: `https://${
+            process.env.VERCEL_URL
           }/restaurant-detail/${encodeURIComponent(
             restaurantNameToUrlParam(restaurant.Restaurant)
           )}`,

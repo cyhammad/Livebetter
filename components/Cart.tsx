@@ -1,23 +1,19 @@
 import classNames from "classnames";
 import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion";
 import { Tote } from "phosphor-react";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { CartModal } from "components/CartModal";
 import { CheckoutModal } from "components/CheckoutModal";
 import { ModalGroupOverlay } from "components/ModalGroupOverlay";
 import { useCartContext } from "hooks/useCartContext";
+import { usePrevious } from "hooks/usePrevious";
 
 export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
   const { cart, count, total } = useCartContext();
   const [isCartModalVisible, setIsCartModalVisible] = useState(false);
   const [isCheckoutModalVisible, setIsCheckoutModalVisible] = useState(false);
-
-  const wasCheckoutModalVisibleRef = useRef(isCheckoutModalVisible);
-
-  useEffect(() => {
-    wasCheckoutModalVisibleRef.current = isCheckoutModalVisible;
-  }, [isCheckoutModalVisible]);
+  const wasCheckoutModalVisible = usePrevious(isCheckoutModalVisible);
 
   const variants = {
     hidden: {
@@ -113,7 +109,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
         origin={
           isCheckoutModalVisible
             ? "carousel-left"
-            : wasCheckoutModalVisibleRef.current
+            : wasCheckoutModalVisible
             ? "carousel-left"
             : "default"
         }

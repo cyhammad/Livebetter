@@ -1,4 +1,4 @@
-import { request } from "lib/request";
+import { request } from "lib/client/request";
 import type { GetApiRestaurants } from "types";
 
 export const fetchRestaurants: GetApiRestaurants = async (options) => {
@@ -10,30 +10,27 @@ export const fetchRestaurants: GetApiRestaurants = async (options) => {
     sortByDistanceFrom,
   } = options || {};
 
-  const restaurantsUrl = new URL(
-    "/api/restaurants",
-    process.env.NEXT_PUBLIC_BASE_URL
-  );
+  const searchParams = new URLSearchParams();
 
-  restaurantsUrl.searchParams.set("limit", `${limit}`);
-  restaurantsUrl.searchParams.set("offset", `${offset}`);
+  searchParams.set("limit", `${limit}`);
+  searchParams.set("offset", `${offset}`);
 
   if (sortByDistanceFrom) {
     const { latitude, longitude } = sortByDistanceFrom;
 
-    restaurantsUrl.searchParams.set("latitude", `${latitude}`);
-    restaurantsUrl.searchParams.set("longitude", `${longitude}`);
+    searchParams.set("latitude", `${latitude}`);
+    searchParams.set("longitude", `${longitude}`);
   }
 
   if (search) {
-    restaurantsUrl.searchParams.set("search", search);
+    searchParams.set("search", search);
   }
 
   if (cuisines && cuisines.length > 0) {
-    restaurantsUrl.searchParams.set("cuisines", cuisines.join(","));
+    searchParams.set("cuisines", cuisines.join(","));
   }
 
-  return await request(restaurantsUrl.toString(), {
+  return await request(`/api/restaurants?${searchParams.toString()}`, {
     method: "GET",
   });
 };

@@ -2,6 +2,7 @@ export * from "./Api";
 export * from "./Cart";
 export * from "./Coordinates";
 export * from "./GetApiRestaurants";
+export * from "./GetCreatePaymentIntent";
 export * from "./GetFeaturedApiRestaurants";
 export * from "./Head";
 export * from "./MenuItem";

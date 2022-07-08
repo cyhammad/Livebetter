@@ -43,3 +43,7 @@ export interface Cart {
   restaurant: ApiRestaurant;
   tip: number;
 }
+
+export interface CreatePaymentIntentCart extends Omit<Cart, "restaurant"> {
+  restaurantName: string;
+}
