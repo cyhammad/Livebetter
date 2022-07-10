@@ -38,6 +38,8 @@ export interface CartMenuItem {
 
 export type ShippingMethod = "delivery" | "pickup";
 
+export type DeliveryDropOffPreference = "Leave it at my door" | "Hand it to me";
+
 export interface Cart {
   items: CartMenuItem[];
   restaurant: ApiRestaurant;
