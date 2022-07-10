@@ -1,12 +1,11 @@
 import classNames from "classnames";
 
-export const InputText = ({
+export const InputTextarea = ({
   className,
   ...props
-}: JSX.IntrinsicElements["input"]) => {
+}: JSX.IntrinsicElements["textarea"]) => {
   return (
-    <input
-      type="text"
+    <textarea
       className={classNames(
         className,
         `

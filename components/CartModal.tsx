@@ -126,7 +126,7 @@ export const CartModal = ({
         <p className="text-right tabular-nums flex justify-between items-center">
           <b>Tip:</b>
           <InputText
-            className="text-right tabular-nums input-number-no-buttons w-20 px-0"
+            className="text-right tabular-nums input-number-no-buttons w-20 px-0 -mr-2"
             onChange={(event) => {
               const nextTip = event.target.valueAsNumber;
 
