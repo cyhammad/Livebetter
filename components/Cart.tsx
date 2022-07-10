@@ -5,15 +5,17 @@ import { useState } from "react";
 
 import { CartModal } from "components/CartModal";
 import { CheckoutModal } from "components/CheckoutModal";
+import { ContactInfoModal } from "components/ContactInfoModal";
 import { ModalGroupOverlay } from "components/ModalGroupOverlay";
 import { useCartContext } from "hooks/useCartContext";
 import { usePrevious } from "hooks/usePrevious";
 
+type ModalName = "cart" | "contact" | "checkout";
+
 export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
   const { cart, count, total } = useCartContext();
-  const [isCartModalVisible, setIsCartModalVisible] = useState(false);
-  const [isCheckoutModalVisible, setIsCheckoutModalVisible] = useState(false);
-  const wasCheckoutModalVisible = usePrevious(isCheckoutModalVisible);
+  const [currentModal, setCurrentModal] = useState<ModalName>();
+  const previousModal = usePrevious(currentModal);
 
   const variants = {
     hidden: {
@@ -27,6 +29,8 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
       padding: "0px",
     },
   };
+
+  const handleRequestClose = () => setCurrentModal(undefined);
 
   return (
     <>
@@ -47,11 +51,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                   gap-2 flex flex-col max-w-3xl
                 `
               )}
-              animate={
-                isCartModalVisible || isCheckoutModalVisible
-                  ? "hidden"
-                  : "banner"
-              }
+              animate={currentModal ? "hidden" : "banner"}
               initial={"hidden"}
               exit={"hidden"}
               transition={{
@@ -61,7 +61,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
               variants={variants}
             >
               <button
-                onClick={() => setIsCartModalVisible(true)}
+                onClick={() => setCurrentModal("cart")}
                 className={classNames(
                   `
                     bg-emerald-700 rounded text-white py-2 pr-2 pl-4 font-bold
@@ -93,41 +93,37 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
         ) : null}
       </AnimatePresence>
       <ModalGroupOverlay
-        isOpen={isCartModalVisible || isCheckoutModalVisible}
-        onRequestClose={() => {
-          setIsCartModalVisible(false);
-          setIsCheckoutModalVisible(false);
-        }}
+        isOpen={!!currentModal}
+        onRequestClose={handleRequestClose}
       />
       <CartModal
-        isOpen={isCartModalVisible}
-        onRequestClose={() => setIsCartModalVisible(false)}
-        onRequestNext={() => {
-          setIsCartModalVisible(false);
-          setIsCheckoutModalVisible(true);
-        }}
+        isOpen={currentModal === "cart"}
+        onRequestClose={handleRequestClose}
+        onRequestNext={() => setCurrentModal("contact")}
         origin={
-          isCheckoutModalVisible
+          [currentModal, previousModal].includes("contact")
             ? "carousel-left"
-            : wasCheckoutModalVisible
+            : "default"
+        }
+      />
+      <ContactInfoModal
+        isOpen={currentModal === "contact"}
+        onRequestClose={handleRequestClose}
+        onRequestPrevious={() => setCurrentModal("cart")}
+        onRequestNext={() => setCurrentModal("checkout")}
+        origin={
+          [currentModal, previousModal].includes("cart")
+            ? "carousel-right"
+            : [currentModal, previousModal].includes("checkout")
             ? "carousel-left"
             : "default"
         }
       />
       <CheckoutModal
-        isOpen={isCheckoutModalVisible}
-        onRequestPrevious={() => {
-          setIsCheckoutModalVisible(false);
-          setIsCartModalVisible(true);
-        }}
-        onRequestClose={() => {
-          setIsCheckoutModalVisible(false);
-        }}
-        origin={
-          !isCartModalVisible && !isCheckoutModalVisible
-            ? "default"
-            : "carousel-right"
-        }
+        isOpen={currentModal === "checkout"}
+        onRequestPrevious={() => setCurrentModal("contact")}
+        onRequestClose={handleRequestClose}
+        origin={!currentModal ? "default" : "carousel-right"}
       />
     </>
   );
