@@ -69,7 +69,7 @@ export const ContactInfoModal = ({
           </span>
         </h5>
         <div className="flex flex-col sm:flex-row gap-4">
-          <label className="flex flex-col text-sm w-full">
+          <label className="flex flex-col text-sm w-full gap-1">
             First name
             <InputText
               autoComplete="given-name"
@@ -79,7 +79,7 @@ export const ContactInfoModal = ({
               onChange={(event) => setFirstName(event.target.value)}
             />
           </label>
-          <label className="flex flex-col text-sm w-full">
+          <label className="flex flex-col text-sm w-full gap-1">
             Last name
             <InputText
               autoComplete="family-name"
@@ -91,7 +91,7 @@ export const ContactInfoModal = ({
           </label>
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
-          <label className="flex flex-col text-sm w-full">
+          <label className="flex flex-col text-sm w-full gap-1">
             Phone number
             <InputText
               autoComplete="tel-national"
@@ -101,7 +101,7 @@ export const ContactInfoModal = ({
               onChange={(event) => setPhoneNumber(event.target.value)}
             />
           </label>
-          <label className="flex flex-col text-sm w-full">
+          <label className="flex flex-col text-sm w-full gap-1">
             Email address
             <InputText
               autoComplete="email"
@@ -113,7 +113,7 @@ export const ContactInfoModal = ({
             />
           </label>
         </div>
-        <label className="flex flex-col text-sm">
+        <label className="flex flex-col text-sm gap-1">
           Apartment or suite number
           <InputText
             autoComplete="address-line2"
