@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { motion } from "framer-motion";
-import { CreditCard, Tote, Trash } from "phosphor-react";
+import { ArrowRight, Tote, Trash } from "phosphor-react";
 import { KeyboardEvent, MouseEvent, useEffect, useRef } from "react";
 
 import { CartChoicesList } from "components/CartChoicesList";
@@ -171,6 +171,9 @@ export const CartModal = ({
             <span>Tax:</span> ${tax.toFixed(2)}
           </p>
         </div>
+        <p className="text-right tabular-nums flex justify-between">
+          <b>Total:</b> <b className="font-semibold">${total.toFixed(2)}</b>
+        </p>
         <div className="flex flex-col gap-2">
           {!isRestaurantOrderValid && restaurantOrderValidationMessage ? (
             <p className="text-amber-600 text-sm sm:text-base font-semibold">
@@ -200,17 +203,15 @@ export const CartModal = ({
           secondaryButtonProps={{ onClick: onRequestClose }}
           primaryButtonLabel={
             <>
-              <span className="flex items-center gap-2">
-                <CreditCard
+              Continue
+              <span className="bg-white/20 px-1 py-1 rounded">
+                <ArrowRight
+                  alt=""
                   color="currentColor"
                   size={24}
                   weight="bold"
                   className="w-6 h-6"
                 />
-                <span className="flex-none">Check out</span>
-              </span>
-              <span className="bg-white/20 px-2 py-1 rounded">
-                ${total.toFixed(2)}
               </span>
             </>
           }

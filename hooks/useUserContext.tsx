@@ -6,6 +6,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useMemo,
 } from "react";
 
 import { usePersistentState } from "hooks/usePersistentState";
@@ -18,11 +19,13 @@ import type {
 
 interface UserContextDefaultValue {
   apartmentNumber: string;
+  contactInfoValidationMessage: string | null;
   deliveryDropOffPreference: DeliveryDropOffPreference;
   deliveryDropOffNote: string;
   email: string;
   firstName: string;
   getDistanceToCoordinates: (coords: Coordinates) => number | null;
+  isContactInfoValid: boolean;
   lastName: string;
   location?: Location;
   phoneNumber: string;
@@ -42,11 +45,13 @@ interface UserContextDefaultValue {
 
 export const UserContext = createContext<UserContextDefaultValue>({
   apartmentNumber: "",
+  contactInfoValidationMessage: null,
   deliveryDropOffPreference: "Leave it at my door",
   deliveryDropOffNote: "",
   email: "",
   firstName: "",
   getDistanceToCoordinates: () => null,
+  isContactInfoValid: false,
   lastName: "",
   phoneNumber: "",
   setApartmentNumber: () => undefined,
@@ -110,38 +115,69 @@ export const UserContextProvider = ({
     [location]
   );
 
-  const setPhoneNumber = (nextPhoneNumber: string) => {
-    const cleanPhone = nextPhoneNumber.replace(/\D/g, "");
+  const setPhoneNumber = useCallback(
+    (nextPhoneNumber: string) => {
+      const cleanPhone = nextPhoneNumber.replace(/\D/g, "");
 
-    const [_, group1, group2, group3] =
-      cleanPhone.match(/(\d{0,3})(\d{0,3})(\d{0,4})/) ?? [];
+      const [_, group1, group2, group3] =
+        cleanPhone.match(/(\d{0,3})(\d{0,3})(\d{0,4})/) ?? [];
 
-    let formattedPhone = "";
+      let formattedPhone = "";
 
-    if (group1) {
-      formattedPhone = "(" + group1;
+      if (group1) {
+        formattedPhone = "(" + group1;
+      }
+
+      if (group2) {
+        formattedPhone += ") " + group2;
+      }
+
+      if (group3) {
+        formattedPhone += "-" + group3;
+      }
+
+      setPhoneNumberInternal(formattedPhone);
+    },
+    [setPhoneNumberInternal]
+  );
+
+  const [isContactInfoValid, contactInfoValidationMessage] = useMemo(() => {
+    if (!firstName) {
+      return [false, "First name is required."];
     }
 
-    if (group2) {
-      formattedPhone += ") " + group2;
+    if (!lastName) {
+      return [false, "Last name is required."];
     }
 
-    if (group3) {
-      formattedPhone += "-" + group3;
+    if (!phoneNumber) {
+      return [false, "Phone number is required."];
     }
 
-    setPhoneNumberInternal(formattedPhone);
-  };
+    const cleanPhone = phoneNumber.replace(/\D/g, "");
+
+    if (cleanPhone.length !== 10) {
+      return [false, "Please make sure your phone number is valid."];
+    }
+
+    if (!email) {
+      return [false, "Email address is required."];
+    }
+
+    return [true, null];
+  }, [email, firstName, lastName, phoneNumber]);
 
   return (
     <UserContext.Provider
       value={{
         apartmentNumber,
+        contactInfoValidationMessage,
         deliveryDropOffNote,
         deliveryDropOffPreference,
         email,
         firstName,
         getDistanceToCoordinates,
+        isContactInfoValid,
         lastName,
         location,
         phoneNumber,
