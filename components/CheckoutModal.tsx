@@ -117,7 +117,7 @@ export const CheckoutModal = ({
           <div
             className="
               z-30 flex flex-col gap-3 justify-between p-4 sm:p-6
-              bg-white sticky
+              bg-white sticky -mx-4 sm:-mx-6 -mb-4 sm:-mb-6
               bottom-0 border-t border-gray-200
             "
           >
