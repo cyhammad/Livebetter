@@ -68,7 +68,7 @@ export const ContactInfoModal = ({
             </span>
           </span>
         </h5>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row gap-4">
           <label className="flex flex-col text-sm w-full">
             First name
             <InputText
@@ -90,27 +90,29 @@ export const ContactInfoModal = ({
             />
           </label>
         </div>
-        <label className="flex flex-col text-sm">
-          Phone number
-          <InputText
-            autoComplete="tel-national"
-            className="px-0"
-            placeholder="(555) 555-5555"
-            value={phoneNumber}
-            onChange={(event) => setPhoneNumber(event.target.value)}
-          />
-        </label>
-        <label className="flex flex-col text-sm">
-          Email address
-          <InputText
-            autoComplete="email"
-            className="px-0"
-            placeholder="jane.doe@example.com"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-          />
-        </label>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <label className="flex flex-col text-sm w-full">
+            Phone number
+            <InputText
+              autoComplete="tel-national"
+              className="px-0"
+              placeholder="(555) 555-5555"
+              value={phoneNumber}
+              onChange={(event) => setPhoneNumber(event.target.value)}
+            />
+          </label>
+          <label className="flex flex-col text-sm w-full">
+            Email address
+            <InputText
+              autoComplete="email"
+              className="px-0"
+              placeholder="jane.doe@example.com"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+          </label>
+        </div>
         <label className="flex flex-col text-sm">
           Apartment or suite number
           <InputText
@@ -159,6 +161,13 @@ export const ContactInfoModal = ({
             />
           </label>
         </div>
+      </div>
+      <div
+        className="
+            z-30 flex flex-col gap-3 justify-between p-4 sm:p-6
+            bg-white sticky
+            bottom-0 border-t border-gray-200"
+      >
         <ModalButtons
           secondaryButtonLabel="Back"
           secondaryButtonProps={{ onClick: onRequestPrevious }}
@@ -181,6 +190,7 @@ export const ContactInfoModal = ({
           primaryButtonProps={{
             className: classNames({
               "opacity-50": false,
+              "py-3 px-4": true,
             }),
             disabled: false,
             onClick: onRequestNext,

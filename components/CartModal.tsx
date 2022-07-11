@@ -187,6 +187,14 @@ export const CartModal = ({
             restaurant={cart?.restaurant}
           />
         </div>
+      </div>
+      <div
+        className="
+          z-30 flex flex-col gap-3 justify-between p-4 sm:p-6
+          bg-white sticky
+          bottom-0 border-t border-gray-200
+        "
+      >
         <ModalButtons
           secondaryButtonLabel="Back"
           secondaryButtonProps={{ onClick: onRequestClose }}
