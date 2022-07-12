@@ -15,17 +15,18 @@ export const getCartPricingBreakdown = (
     shippingMethod === "delivery" ? toMoney(subtotal * 0.19) : 0;
   const smallOrderFee =
     shippingMethod === "delivery" && subtotal < 20 ? 2.99 : 0;
-  const total =
+  const total = toMoney(
     subtotal +
-    tax +
-    tip +
-    deliveryFee +
-    processingFee +
-    serviceFee +
-    smallOrderFee;
+      tax +
+      tip +
+      deliveryFee +
+      processingFee +
+      serviceFee +
+      smallOrderFee
+  );
 
   return {
-    amount: total * 100,
+    amount: toMoney(total * 100),
     deliveryFee,
     processingFee,
     serviceFee,
