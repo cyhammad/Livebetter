@@ -216,8 +216,8 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
           title: restaurant.Restaurant,
           image: restaurant.Image ?? "",
           type: "website",
-          url: `https://www.livebetterphl.com/restaurant-detail/${encodeURIComponent(
-            restaurantNameToUrlParam(restaurant.Restaurant)
+          url: `https://www.livebetterphl.com/restaurant-detail/${restaurantNameToUrlParam(
+            restaurant.Restaurant
           )}`,
         }}
       ></Head>

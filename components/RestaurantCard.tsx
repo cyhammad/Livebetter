@@ -29,8 +29,8 @@ export const RestaurantCard = ({
 
   return (
     <Link
-      href={`/restaurant-detail/${encodeURIComponent(
-        restaurantNameToUrlParam(restaurant.Restaurant)
+      href={`/restaurant-detail/${restaurantNameToUrlParam(
+        restaurant.Restaurant
       )}`}
     >
       <a

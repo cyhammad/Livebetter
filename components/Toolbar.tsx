@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { forwardRef, useEffect, useState } from "react";
 
-import { HEADER_HEIGHT } from "components/Header";
+import { HEADER_HEIGHT, WARNING_HEIGHT } from "components/Header";
 
 interface ToolbarProps {
   isShadowVisible?: boolean;
@@ -25,7 +25,10 @@ export const Toolbar = forwardRef<
       ([entry]) => {
         setIsToolbarPinned(entry.intersectionRatio < 1);
       },
-      { rootMargin: `-${HEADER_HEIGHT + TOOLBAR_HEIGHT}px`, threshold: [1] }
+      {
+        rootMargin: `-${HEADER_HEIGHT + TOOLBAR_HEIGHT + WARNING_HEIGHT}px`,
+        threshold: [1],
+      }
     );
 
     if (topRef) {
@@ -42,7 +45,7 @@ export const Toolbar = forwardRef<
   return (
     <div
       className={classNames({
-        "flex flex-col gap-4 sticky top-[48px] sm:top-[56px] px-4 py-3 sm:p-6 rounded-none sm:rounded-lg transition-shadow z-30 bg-white container mx-auto":
+        "flex flex-col gap-4 sticky top-[92px] sm:top-[100px] px-4 py-3 sm:p-6 rounded-none sm:rounded-lg transition-shadow z-30 bg-white container mx-auto":
           true,
         "shadow sm:shadow-lg": isShadowVisible || isToolbarPinned,
       })}
