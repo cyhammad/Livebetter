@@ -8,6 +8,7 @@ import { Taxi } from "phosphor-react";
 import { FormEvent, KeyboardEvent, MouseEvent, useState } from "react";
 
 import { ModalButtons } from "components/ModalButtons";
+import { useUserContext } from "hooks/useUserContext";
 
 interface CheckoutFormProps {
   onRequestPrevious?: (event?: MouseEvent | KeyboardEvent) => void;
@@ -22,6 +23,7 @@ export const CheckoutForm = ({
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>();
+  const { email } = useUserContext();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -35,8 +37,8 @@ export const CheckoutForm = ({
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // Make sure to change this to your payment completion page
         return_url: `${window.location.origin}/order-confirmation`,
+        receipt_email: email,
       },
     });
 

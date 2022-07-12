@@ -11,11 +11,14 @@ import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";
 import { useCartContext } from "hooks/useCartContext";
 import { usePrevious } from "hooks/usePrevious";
+import { useUserContext } from "hooks/useUserContext";
 import { fetchCreatePaymentIntent } from "lib/client/fetchCreatePaymentIntent";
 import { getStripePromise } from "lib/getStripePromise";
 import type {
   Cart,
   CreatePaymentIntentCart,
+  CreatePaymentIntentRequestBody,
+  CreatePaymentIntentUser,
   GetCreatePaymentIntentResult,
   ModalProps,
 } from "types";
@@ -32,11 +35,22 @@ export const CheckoutModal = ({
   ...restProps
 }: CheckoutModalProps) => {
   const { cart, total } = useCartContext();
+  const {
+    apartmentNumber,
+    deliveryDropOffNote,
+    deliveryDropOffPreference,
+    email,
+    firstName,
+    lastName,
+    phoneNumber,
+    shippingMethod,
+    location,
+  } = useUserContext();
   const { mutateAsync: createPaymentIntent } = useMutation<
     GetCreatePaymentIntentResult,
     unknown,
-    CreatePaymentIntentCart
-  >((variables) => fetchCreatePaymentIntent(variables), {
+    CreatePaymentIntentRequestBody
+  >((variables) => fetchCreatePaymentIntent(variables.cart, variables.user), {
     mutationKey: ["create_payment_intent"],
   });
   const [clientSecret, setClientSecret] = useState<string>();
@@ -52,17 +66,33 @@ export const CheckoutModal = ({
     if (
       isOpen &&
       !wasOpen &&
-      !deepEqual(cart, cartThatCreatedThePaymentIntentRef.current)
+      !deepEqual(cart, cartThatCreatedThePaymentIntentRef.current) &&
+      shippingMethod &&
+      location
     ) {
       const createPaymentIntentCart: CreatePaymentIntentCart = {
         items: cart?.items ?? [],
         restaurantName: cart?.restaurant?.Restaurant ?? "",
         tip: cart?.tip ?? 0,
       };
+      const createPaymentIntentUser: CreatePaymentIntentUser = {
+        location,
+        apartmentNumber,
+        deliveryDropOffNote,
+        deliveryDropOffPreference,
+        email,
+        firstName,
+        lastName,
+        phoneNumber,
+        shippingMethod,
+      };
 
       cartThatCreatedThePaymentIntentRef.current = cart;
 
-      createPaymentIntent(createPaymentIntentCart)
+      createPaymentIntent({
+        cart: createPaymentIntentCart,
+        user: createPaymentIntentUser,
+      })
         .then((result) => {
           if (result && result.clientSecret) {
             setClientSecret(result.clientSecret);
@@ -72,7 +102,21 @@ export const CheckoutModal = ({
           captureException(error, { extra: { createPaymentIntentCart } });
         });
     }
-  }, [cart, createPaymentIntent, isOpen, wasOpen]);
+  }, [
+    cart,
+    createPaymentIntent,
+    isOpen,
+    wasOpen,
+    apartmentNumber,
+    deliveryDropOffNote,
+    deliveryDropOffPreference,
+    email,
+    firstName,
+    lastName,
+    location,
+    phoneNumber,
+    shippingMethod,
+  ]);
 
   return (
     <Modal

@@ -7,4 +7,6 @@ export * from "./GetFeaturedApiRestaurants";
 export * from "./Head";
 export * from "./MenuItem";
 export * from "./Modal";
+export * from "./Order";
+export * from "./PaymentIntentOrder";
 export * from "./Restaurant";

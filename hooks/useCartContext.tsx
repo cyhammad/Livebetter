@@ -9,6 +9,7 @@ import {
 
 import { usePersistentState } from "hooks/usePersistentState";
 import { getCartItemsSubtotal } from "lib/getCartItemsSubtotal";
+import { getCartPricingBreakdown } from "lib/getCartPricingBreakdown";
 import type {
   ApiRestaurant,
   Cart,
@@ -166,21 +167,15 @@ export const CartContextProvider = ({
     [cart?.items]
   );
 
-  const tip = cart?.tip ?? 0;
-  const tax = subtotal * 0.08;
-  const deliveryFee = shippingMethod === "delivery" ? 3.99 : 0;
-  const processingFee = shippingMethod === "pickup" ? 2 : 0;
-  const serviceFee = shippingMethod === "delivery" ? subtotal * 0.19 : 0;
-  const smallOrderFee =
-    shippingMethod === "delivery" && subtotal < 20 ? 2.99 : 0;
-  const total =
-    subtotal +
-    tax +
-    tip +
-    deliveryFee +
-    processingFee +
-    serviceFee +
-    smallOrderFee;
+  const {
+    total,
+    deliveryFee,
+    processingFee,
+    serviceFee,
+    smallOrderFee,
+    tax,
+    tip,
+  } = getCartPricingBreakdown(cart?.items ?? [], shippingMethod, cart?.tip);
 
   return (
     <CartContext.Provider

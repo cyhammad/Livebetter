@@ -1,9 +1,15 @@
-import { CreatePaymentIntentCart } from "./Cart";
+import { CreatePaymentIntentCart, CreatePaymentIntentUser } from "types";
 
 export interface GetCreatePaymentIntentResult {
   clientSecret: string | null;
 }
 
 export type GetCreatePaymentIntent = (
-  cart: CreatePaymentIntentCart
+  cart: CreatePaymentIntentCart,
+  user: CreatePaymentIntentUser
 ) => Promise<GetCreatePaymentIntentResult>;
+
+export interface CreatePaymentIntentRequestBody {
+  cart: CreatePaymentIntentCart;
+  user: CreatePaymentIntentUser;
+}
