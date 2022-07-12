@@ -64,20 +64,28 @@ export const Header = forwardRef<HTMLElement>(function Header(_, ref) {
           </span>
         ) : null}
       </div>
-      <div className="flex flex-col justify-center h-11 flex-shrink flex-grow-0 bg-rose-600 text-white px-3 py-1">
-        <p className="text-sm font-bold text-center">Live ordering disabled</p>
-        <p className="text-xs text-center">
-          Please{" "}
-          <a
-            className="underline"
-            href={`https://livebetterphl.web.app${legacyPath}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            visit this page
-          </a>{" "}
-          on our current website.
+      <div className="flex flex-col justify-center h-11 flex-shrink flex-grow-0 bg-amber-600 text-white px-3 py-1">
+        <p className="text-sm font-bold text-center">
+          New Website Coming Soon! 🎉
         </p>
+        {typeof router.query.restaurantName === "string" ? (
+          <p className="text-xs text-center">
+            To order from{" "}
+            <span className="capitalize">
+              {router.query.restaurantName.toLocaleLowerCase()}
+            </span>
+            , please{" "}
+            <a
+              className="underline"
+              href={`https://livebetterphl.web.app${legacyPath}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              click here
+            </a>
+            .
+          </p>
+        ) : null}
       </div>
     </header>
   );
