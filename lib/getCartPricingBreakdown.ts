@@ -7,6 +7,9 @@ export const getCartPricingBreakdown = (
   shippingMethod?: ShippingMethod,
   tip = 0
 ) => {
+  // NOTE: Always run any mathematical calculations through `toMoney` to prevent
+  // JS math issues. (Try `16 + 2.99` in the console. You will see `18.990000000000002`)
+
   const subtotal = getCartItemsSubtotal(items);
   const tax = toMoney(subtotal * 0.08);
   const deliveryFee = shippingMethod === "delivery" ? 3.99 : 0;
