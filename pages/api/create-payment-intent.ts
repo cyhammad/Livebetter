@@ -85,8 +85,9 @@ async function handler(
     },
     currency: "usd",
     customer: customerId,
-    description: `Payment intent created by ${user.email}`,
+    description: `Order from ${cart.restaurantName} created by ${user.email}`,
     setup_future_usage: "off_session",
+    receipt_email: user.email,
   });
 
   const order = createOrder(cart, user, customerId, subtotal, cart.tip, total);
