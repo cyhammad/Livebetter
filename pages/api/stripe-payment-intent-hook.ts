@@ -1,5 +1,6 @@
 import { withSentry } from "@sentry/nextjs";
 import {
+  Timestamp,
   addDoc,
   collection,
   deleteDoc,
@@ -81,7 +82,11 @@ async function handler(
         const status = event.type.split(".")[1];
 
         // Update our status if any of the above fail
-        await setDoc(paymentIntentOrderDocRef, { status }, { merge: true });
+        await setDoc(
+          paymentIntentOrderDocRef,
+          { status, updatedAt: Timestamp.now() },
+          { merge: true }
+        );
       }
 
       break;
