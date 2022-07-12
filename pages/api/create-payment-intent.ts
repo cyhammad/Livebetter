@@ -65,7 +65,13 @@ async function handler(
   let customerId = lastOrderFromEmail.customers_id;
 
   if (!customerId) {
-    const customer = await stripe.customers.create({ email: user.email });
+    const customerCreateParams: Stripe.CustomerCreateParams = {
+      email: user.email,
+      name: `${user.firstName} ${user.lastName}`,
+      phone: user.phoneNumber,
+    };
+
+    const customer = await stripe.customers.create(customerCreateParams);
 
     customerId = customer.id;
   }
