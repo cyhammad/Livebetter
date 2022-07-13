@@ -3,6 +3,8 @@ import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "lib/server/db";
 import type { CreatePaymentIntentCart, MenuItem } from "types";
 
+import { toApiMenuItem } from "./toApiMenuItem";
+
 /**
  * Goes through the cart and resets each item's price, choice prices, and
  * optional choices prices to the value from the Restaurant_Menu collection
@@ -22,16 +24,20 @@ export const reassignCartPrices = async (cart: CreatePaymentIntentCart) => {
     const menuItemDoc = menuDocuments.docs.find((doc) => doc.id === item.name);
 
     if (menuItemDoc) {
-      const menuItemData = menuItemDoc.data() as MenuItem;
+      const apiMenuItem = toApiMenuItem(
+        menuItemDoc.id,
+        menuItemDoc.data() as MenuItem
+      );
 
-      item.mealPrice = menuItemData.meal_Price;
+      item.mealPrice = apiMenuItem.mealPrice;
 
       if (item.choices) {
         Object.entries(item.choices).forEach(([category, categoryChoices]) => {
           categoryChoices.forEach((categoryChoice) => {
             const price =
-              menuItemData.choices?.[`${category})∞(${categoryChoice.name}`] ??
-              0;
+              apiMenuItem.choices?.[category]?.find(
+                ({ name }) => name === categoryChoice.name
+              )?.price ?? 0;
 
             categoryChoice.price = price;
           });
@@ -43,9 +49,9 @@ export const reassignCartPrices = async (cart: CreatePaymentIntentCart) => {
           ([category, categoryChoices]) => {
             categoryChoices.forEach((categoryChoice) => {
               const price =
-                menuItemData.choices?.[
-                  `${category})∞(${categoryChoice.name}`
-                ] ?? 0;
+                apiMenuItem.optionalChoices?.[category]?.find(
+                  ({ name }) => name === categoryChoice.name
+                )?.price ?? 0;
 
               categoryChoice.price = price;
             });
