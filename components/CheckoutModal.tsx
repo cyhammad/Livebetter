@@ -68,7 +68,7 @@ export const CheckoutModal = ({
       !wasOpen &&
       !deepEqual(cart, cartThatCreatedThePaymentIntentRef.current) &&
       shippingMethod &&
-      location
+      (shippingMethod === "delivery" ? !!location : true)
     ) {
       const createPaymentIntentCart: CreatePaymentIntentCart = {
         items: cart?.items ?? [],
