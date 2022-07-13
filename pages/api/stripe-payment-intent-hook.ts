@@ -1,4 +1,5 @@
-import { withSentry } from "@sentry/nextjs";
+import sendGridMail from "@sendgrid/mail";
+import { captureException, withSentry } from "@sentry/nextjs";
 import {
   Timestamp,
   addDoc,
@@ -14,9 +15,12 @@ import {
 import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
+import twilio from "twilio";
 
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
+import { getOrderEmail } from "lib/server/getOrderEmail";
+import { getOrderSms } from "lib/server/getOrderSms";
 import type { ApiErrorResponse, PaymentIntentOrder } from "types";
 
 export const config = { api: { bodyParser: false } };
@@ -47,6 +51,13 @@ async function handler(
     apiVersion: "2020-08-27",
     typescript: true,
   });
+
+  sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+  const twilioClient = twilio(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_AUTH_TOKEN
+  );
 
   let event;
 
@@ -97,17 +108,70 @@ async function handler(
       if (paymentIntentOrderDoc) {
         const paymentIntentOrder =
           paymentIntentOrderDoc.data() as PaymentIntentOrder;
-        const order = paymentIntentOrder.order;
+        const newOrderData = paymentIntentOrder.order;
 
-        order.charges_id = paymentIntentOrder.paymentIntentId;
+        newOrderData.charges_id = paymentIntentOrder.paymentIntentId;
 
         // Move the order to the `orders` collection
-        await addDoc(collection(db, "orders"), order);
+        const order = await addDoc(collection(db, "orders"), newOrderData);
 
         // Delete the payment intent order
         await deleteDoc(
           doc(db, "payment_intent_orders", paymentIntentOrderDoc.id)
         );
+
+        const orderEmailHtml = getOrderEmail(newOrderData);
+        const orderSmsText = getOrderSms(newOrderData);
+
+        const [twilioResponse, sendGridResponse] = await Promise.allSettled([
+          twilioClient.messages.create({
+            to: "+16107623898",
+            // to: "+12157794302",
+            from: "+18782313212",
+            body: orderSmsText,
+          }),
+          await sendGridMail.send({
+            from: "livebetterphl@gmail.com",
+            // to: "livebetterphl@gmail.com",
+            to: "atdrago@gmail.com",
+            subject: `New Order Notification ✔ (Order #${order.id})`,
+            html: orderEmailHtml,
+            headers: { Accept: "application/json" },
+          }),
+        ]);
+
+        const didTwilioFail = twilioResponse.status === "rejected";
+        const didSendGridFail = sendGridResponse.status === "rejected";
+
+        if (didTwilioFail) {
+          captureException(twilioResponse.reason, {
+            extra: {
+              message: "Failed to send SMS using Twilio",
+            },
+          });
+        }
+
+        if (didSendGridFail) {
+          captureException(sendGridResponse.reason, {
+            extra: {
+              message: "Failed to send email using SendGrid",
+            },
+          });
+        }
+
+        if (didSendGridFail && didTwilioFail) {
+          res.status(500).json(
+            createApiErrorResponse(`
+              Error occurred sending Twilio SMS and SendGrid email.
+
+              Twilio error: ${twilioResponse.reason}
+
+              SendGrid error: ${sendGridResponse.reason}
+            `)
+          );
+
+          return;
+        }
       }
 
       break;

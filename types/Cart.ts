@@ -51,7 +51,7 @@ export interface CreatePaymentIntentCart extends Omit<Cart, "restaurant"> {
 }
 
 export interface CreatePaymentIntentUser {
-  location: Location;
+  location?: Location;
   apartmentNumber: string;
   deliveryDropOffPreference: DeliveryDropOffPreference;
   deliveryDropOffNote: string;

@@ -48,7 +48,7 @@ export interface OrderItem {
   tipPlaceHolderText?: string;
 }
 
-interface Choice {
+export interface Choice {
   name: string;
   price: number;
   qty: number;
