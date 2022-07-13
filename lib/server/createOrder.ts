@@ -16,24 +16,40 @@ export const createOrder = (
   tip: number,
   total: number
 ): Order => {
+  const deliver_to: Order["deliver_to"] =
+    user.shippingMethod === "pickup"
+      ? {
+          address: "PICKUP ORDER",
+          appartmentNo: "PICKUP ORDER",
+          dropoff: "PICKUP ORDER",
+          dropoff_note: "",
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phoneNumber: user.phoneNumber,
+        }
+      : {
+          address: user.location?.address ?? "Unknown",
+          appartmentNo: user.apartmentNumber,
+          customerLocation: user.location
+            ? {
+                lat: user.location.latitude,
+                lng: user.location.longitude,
+              }
+            : undefined,
+          dropoff_note: user.deliveryDropOffNote,
+          dropoff: user.deliveryDropOffPreference,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phoneNumber: user.phoneNumber,
+        };
+
   return {
     charges_id: "",
     created_at: Timestamp.now(),
     customers_id: customerId,
-    deliver_to: {
-      address: user.location.address,
-      appartmentNo: user.apartmentNumber,
-      customerLocation: {
-        lat: user.location.latitude,
-        lng: user.location.longitude,
-      },
-      dropoff_note: user.deliveryDropOffNote,
-      dropoff: user.deliveryDropOffPreference,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phoneNumber: user.phoneNumber,
-    },
+    deliver_to,
     order_items: cart.items.map(
       ({ name, mealPrice, count, choices, optionalChoices }): OrderItem => {
         const menuItemTotal = getCartMenuItemTotal(
