@@ -40,6 +40,7 @@ export const ContactInfoModal = ({
     setFirstName,
     setLastName,
     setPhoneNumber,
+    shippingMethod,
   } = useUserContext();
   const [didSubmit, setDidSubmit] = useState(false);
 
@@ -129,46 +130,56 @@ export const ContactInfoModal = ({
               />
             </label>
           </fieldset>
-          <label className="flex flex-col text-sm gap-1">
-            Apartment or suite number
-            <InputText
-              autoComplete="address-line2"
-              className="px-0"
-              placeholder="1600"
-              value={apartmentNumber}
-              onChange={(event) => setApartmentNumber(event.target.value)}
-            />
-          </label>
-          <div className="flex flex-col gap-3">
-            <fieldset className="flex flex-col gap-1">
-              <legend className=" text-sm">Drop-off preference</legend>
-              <label className="flex items-center gap-2">
-                <Radio
-                  checked={deliveryDropOffPreference === "Hand it to me"}
-                  onChange={() => setDeliveryDropOffPreference("Hand it to me")}
-                />{" "}
-                Hand it to me
+          {shippingMethod === "delivery" ? (
+            <>
+              <label className="flex flex-col text-sm gap-1">
+                Apartment or suite number
+                <InputText
+                  autoComplete="address-line2"
+                  className="px-0"
+                  placeholder="1600"
+                  value={apartmentNumber}
+                  onChange={(event) => setApartmentNumber(event.target.value)}
+                />
               </label>
-              <label className="flex items-center gap-2">
-                <Radio
-                  checked={deliveryDropOffPreference === "Leave it at my door"}
-                  onChange={() =>
-                    setDeliveryDropOffPreference("Leave it at my door")
-                  }
-                />{" "}
-                Leave it at my door
-              </label>
-            </fieldset>
-            <label className="flex flex-col text-sm gap-1">
-              Drop-off note
-              <InputTextarea
-                autoComplete="address-line2"
-                placeholder="e.g. enter on Main st, it's the 4th door on the right"
-                value={deliveryDropOffNote}
-                onChange={(event) => setDeliveryDropOffNote(event.target.value)}
-              />
-            </label>
-          </div>
+              <div className="flex flex-col gap-3">
+                <fieldset className="flex flex-col gap-1">
+                  <legend className=" text-sm">Drop-off preference</legend>
+                  <label className="flex items-center gap-2">
+                    <Radio
+                      checked={deliveryDropOffPreference === "Hand it to me"}
+                      onChange={() =>
+                        setDeliveryDropOffPreference("Hand it to me")
+                      }
+                    />{" "}
+                    Hand it to me
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <Radio
+                      checked={
+                        deliveryDropOffPreference === "Leave it at my door"
+                      }
+                      onChange={() =>
+                        setDeliveryDropOffPreference("Leave it at my door")
+                      }
+                    />{" "}
+                    Leave it at my door
+                  </label>
+                </fieldset>
+                <label className="flex flex-col text-sm gap-1">
+                  Drop-off note
+                  <InputTextarea
+                    autoComplete="address-line2"
+                    placeholder="e.g. enter on Main st, it's the 4th door on the right"
+                    value={deliveryDropOffNote}
+                    onChange={(event) =>
+                      setDeliveryDropOffNote(event.target.value)
+                    }
+                  />
+                </label>
+              </div>
+            </>
+          ) : null}
         </div>
         <div
           className="
