@@ -115,6 +115,11 @@ export const CartModal = ({
                 </div>
                 <CartChoicesList choices={item.choices} />
                 <CartChoicesList choices={item.optionalChoices} />
+                {item.notes ? (
+                  <p className="text-sm text-gray-600 ml-4">
+                    <b>Notes</b> {item.notes}
+                  </p>
+                ) : null}
               </motion.li>
             );
           })}

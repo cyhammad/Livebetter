@@ -51,7 +51,14 @@ export const createOrder = (
     customers_id: customerId,
     deliver_to,
     order_items: cart.items.map(
-      ({ name, mealPrice, count, choices, optionalChoices }): OrderItem => {
+      ({
+        choices,
+        count,
+        mealPrice,
+        name,
+        notes,
+        optionalChoices,
+      }): OrderItem => {
         const menuItemTotal = getCartMenuItemTotal(
           mealPrice,
           count,
@@ -70,7 +77,7 @@ export const createOrder = (
                 })
               )
           ),
-          item_description: "",
+          item_description: notes,
           item_id: name,
           item_price: mealPrice,
           item_total: menuItemTotal.toFixed(2),

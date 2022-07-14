@@ -169,7 +169,6 @@ export const ContactInfoModal = ({
                 <label className="flex flex-col text-sm gap-1">
                   Drop-off note
                   <InputTextarea
-                    autoComplete="address-line2"
                     placeholder="e.g. enter on Main st, it's the 4th door on the right"
                     value={deliveryDropOffNote}
                     onChange={(event) =>

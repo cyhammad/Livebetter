@@ -33,6 +33,7 @@ export interface CartMenuItem {
   count: number;
   mealPrice: number;
   name: string;
+  notes: string;
   optionalChoices?: CartMenuItemChoices;
 }
 

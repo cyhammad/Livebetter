@@ -26,6 +26,7 @@ interface CartContextDefaultValue {
     menuItemPrice: number,
     menuItemCategory: string | null,
     count: number,
+    menuItemNotes: string,
     choices?: CartMenuItemChoices,
     optionalChoices?: CartMenuItemChoices
   ) => void;
@@ -129,6 +130,7 @@ export const CartContextProvider = ({
     menuItemPrice,
     menuItemCategory,
     count,
+    menuItemNotes,
     choices,
     optionalChoices
   ) => {
@@ -139,6 +141,7 @@ export const CartContextProvider = ({
         count,
         mealPrice: menuItemPrice,
         name: menuItemName,
+        notes: menuItemNotes,
         optionalChoices,
       };
 

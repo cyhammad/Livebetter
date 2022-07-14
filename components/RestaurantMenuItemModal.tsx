@@ -5,6 +5,7 @@ import ReactModal from "react-modal";
 
 import { Checkbox } from "components/Checkbox";
 import { InputCounter } from "components/InputCounter";
+import { InputTextarea } from "components/InputTextarea";
 import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";
 import { Select } from "components/Select";
@@ -58,6 +59,7 @@ export const RestaurantMenuItemModal = ({
         ? "pickup"
         : null
     );
+  const [menuItemNotes, setMenuItemNotes] = useState("");
 
   const didRestaurantChange =
     !cart?.restaurant.Restaurant ||
@@ -405,6 +407,21 @@ export const RestaurantMenuItemModal = ({
                 )}
               </>
             ) : null}
+            <label className="flex flex-col text-sm gap-2 px-4 sm:px-6">
+              <h3
+                className="
+                  z-0 flex justify-between items-center gap-1
+                  sticky top-10 text-xl font-bold bg-white
+                "
+              >
+                Extra instructions
+              </h3>
+              <InputTextarea
+                placeholder="Add any special requests (e.g., food allergies, extra spicy, etc.) and the store will do its best to accommodate you."
+                value={menuItemNotes}
+                onChange={(event) => setMenuItemNotes(event.target.value)}
+              />
+            </label>
           </section>
           <div
             className="
@@ -472,6 +489,7 @@ export const RestaurantMenuItemModal = ({
                     menuItem.mealPrice,
                     menuItem.category,
                     1,
+                    menuItemNotes,
                     selectedChoices
                       ? toCartMenuItemChoices(selectedChoices)
                       : undefined,
