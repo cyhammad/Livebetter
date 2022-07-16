@@ -1,4 +1,5 @@
 import { getCartFees } from "lib/getCartPricingBreakdown";
+import { toMoney } from "lib/toMoney";
 import { Choice, Order, OrderItem } from "types";
 
 const getChoices = (choices?: Array<Choice>) => {
@@ -35,8 +36,9 @@ export const getOrderEmail = (order: Order) => {
     order.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery"
   );
 
-  const profit =
-    deliveryFee + processingFee + serviceFee + smallOrderFee + order.tip;
+  const profit = toMoney(
+    deliveryFee + processingFee + serviceFee + smallOrderFee + order.tip
+  );
 
   return `
   <!DOCTYPE html>
