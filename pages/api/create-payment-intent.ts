@@ -53,6 +53,9 @@ async function handler(
     typescript: true,
   });
 
+  // Remove non-digits from the user's phone number before saving
+  user.phoneNumber = user.phoneNumber.replace(/\D/g, "");
+
   const lastOrderDocFromEmail = await getDocs(
     query(
       collection(db, "orders"),
