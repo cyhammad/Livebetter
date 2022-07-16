@@ -156,6 +156,7 @@ export const RestaurantMenuItemModal = ({
           ? "pickup"
           : null
       );
+      setMenuItemNotes("");
     }
 
     prevIsOpenRef.current = isOpen;
