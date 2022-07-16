@@ -1,11 +1,12 @@
 import { withSentry } from "@sentry/nextjs";
 import {
   Timestamp,
-  addDoc,
   collection,
+  doc,
   getDocs,
   limit,
   query,
+  setDoc,
   where,
 } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -19,7 +20,7 @@ import { reassignCartPrices } from "lib/server/reassignCartPrices";
 import type {
   ApiErrorResponse,
   CreatePaymentIntentRequestBody,
-  GetCreatePaymentIntentResult,
+  CreatePaymentIntentResult,
   Order,
   PaymentIntentOrder,
 } from "types";
@@ -30,7 +31,7 @@ interface CreatePaymentIntentRequest extends NextApiRequest {
 
 async function handler(
   req: CreatePaymentIntentRequest,
-  res: NextApiResponse<GetCreatePaymentIntentResult | ApiErrorResponse>
+  res: NextApiResponse<CreatePaymentIntentResult | ApiErrorResponse>
 ) {
   const cart = req.body.cart;
   const user = req.body.user;
@@ -84,31 +85,46 @@ async function handler(
     cart.tip
   );
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount,
-    automatic_payment_methods: {
-      enabled: true,
-    },
-    currency: "usd",
-    customer: customerId,
-    description: `Order from ${cart.restaurantName} created by ${user.email}`,
-    setup_future_usage: "off_session",
-    receipt_email: user.email,
-  });
-
   const order = createOrder(cart, user, customerId, subtotal, cart.tip, total);
 
   const paymentIntentOrder: PaymentIntentOrder = {
-    createdAt: Timestamp.now(),
     order,
-    paymentIntentId: paymentIntent.id,
     status: null,
     updatedAt: Timestamp.now(),
   };
 
-  await addDoc(collection(db, "payment_intent_orders"), paymentIntentOrder);
+  let paymentIntent;
 
-  const result: GetCreatePaymentIntentResult = {
+  // If a payment intent client secret is passed we can use that to update the
+  // existing payment intent, rather than creating a new one.
+  if (cart.paymentIntentClientSecret) {
+    // Not sure if this is okay or not, but the payment intent id is everything
+    // before _secret_ in the client secret
+    const paymentIntentId = cart.paymentIntentClientSecret.split("_secret_")[0];
+
+    paymentIntent = await stripe.paymentIntents.update(paymentIntentId, {
+      amount,
+    });
+  } else {
+    paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      currency: "usd",
+      customer: customerId,
+      description: `Order from ${cart.restaurantName} created by ${user.email}`,
+      setup_future_usage: "off_session",
+      receipt_email: user.email,
+    });
+  }
+
+  await setDoc(
+    doc(db, "payment_intent_orders", paymentIntent.id),
+    paymentIntentOrder
+  );
+
+  const result: CreatePaymentIntentResult = {
     clientSecret: paymentIntent.client_secret,
   };
 

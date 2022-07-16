@@ -6,11 +6,8 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDocs,
-  limit,
-  query,
+  getDoc,
   setDoc,
-  where,
 } from "firebase/firestore";
 import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -30,15 +27,7 @@ const getPaymentIntentOrderDoc = async (event: Stripe.Event) => {
   const paymentIntentId =
     "id" in paymentIntentObject ? paymentIntentObject.id : "";
 
-  const existingDocs = await getDocs(
-    query(
-      collection(db, "payment_intent_orders"),
-      where("paymentIntentId", "==", paymentIntentId),
-      limit(1)
-    )
-  );
-
-  return existingDocs.docs[0];
+  return await getDoc(doc(db, "payment_intent_orders", paymentIntentId));
 };
 
 async function handler(
@@ -110,7 +99,7 @@ async function handler(
           paymentIntentOrderDoc.data() as PaymentIntentOrder;
         const newOrderData = paymentIntentOrder.order;
 
-        newOrderData.charges_id = paymentIntentOrder.paymentIntentId;
+        newOrderData.charges_id = paymentIntentOrderDoc.id;
 
         // Move the order to the `orders` collection
         const order = await addDoc(collection(db, "orders"), newOrderData);

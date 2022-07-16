@@ -13,8 +13,8 @@ import { usePersistentState } from "hooks/usePersistentState";
 import type {
   Coordinates,
   DeliveryDropOffPreference,
-  Location,
   ShippingMethod,
+  UserLocation,
 } from "types";
 
 interface UserContextDefaultValue {
@@ -27,7 +27,7 @@ interface UserContextDefaultValue {
   getDistanceToCoordinates: (coords: Coordinates) => number | null;
   isContactInfoValid: boolean;
   lastName: string;
-  location?: Location;
+  location?: UserLocation;
   phoneNumber: string;
   setApartmentNumber: Dispatch<SetStateAction<string>>;
   setDeliveryDropOffNote: Dispatch<SetStateAction<string>>;
@@ -37,7 +37,7 @@ interface UserContextDefaultValue {
   setEmail: Dispatch<SetStateAction<string>>;
   setFirstName: Dispatch<SetStateAction<string>>;
   setLastName: Dispatch<SetStateAction<string>>;
-  setLocation: Dispatch<SetStateAction<Location | undefined>>;
+  setLocation: Dispatch<SetStateAction<UserLocation | undefined>>;
   setPhoneNumber: (nextPhoneNumber: string) => void;
   setShippingMethod: Dispatch<SetStateAction<ShippingMethod | undefined>>;
   shippingMethod?: ShippingMethod;
@@ -68,7 +68,7 @@ export const UserContext = createContext<UserContextDefaultValue>({
 export const UserContextProvider = ({
   children,
 }: PropsWithChildren<unknown>) => {
-  const [location, setLocation] = usePersistentState<Location | undefined>(
+  const [location, setLocation] = usePersistentState<UserLocation | undefined>(
     "user.location",
     undefined
   );

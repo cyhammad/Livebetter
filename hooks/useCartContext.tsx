@@ -51,6 +51,7 @@ interface CartContextDefaultValue {
    * The total price of the cart
    */
   total: number;
+  setPaymentIntentClientSecret: (secret: string) => void;
 }
 
 export const CartContext = createContext<CartContextDefaultValue>({
@@ -69,6 +70,7 @@ export const CartContext = createContext<CartContextDefaultValue>({
   tax: 0,
   tip: 0,
   total: 0,
+  setPaymentIntentClientSecret: () => undefined,
 });
 
 export const CartContextProvider = ({
@@ -79,50 +81,6 @@ export const CartContextProvider = ({
     "cart",
     undefined
   );
-
-  const removeMenuItem: CartContextDefaultValue["removeMenuItem"] = (
-    menuItemIndex
-  ) => {
-    setCart((prevCart) => {
-      if (prevCart) {
-        return {
-          ...prevCart,
-          items:
-            prevCart?.items.filter((item, index) => index !== menuItemIndex) ??
-            [],
-        };
-      }
-    });
-  };
-
-  const setMenuItemCount: CartContextDefaultValue["setMenuItemCount"] = (
-    menuItemIndex,
-    nextCount
-  ) => {
-    setCart((prevCart) => {
-      if (prevCart) {
-        return {
-          ...prevCart,
-          items:
-            prevCart?.items.map((item, index) => ({
-              ...item,
-              count: index === menuItemIndex ? nextCount : item.count,
-            })) ?? [],
-        };
-      }
-    });
-  };
-
-  const setTip: CartContextDefaultValue["setTip"] = (tip) => {
-    setCart((prevCart) => {
-      if (prevCart) {
-        return {
-          ...prevCart,
-          tip,
-        };
-      }
-    });
-  };
 
   const addToCart: CartContextDefaultValue["addToCart"] = (
     restaurant,
@@ -157,7 +115,64 @@ export const CartContextProvider = ({
           : [...prevCart.items, addedItem],
         restaurant,
         tip: prevCart?.tip ?? 0,
+        paymentIntentClientSecret: prevCart?.paymentIntentClientSecret ?? null,
       };
+    });
+  };
+
+  const removeMenuItem: CartContextDefaultValue["removeMenuItem"] = (
+    menuItemIndex
+  ) => {
+    setCart((prevCart) => {
+      if (prevCart) {
+        return {
+          ...prevCart,
+          items:
+            prevCart?.items.filter((item, index) => index !== menuItemIndex) ??
+            [],
+        };
+      }
+    });
+  };
+
+  const setMenuItemCount: CartContextDefaultValue["setMenuItemCount"] = (
+    menuItemIndex,
+    nextCount
+  ) => {
+    setCart((prevCart) => {
+      if (prevCart) {
+        return {
+          ...prevCart,
+          items:
+            prevCart?.items.map((item, index) => ({
+              ...item,
+              count: index === menuItemIndex ? nextCount : item.count,
+            })) ?? [],
+        };
+      }
+    });
+  };
+
+  const setPaymentIntentClientSecret: CartContextDefaultValue["setPaymentIntentClientSecret"] =
+    (secret) => {
+      setCart((prevCart) => {
+        if (prevCart) {
+          return {
+            ...prevCart,
+            paymentIntentClientSecret: secret,
+          };
+        }
+      });
+    };
+
+  const setTip: CartContextDefaultValue["setTip"] = (tip) => {
+    setCart((prevCart) => {
+      if (prevCart) {
+        return {
+          ...prevCart,
+          tip,
+        };
+      }
     });
   };
 
@@ -199,6 +214,7 @@ export const CartContextProvider = ({
         tax,
         tip,
         total,
+        setPaymentIntentClientSecret,
       }}
     >
       {children}

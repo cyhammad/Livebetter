@@ -11,9 +11,7 @@ export type PaymentIntentStatus =
   | "succeeded";
 
 export interface PaymentIntentOrder {
-  createdAt: Timestamp;
   order: Order;
-  paymentIntentId: string;
   status:
     | null
     | "canceled"

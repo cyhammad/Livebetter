@@ -3,6 +3,6 @@ export interface Coordinates {
   longitude: number;
 }
 
-export interface Location extends Coordinates {
+export interface UserLocation extends Coordinates {
   address: string;
 }

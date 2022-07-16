@@ -1,4 +1,4 @@
-import type { ApiMenuItemChoice, ApiRestaurant, Location } from "types";
+import type { ApiMenuItemChoice, ApiRestaurant } from "types";
 
 export interface CartMenuItemChoiceInput extends ApiMenuItemChoice {
   count: number | null;
@@ -45,20 +45,5 @@ export interface Cart {
   items: CartMenuItem[];
   restaurant: ApiRestaurant;
   tip: number;
-}
-
-export interface CreatePaymentIntentCart extends Omit<Cart, "restaurant"> {
-  restaurantName: string;
-}
-
-export interface CreatePaymentIntentUser {
-  location?: Location;
-  apartmentNumber: string;
-  deliveryDropOffPreference: DeliveryDropOffPreference;
-  deliveryDropOffNote: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  shippingMethod: ShippingMethod;
+  paymentIntentClientSecret: string | null;
 }

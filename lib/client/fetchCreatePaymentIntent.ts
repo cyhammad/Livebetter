@@ -1,10 +1,10 @@
 import { request } from "lib/client/request";
 import type {
   CreatePaymentIntentRequestBody,
-  GetCreatePaymentIntent,
+  FetchCreatePaymentIntent,
 } from "types";
 
-export const fetchCreatePaymentIntent: GetCreatePaymentIntent = async (
+export const fetchCreatePaymentIntent: FetchCreatePaymentIntent = async (
   cart,
   user
 ) => {

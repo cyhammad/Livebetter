@@ -3,7 +3,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import classNames from "classnames";
 import { deepEqual } from "fast-equals";
 import { CreditCard, Taxi } from "phosphor-react";
-import { KeyboardEvent, MouseEvent, useEffect, useRef, useState } from "react";
+import { KeyboardEvent, MouseEvent, useEffect, useRef } from "react";
 import { useMutation } from "react-query";
 
 import { CheckoutForm } from "components/CheckoutForm";
@@ -18,8 +18,8 @@ import type {
   Cart,
   CreatePaymentIntentCart,
   CreatePaymentIntentRequestBody,
+  CreatePaymentIntentResult,
   CreatePaymentIntentUser,
-  GetCreatePaymentIntentResult,
   ModalProps,
 } from "types";
 
@@ -34,7 +34,7 @@ export const CheckoutModal = ({
   onRequestPrevious,
   ...restProps
 }: CheckoutModalProps) => {
-  const { cart, total } = useCartContext();
+  const { cart, total, setPaymentIntentClientSecret } = useCartContext();
   const {
     apartmentNumber,
     deliveryDropOffNote,
@@ -47,13 +47,12 @@ export const CheckoutModal = ({
     location,
   } = useUserContext();
   const { mutateAsync: createPaymentIntent } = useMutation<
-    GetCreatePaymentIntentResult,
+    CreatePaymentIntentResult,
     unknown,
     CreatePaymentIntentRequestBody
   >((variables) => fetchCreatePaymentIntent(variables.cart, variables.user), {
     mutationKey: ["create_payment_intent"],
   });
-  const [clientSecret, setClientSecret] = useState<string>();
 
   const wasOpen = usePrevious(isOpen);
   const cartThatCreatedThePaymentIntentRef = useRef<Cart>();
@@ -74,6 +73,7 @@ export const CheckoutModal = ({
         items: cart?.items ?? [],
         restaurantName: cart?.restaurant?.Restaurant ?? "",
         tip: cart?.tip ?? 0,
+        paymentIntentClientSecret: cart?.paymentIntentClientSecret ?? null,
       };
       const createPaymentIntentUser: CreatePaymentIntentUser = {
         location,
@@ -95,7 +95,7 @@ export const CheckoutModal = ({
       })
         .then((result) => {
           if (result && result.clientSecret) {
-            setClientSecret(result.clientSecret);
+            setPaymentIntentClientSecret(result.clientSecret);
           }
         })
         .catch((error) => {
@@ -116,6 +116,7 @@ export const CheckoutModal = ({
     location,
     phoneNumber,
     shippingMethod,
+    setPaymentIntentClientSecret,
   ]);
 
   return (
@@ -146,9 +147,12 @@ export const CheckoutModal = ({
             </span>
           </span>
         </h5>
-        {clientSecret ? (
+        {cart?.paymentIntentClientSecret ? (
           <Elements
-            options={{ appearance: { theme: "flat" }, clientSecret }}
+            options={{
+              appearance: { theme: "flat" },
+              clientSecret: cart.paymentIntentClientSecret,
+            }}
             stripe={getStripePromise()}
           >
             <CheckoutForm onRequestPrevious={onRequestPrevious} total={total} />
