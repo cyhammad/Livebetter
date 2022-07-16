@@ -93,6 +93,7 @@ async function handler(
         const newOrderData = paymentIntentOrder.order;
 
         newOrderData.charges_id = paymentIntentOrderDoc.id;
+        newOrderData.created_at = Timestamp.now();
 
         // Move the order to the `orders` collection
         const order = await addDoc(collection(db, "orders"), newOrderData);
