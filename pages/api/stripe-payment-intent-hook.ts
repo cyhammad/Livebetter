@@ -65,7 +65,7 @@ async function handler(
     case "payment_intent.processing": {
       const paymentIntentOrderDoc = await getPaymentIntentOrderDoc(event);
 
-      if (paymentIntentOrderDoc) {
+      if (paymentIntentOrderDoc && paymentIntentOrderDoc.exists()) {
         const paymentIntentOrderDocRef = doc(
           db,
           "payment_intent_orders",
@@ -87,7 +87,7 @@ async function handler(
     case "payment_intent.succeeded": {
       const paymentIntentOrderDoc = await getPaymentIntentOrderDoc(event);
 
-      if (paymentIntentOrderDoc) {
+      if (paymentIntentOrderDoc && paymentIntentOrderDoc.exists()) {
         const paymentIntentOrder =
           paymentIntentOrderDoc.data() as PaymentIntentOrder;
         const newOrderData = paymentIntentOrder.order;
