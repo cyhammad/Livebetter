@@ -8,7 +8,5 @@ declare namespace NodeJS {
     SENDGRID_API_KEY: string;
     STRIPE_SECRET_KEY: string;
     STRIPE_WEBHOOK_SECRET: string;
-    TWILIO_ACCOUNT_SID: string;
-    TWILIO_AUTH_TOKEN: string;
   }
 }

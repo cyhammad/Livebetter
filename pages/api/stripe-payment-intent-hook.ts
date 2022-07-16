@@ -12,12 +12,10 @@ import {
 import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
-import twilio from "twilio";
 
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
 import { getOrderEmail } from "lib/server/getOrderEmail";
-import { getOrderSms } from "lib/server/getOrderSms";
 import type { ApiErrorResponse, PaymentIntentOrder } from "types";
 
 export const config = { api: { bodyParser: false } };
@@ -42,11 +40,6 @@ async function handler(
   });
 
   sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-  const twilioClient = twilio(
-    process.env.TWILIO_ACCOUNT_SID,
-    process.env.TWILIO_AUTH_TOKEN
-  );
 
   let event;
 
@@ -110,15 +103,8 @@ async function handler(
         );
 
         const orderEmailHtml = getOrderEmail(newOrderData);
-        const orderSmsText = getOrderSms(newOrderData);
 
-        const [twilioResponse, sendGridResponse] = await Promise.allSettled([
-          twilioClient.messages.create({
-            to: "+16107623898",
-            // to: "+12157794302",
-            from: "+18782313212",
-            body: orderSmsText,
-          }),
+        const [sendGridResponse] = await Promise.allSettled([
           await sendGridMail.send({
             from: "livebetterphl@gmail.com",
             // to: "livebetterphl@gmail.com",
@@ -129,16 +115,7 @@ async function handler(
           }),
         ]);
 
-        const didTwilioFail = twilioResponse.status === "rejected";
         const didSendGridFail = sendGridResponse.status === "rejected";
-
-        if (didTwilioFail) {
-          captureException(twilioResponse.reason, {
-            extra: {
-              message: "Failed to send SMS using Twilio",
-            },
-          });
-        }
 
         if (didSendGridFail) {
           captureException(sendGridResponse.reason, {
@@ -146,20 +123,6 @@ async function handler(
               message: "Failed to send email using SendGrid",
             },
           });
-        }
-
-        if (didSendGridFail && didTwilioFail) {
-          res.status(500).json(
-            createApiErrorResponse(`
-              Error occurred sending Twilio SMS and SendGrid email.
-
-              Twilio error: ${twilioResponse.reason}
-
-              SendGrid error: ${sendGridResponse.reason}
-            `)
-          );
-
-          return;
         }
       }
 
