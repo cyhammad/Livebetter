@@ -107,8 +107,10 @@ async function handler(
         const [sendGridResponse] = await Promise.allSettled([
           await sendGridMail.send({
             from: "livebetterphl@gmail.com",
-            // to: "livebetterphl@gmail.com",
-            to: "atdrago@gmail.com",
+            to:
+              process.env.NODE_ENV === "production"
+                ? "livebetterphl@gmail.com"
+                : "atdrago@gmail.com",
             subject: `New Order Notification ✔ (Order #${order.id})`,
             html: orderEmailHtml,
             headers: { Accept: "application/json" },
