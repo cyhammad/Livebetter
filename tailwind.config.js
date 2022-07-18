@@ -7,6 +7,7 @@ module.exports = {
     extend: {
       animation: {
         compass: "compass 1.85s infinite",
+        "spin-slow": "spin 2s linear infinite",
       },
       keyframes: {
         compass: {

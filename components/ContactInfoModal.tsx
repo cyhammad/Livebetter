@@ -1,14 +1,24 @@
+import { captureException } from "@sentry/nextjs";
 import classNames from "classnames";
-import { ArrowRight, User } from "phosphor-react";
-import { KeyboardEvent, MouseEvent, useState } from "react";
+import { ArrowRight, Spinner, User } from "phosphor-react";
+import React, { KeyboardEvent, MouseEvent, useState } from "react";
+import { useMutation } from "react-query";
 
 import { InputText } from "components/InputText";
 import { InputTextarea } from "components/InputTextarea";
 import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";
 import { Radio } from "components/Radio";
+import { useCartContext } from "hooks/useCartContext";
 import { useUserContext } from "hooks/useUserContext";
-import type { ModalProps } from "types";
+import { fetchCreatePaymentIntent } from "lib/client/fetchCreatePaymentIntent";
+import type {
+  CreatePaymentIntentCart,
+  CreatePaymentIntentRequestBody,
+  CreatePaymentIntentResult,
+  CreatePaymentIntentUser,
+  ModalProps,
+} from "types";
 
 interface ContactInfoModalProps extends ModalProps {
   onRequestClose?: (event?: MouseEvent | KeyboardEvent) => void;
@@ -23,6 +33,7 @@ export const ContactInfoModal = ({
   onRequestNext,
   ...restProps
 }: ContactInfoModalProps) => {
+  const { cart, setPaymentIntentClientSecret } = useCartContext();
   const {
     apartmentNumber,
     contactInfoValidationMessage,
@@ -32,6 +43,7 @@ export const ContactInfoModal = ({
     firstName,
     isContactInfoValid,
     lastName,
+    location,
     phoneNumber,
     setApartmentNumber,
     setDeliveryDropOffNote,
@@ -43,6 +55,67 @@ export const ContactInfoModal = ({
     shippingMethod,
   } = useUserContext();
   const [didSubmit, setDidSubmit] = useState(false);
+  const [createPaymentIntentMessage, setCreatePaymentIntentMessage] =
+    useState("");
+  const { mutateAsync: createPaymentIntent, isLoading } = useMutation<
+    CreatePaymentIntentResult,
+    unknown,
+    CreatePaymentIntentRequestBody
+  >((variables) => fetchCreatePaymentIntent(variables.cart, variables.user), {
+    mutationKey: ["create_payment_intent"],
+  });
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    setDidSubmit(true);
+
+    if (
+      isContactInfoValid &&
+      shippingMethod &&
+      (shippingMethod === "delivery" ? !!location : true)
+    ) {
+      const createPaymentIntentCart: CreatePaymentIntentCart = {
+        items: cart?.items ?? [],
+        restaurantName: cart?.restaurant?.Restaurant ?? "",
+        tip: cart?.tip ?? 0,
+        paymentIntentClientSecret: cart?.paymentIntentClientSecret ?? null,
+      };
+      const createPaymentIntentUser: CreatePaymentIntentUser = {
+        location,
+        apartmentNumber,
+        deliveryDropOffNote,
+        deliveryDropOffPreference,
+        email,
+        firstName,
+        lastName,
+        phoneNumber,
+        shippingMethod,
+      };
+
+      createPaymentIntent({
+        cart: createPaymentIntentCart,
+        user: createPaymentIntentUser,
+      })
+        .then((result) => {
+          if (result && result.clientSecret) {
+            setPaymentIntentClientSecret(result.clientSecret);
+            onRequestNext && onRequestNext();
+          }
+        })
+        .catch((error) => {
+          if (error instanceof Error) {
+            setCreatePaymentIntentMessage(error.message);
+          } else {
+            setCreatePaymentIntentMessage(
+              "An unknown error occurred. Please try again."
+            );
+          }
+
+          captureException(error, { extra: { createPaymentIntentCart } });
+        });
+    }
+  };
 
   return (
     <Modal
@@ -57,17 +130,7 @@ export const ContactInfoModal = ({
       }}
       {...restProps}
     >
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-
-          setDidSubmit(true);
-
-          if (isContactInfoValid) {
-            onRequestNext && onRequestNext();
-          }
-        }}
-      >
+      <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-3 py-4 sm:py-6 px-4 sm:px-6">
           <h5 className="text-2xl font-bold">
             <span className="flex gap-2 items-center">
@@ -191,6 +254,11 @@ export const ContactInfoModal = ({
               {contactInfoValidationMessage}
             </p>
           ) : null}
+          {createPaymentIntentMessage ? (
+            <p className="text-rose-600 text-sm sm:text-base font-semibold">
+              {createPaymentIntentMessage}
+            </p>
+          ) : null}
           <ModalButtons
             secondaryButtonLabel="Back"
             secondaryButtonProps={{ onClick: onRequestPrevious }}
@@ -198,13 +266,23 @@ export const ContactInfoModal = ({
               <>
                 Continue
                 <span className="bg-white/20 px-1 py-1 rounded">
-                  <ArrowRight
-                    alt=""
-                    color="currentColor"
-                    size={24}
-                    weight="bold"
-                    className="w-6 h-6"
-                  />
+                  {isLoading ? (
+                    <Spinner
+                      alt=""
+                      color="currentColor"
+                      size={24}
+                      weight="bold"
+                      className="w-6 h-6 animate-spin-slow"
+                    />
+                  ) : (
+                    <ArrowRight
+                      alt=""
+                      color="currentColor"
+                      size={24}
+                      weight="bold"
+                      className="w-6 h-6"
+                    />
+                  )}
                 </span>
               </>
             }

@@ -1,27 +1,14 @@
-import { captureException } from "@sentry/nextjs";
 import { Elements } from "@stripe/react-stripe-js";
 import classNames from "classnames";
-import { deepEqual } from "fast-equals";
 import { CreditCard, Taxi } from "phosphor-react";
-import { KeyboardEvent, MouseEvent, useEffect, useRef } from "react";
-import { useMutation } from "react-query";
+import { KeyboardEvent, MouseEvent } from "react";
 
 import { CheckoutForm } from "components/CheckoutForm";
 import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";
 import { useCartContext } from "hooks/useCartContext";
-import { usePrevious } from "hooks/usePrevious";
-import { useUserContext } from "hooks/useUserContext";
-import { fetchCreatePaymentIntent } from "lib/client/fetchCreatePaymentIntent";
 import { getStripePromise } from "lib/getStripePromise";
-import type {
-  Cart,
-  CreatePaymentIntentCart,
-  CreatePaymentIntentRequestBody,
-  CreatePaymentIntentResult,
-  CreatePaymentIntentUser,
-  ModalProps,
-} from "types";
+import type { ModalProps } from "types";
 
 interface CheckoutModalProps extends ModalProps {
   onRequestClose?: (event?: MouseEvent | KeyboardEvent) => void;
@@ -34,90 +21,7 @@ export const CheckoutModal = ({
   onRequestPrevious,
   ...restProps
 }: CheckoutModalProps) => {
-  const { cart, total, setPaymentIntentClientSecret } = useCartContext();
-  const {
-    apartmentNumber,
-    deliveryDropOffNote,
-    deliveryDropOffPreference,
-    email,
-    firstName,
-    lastName,
-    phoneNumber,
-    shippingMethod,
-    location,
-  } = useUserContext();
-  const { mutateAsync: createPaymentIntent } = useMutation<
-    CreatePaymentIntentResult,
-    unknown,
-    CreatePaymentIntentRequestBody
-  >((variables) => fetchCreatePaymentIntent(variables.cart, variables.user), {
-    mutationKey: ["create_payment_intent"],
-  });
-
-  const wasOpen = usePrevious(isOpen);
-  const cartThatCreatedThePaymentIntentRef = useRef<Cart>();
-
-  useEffect(() => {
-    // Only create a payment method if
-    // - The checkout modal is open,
-    // - and it previously was not open,
-    // - and the cart changed
-    if (
-      isOpen &&
-      !wasOpen &&
-      !deepEqual(cart, cartThatCreatedThePaymentIntentRef.current) &&
-      shippingMethod &&
-      (shippingMethod === "delivery" ? !!location : true)
-    ) {
-      const createPaymentIntentCart: CreatePaymentIntentCart = {
-        items: cart?.items ?? [],
-        restaurantName: cart?.restaurant?.Restaurant ?? "",
-        tip: cart?.tip ?? 0,
-        paymentIntentClientSecret: cart?.paymentIntentClientSecret ?? null,
-      };
-      const createPaymentIntentUser: CreatePaymentIntentUser = {
-        location,
-        apartmentNumber,
-        deliveryDropOffNote,
-        deliveryDropOffPreference,
-        email,
-        firstName,
-        lastName,
-        phoneNumber,
-        shippingMethod,
-      };
-
-      cartThatCreatedThePaymentIntentRef.current = cart;
-
-      createPaymentIntent({
-        cart: createPaymentIntentCart,
-        user: createPaymentIntentUser,
-      })
-        .then((result) => {
-          if (result && result.clientSecret) {
-            setPaymentIntentClientSecret(result.clientSecret);
-          }
-        })
-        .catch((error) => {
-          captureException(error, { extra: { createPaymentIntentCart } });
-        });
-    }
-  }, [
-    cart,
-    createPaymentIntent,
-    isOpen,
-    wasOpen,
-    apartmentNumber,
-    deliveryDropOffNote,
-    deliveryDropOffPreference,
-    email,
-    firstName,
-    lastName,
-    location,
-    phoneNumber,
-    shippingMethod,
-    setPaymentIntentClientSecret,
-  ]);
+  const { cart, total } = useCartContext();
 
   return (
     <Modal
