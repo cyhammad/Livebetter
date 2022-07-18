@@ -60,7 +60,7 @@ export const OrderConfirmationDetails = ({
           break;
       }
     });
-  }, [stripe]);
+  }, [cart?.paymentIntentClientSecret, emptyCart, stripe]);
 
   const shippingMethod: ShippingMethod =
     order?.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery";
