@@ -13,6 +13,10 @@ export interface Order {
   total: number;
 }
 
+export interface ApiOrder extends Omit<Order, "created_at"> {
+  created_at: string;
+}
+
 interface DeliverTo {
   address: string;
   appartmentNo: string;

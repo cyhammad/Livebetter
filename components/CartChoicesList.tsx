@@ -11,7 +11,7 @@ export const CartChoicesList = ({ choices }: CartChoicesListProps) => {
 
   return (
     <>
-      {Object.entries(choices ?? {}).map(([category, options]) => (
+      {Object.entries(choices).map(([category, options]) => (
         <section className="text-sm text-gray-600 ml-4" key={category}>
           {/* Collapse the choice onto 1 line if there is only 1 choice */}
           {options.length === 1 ? (
