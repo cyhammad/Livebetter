@@ -4,7 +4,7 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import classNames from "classnames";
-import { Taxi } from "phosphor-react";
+import { Spinner, Taxi } from "phosphor-react";
 import { FormEvent, KeyboardEvent, MouseEvent, useState } from "react";
 
 import { ModalButtons } from "components/ModalButtons";
@@ -87,7 +87,17 @@ export const CheckoutForm = ({
                 <span className="flex-none">Place order</span>
               </span>
               <span className="bg-white/20 px-2 py-1 rounded">
-                ${total.toFixed(2)}
+                {isLoading ? (
+                  <Spinner
+                    alt=""
+                    color="currentColor"
+                    size={24}
+                    weight="bold"
+                    className="w-6 h-6 animate-spin-slow"
+                  />
+                ) : (
+                  <>${total.toFixed(2)}</>
+                )}
               </span>
             </>
           }
