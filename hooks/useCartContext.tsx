@@ -3,6 +3,7 @@ import {
   PropsWithChildren,
   SetStateAction,
   createContext,
+  useCallback,
   useContext,
   useMemo,
 } from "react";
@@ -165,16 +166,19 @@ export const CartContextProvider = ({
       });
     };
 
-  const setTip: CartContextDefaultValue["setTip"] = (tip) => {
-    setCart((prevCart) => {
-      if (prevCart) {
-        return {
-          ...prevCart,
-          tip,
-        };
-      }
-    });
-  };
+  const setTip: CartContextDefaultValue["setTip"] = useCallback(
+    (tip) => {
+      setCart((prevCart) => {
+        if (prevCart) {
+          return {
+            ...prevCart,
+            tip,
+          };
+        }
+      });
+    },
+    [setCart]
+  );
 
   function emptyCart() {
     setCart(undefined);
