@@ -13,7 +13,7 @@ import { usePrevious } from "hooks/usePrevious";
 type ModalName = "cart" | "contact" | "checkout";
 
 export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
-  const { cart, count, total } = useCartContext();
+  const { cart, count, total, subtotal } = useCartContext();
   const [currentModal, setCurrentModal] = useState<ModalName>();
   const previousModal = usePrevious(currentModal);
 
@@ -85,7 +85,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                   </span>
                 </span>
                 <span className="bg-white/20 px-2 py-1 rounded">
-                  ${total.toFixed(2)}
+                  ${subtotal.toFixed(2)}
                 </span>
               </button>
             </motion.div>
