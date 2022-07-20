@@ -181,7 +181,7 @@ export const CartModal = ({
         </p>
         <p className="text-right tabular-nums flex justify-between items-center">
           <b>Tip:</b>
-          <div className="flex gap-2">
+          <span className="flex gap-2">
             <Select
               value={selectedTipPercent}
               className="md:text-base"
@@ -236,7 +236,7 @@ export const CartModal = ({
                 min={0}
               />
             ) : null}
-          </div>
+          </span>
         </p>
         <div className="flex flex-col gap-0">
           {serviceFee ? (
