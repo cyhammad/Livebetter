@@ -1,12 +1,13 @@
-import { withSentry } from "@sentry/nextjs";
+import { captureException, flush, withSentry } from "@sentry/nextjs";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { getApiRestaurants } from "lib/server/getApiRestaurants";
-import type { GetApiRestaurantsResult } from "types";
+import type { ApiErrorResponse, GetApiRestaurantsResult } from "types";
 
 async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<GetApiRestaurantsResult>
+  res: NextApiResponse<GetApiRestaurantsResult | ApiErrorResponse>
 ) {
   const limit =
     typeof req.query.limit === "string" && !isNaN(parseInt(req.query.limit))
@@ -33,16 +34,24 @@ async function handler(
       ? req.query.cuisines.split(",")
       : undefined;
 
-  const result = await getApiRestaurants({
-    limit,
-    offset,
-    search,
-    sortByDistanceFrom:
-      latitude && longitude ? { latitude, longitude } : undefined,
-    cuisines: cuisinesParam,
-  });
+  try {
+    const result = await getApiRestaurants({
+      limit,
+      offset,
+      search,
+      sortByDistanceFrom:
+        latitude && longitude ? { latitude, longitude } : undefined,
+      cuisines: cuisinesParam,
+    });
 
-  res.status(200).json(result);
+    res.status(200).json(result);
+  } catch (err) {
+    captureException(err);
+
+    await flush(2000);
+
+    res.status(500).json(createApiErrorResponse(err));
+  }
 }
 
 export default withSentry(handler);

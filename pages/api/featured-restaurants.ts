@@ -1,12 +1,17 @@
-import { withSentry } from "@sentry/nextjs";
+import { captureException, flush, withSentry } from "@sentry/nextjs";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { getFeaturedApiRestaurants } from "lib/server/getFeaturedApiRestaurants";
-import type { FeaturedSection, GetFeaturedApiRestaurantsResult } from "types";
+import type {
+  ApiErrorResponse,
+  FeaturedSection,
+  GetFeaturedApiRestaurantsResult,
+} from "types";
 
 async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<GetFeaturedApiRestaurantsResult>
+  res: NextApiResponse<GetFeaturedApiRestaurantsResult | ApiErrorResponse>
 ) {
   const latitude =
     typeof req.query.latitude === "string" &&
@@ -25,13 +30,21 @@ async function handler(
       : []
   ) as FeaturedSection[];
 
-  const result = await getFeaturedApiRestaurants({
-    sectionKeys,
-    sortByDistanceFrom:
-      latitude && longitude ? { latitude, longitude } : undefined,
-  });
+  try {
+    const result = await getFeaturedApiRestaurants({
+      sectionKeys,
+      sortByDistanceFrom:
+        latitude && longitude ? { latitude, longitude } : undefined,
+    });
 
-  res.status(200).json(result);
+    res.status(200).json(result);
+  } catch (err) {
+    captureException(err);
+
+    await flush(2000);
+
+    res.status(500).json(createApiErrorResponse(err));
+  }
 }
 
 export default withSentry(handler);

@@ -1,5 +1,5 @@
 import sendGridMail from "@sendgrid/mail";
-import { captureException, withSentry } from "@sentry/nextjs";
+import { captureException, flush, withSentry } from "@sentry/nextjs";
 import {
   Timestamp,
   addDoc,
@@ -52,6 +52,10 @@ async function handler(
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
+    captureException(err);
+
+    await flush(2000);
+
     res.status(400).json(createApiErrorResponse(err));
 
     return;
