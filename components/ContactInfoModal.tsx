@@ -100,6 +100,7 @@ export const ContactInfoModal = ({
         .then((result) => {
           if (result && result.clientSecret) {
             setPaymentIntentClientSecret(result.clientSecret);
+            setCreatePaymentIntentMessage("");
             onRequestNext && onRequestNext();
           }
         })
