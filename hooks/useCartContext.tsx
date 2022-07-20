@@ -83,88 +83,98 @@ export const CartContextProvider = ({
     undefined
   );
 
-  const addToCart: CartContextDefaultValue["addToCart"] = (
-    restaurant,
-    menuItemName,
-    menuItemPrice,
-    menuItemCategory,
-    count,
-    menuItemNotes,
-    choices,
-    optionalChoices
-  ) => {
-    setCart((prevCart) => {
-      const addedItem: CartMenuItem = {
-        category: menuItemCategory,
-        choices,
-        count,
-        mealPrice: menuItemPrice,
-        name: menuItemName,
-        notes: menuItemNotes,
-        optionalChoices,
-      };
+  const addToCart: CartContextDefaultValue["addToCart"] = useCallback(
+    (
+      restaurant,
+      menuItemName,
+      menuItemPrice,
+      menuItemCategory,
+      count,
+      menuItemNotes,
+      choices,
+      optionalChoices
+    ) => {
+      setCart((prevCart) => {
+        const addedItem: CartMenuItem = {
+          category: menuItemCategory,
+          choices,
+          count,
+          mealPrice: menuItemPrice,
+          name: menuItemName,
+          notes: menuItemNotes,
+          optionalChoices,
+        };
 
-      const didRestaurantChange =
-        !prevCart?.restaurant.Restaurant ||
-        prevCart?.restaurant.Restaurant !== restaurant.Restaurant;
+        const didRestaurantChange =
+          !prevCart?.restaurant.Restaurant ||
+          prevCart?.restaurant.Restaurant !== restaurant.Restaurant;
 
-      return {
-        ...prevCart,
-        // If the restaurant changed, we reset the cart
-        items: didRestaurantChange
-          ? [addedItem]
-          : [...prevCart.items, addedItem],
-        restaurant,
-        tip: prevCart?.tip ?? 0,
-        paymentIntentClientSecret: prevCart?.paymentIntentClientSecret ?? null,
-      };
-    });
-  };
-
-  const removeMenuItem: CartContextDefaultValue["removeMenuItem"] = (
-    menuItemIndex
-  ) => {
-    setCart((prevCart) => {
-      if (prevCart) {
         return {
           ...prevCart,
-          items:
-            prevCart?.items.filter((item, index) => index !== menuItemIndex) ??
-            [],
+          // If the restaurant changed, we reset the cart
+          items: didRestaurantChange
+            ? [addedItem]
+            : [...prevCart.items, addedItem],
+          restaurant,
+          tip: prevCart?.tip ?? 0,
+          paymentIntentClientSecret:
+            prevCart?.paymentIntentClientSecret ?? null,
         };
-      }
-    });
-  };
+      });
+    },
+    [setCart]
+  );
 
-  const setMenuItemCount: CartContextDefaultValue["setMenuItemCount"] = (
-    menuItemIndex,
-    nextCount
-  ) => {
-    setCart((prevCart) => {
-      if (prevCart) {
-        return {
-          ...prevCart,
-          items:
-            prevCart?.items.map((item, index) => ({
-              ...item,
-              count: index === menuItemIndex ? nextCount : item.count,
-            })) ?? [],
-        };
-      }
-    });
-  };
-
-  const setPaymentIntentClientSecret: CartContextDefaultValue["setPaymentIntentClientSecret"] =
-    (secret) => {
+  const removeMenuItem: CartContextDefaultValue["removeMenuItem"] = useCallback(
+    (menuItemIndex) => {
       setCart((prevCart) => {
         if (prevCart) {
           return {
             ...prevCart,
-            paymentIntentClientSecret: secret,
+            items:
+              prevCart?.items.filter(
+                (item, index) => index !== menuItemIndex
+              ) ?? [],
           };
         }
       });
-    };
+    },
+    [setCart]
+  );
+
+  const setMenuItemCount: CartContextDefaultValue["setMenuItemCount"] =
+    useCallback(
+      (menuItemIndex, nextCount) => {
+        setCart((prevCart) => {
+          if (prevCart) {
+            return {
+              ...prevCart,
+              items:
+                prevCart?.items.map((item, index) => ({
+                  ...item,
+                  count: index === menuItemIndex ? nextCount : item.count,
+                })) ?? [],
+            };
+          }
+        });
+      },
+      [setCart]
+    );
+
+  const setPaymentIntentClientSecret: CartContextDefaultValue["setPaymentIntentClientSecret"] =
+    useCallback(
+      (secret) => {
+        setCart((prevCart) => {
+          if (prevCart) {
+            return {
+              ...prevCart,
+              paymentIntentClientSecret: secret,
+            };
+          }
+        });
+      },
+      [setCart]
+    );
 
   const setTip: CartContextDefaultValue["setTip"] = useCallback(
     (tip) => {
@@ -180,9 +190,9 @@ export const CartContextProvider = ({
     [setCart]
   );
 
-  function emptyCart() {
+  const emptyCart = useCallback(() => {
     setCart(undefined);
-  }
+  }, [setCart]);
 
   const subtotal = useMemo(
     () => getCartItemsSubtotal(cart?.items),
