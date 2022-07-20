@@ -17,6 +17,12 @@ export interface Restaurant {
   isPickUpAvailable?: boolean;
   Tracking?: number;
   featured_in?: FeaturedSection[];
+
+  // loyalty program properties
+  loyaltyProgramAvailable?: boolean;
+  threshold?: number;
+  discountAmount?: number;
+  discountUpon?: number;
 }
 
 export type RestaurantOpenHours = Record<string, string>;

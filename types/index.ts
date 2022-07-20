@@ -10,3 +10,4 @@ export * from "./Modal";
 export * from "./Order";
 export * from "./PaymentIntentOrder";
 export * from "./Restaurant";
+export * from "./UserForVerification";
