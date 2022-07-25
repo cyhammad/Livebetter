@@ -6,14 +6,14 @@ import { useState } from "react";
 import { CartModal } from "components/CartModal";
 import { CheckoutModal } from "components/CheckoutModal";
 import { ModalGroupOverlay } from "components/ModalGroupOverlay";
+import { OtpModal } from "components/OtpModal";
 import { useCartContext } from "hooks/useCartContext";
 import { usePrevious } from "hooks/usePrevious";
-
-type ModalName = "cart" | "checkout";
+import type { CartFlowModalName } from "types";
 
 export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
   const { cart, count, subtotal } = useCartContext();
-  const [currentModal, setCurrentModal] = useState<ModalName>();
+  const [currentModal, setCurrentModal] = useState<CartFlowModalName>();
   const previousModal = usePrevious(currentModal);
 
   const variants = {
@@ -166,10 +166,24 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
       <CartModal
         isOpen={currentModal === "cart"}
         onRequestClose={handleRequestClose}
+        onRequestNext={(modalName) => setCurrentModal(modalName)}
+        origin={
+          [currentModal, previousModal].includes("otp") ||
+          [currentModal, previousModal].includes("checkout")
+            ? "carousel-left"
+            : "default"
+        }
+      />
+      <OtpModal
+        isOpen={currentModal === "otp"}
+        onRequestPrevious={() => setCurrentModal("cart")}
+        onRequestClose={handleRequestClose}
         onRequestNext={() => setCurrentModal("checkout")}
         origin={
           [currentModal, previousModal].includes("checkout")
             ? "carousel-left"
+            : [currentModal, previousModal].includes("cart")
+            ? "carousel-right"
             : "default"
         }
       />

@@ -64,7 +64,8 @@ async function handler(
         prevUser.phoneNumber === phoneNumber &&
         prevUser.email === email &&
         prevUser.firstName === firstName &&
-        prevUser.lastName === lastName
+        prevUser.lastName === lastName &&
+        prevUser.otpVerified
       ) {
         return res.status(200).json({ otpRequired: false });
       }

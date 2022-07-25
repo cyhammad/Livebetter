@@ -48,3 +48,5 @@ export interface Cart {
   tip: number;
   paymentIntentClientSecret: string | null;
 }
+
+export type CartFlowModalName = "cart" | "checkout" | "otp";

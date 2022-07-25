@@ -1,7 +1,7 @@
 import { Elements } from "@stripe/react-stripe-js";
 import classNames from "classnames";
 import { CreditCard, Taxi } from "phosphor-react";
-import { KeyboardEvent, MouseEvent } from "react";
+import type React from "react";
 
 import { CheckoutForm } from "components/CheckoutForm";
 import { Modal } from "components/Modal";
@@ -11,8 +11,8 @@ import { getStripePromise } from "lib/getStripePromise";
 import type { ModalProps } from "types";
 
 interface CheckoutModalProps extends ModalProps {
-  onRequestClose?: (event?: MouseEvent | KeyboardEvent) => void;
-  onRequestPrevious?: (event?: MouseEvent | KeyboardEvent) => void;
+  onRequestClose?: (event?: React.MouseEvent | React.KeyboardEvent) => void;
+  onRequestPrevious?: (event?: React.MouseEvent | React.KeyboardEvent) => void;
 }
 
 export const CheckoutModal = ({

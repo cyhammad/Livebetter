@@ -1,8 +1,9 @@
 export * from "./Api";
 export * from "./Cart";
 export * from "./Coordinates";
-export * from "./GetApiRestaurants";
+export * from "./CreateOtp";
 export * from "./CreatePaymentIntent";
+export * from "./GetApiRestaurants";
 export * from "./GetFeaturedApiRestaurants";
 export * from "./Head";
 export * from "./MenuItem";
@@ -12,3 +13,4 @@ export * from "./PaymentIntentOrder";
 export * from "./Restaurant";
 export * from "./UserForVerification";
 export * from "./UserWithLoyaltyProgram";
+export * from "./VerifyOtp";

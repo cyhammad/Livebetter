@@ -19,10 +19,14 @@ import { usePrevious } from "hooks/usePrevious";
 import { useRestaurantOrderValidation } from "hooks/useRestaurantOrderValidation";
 import { useShippingMethodValidation } from "hooks/useShippingMethodValidation";
 import { useUserContext } from "hooks/useUserContext";
+import { fetchCreateOtp } from "lib/client/fetchCreateOtp";
 import { fetchCreatePaymentIntent } from "lib/client/fetchCreatePaymentIntent";
 import { toMoney } from "lib/toMoney";
 import type {
   ApiErrorResponse,
+  CartFlowModalName,
+  CreateOtpRequestBody,
+  CreateOtpResult,
   CreatePaymentIntentCart,
   CreatePaymentIntentRequestBody,
   CreatePaymentIntentResult,
@@ -32,7 +36,10 @@ import type {
 
 interface CartModalProps extends ModalProps {
   onRequestClose?: (event?: React.MouseEvent | React.KeyboardEvent) => void;
-  onRequestNext?: (event?: React.MouseEvent | React.KeyboardEvent) => void;
+  onRequestNext?: (
+    nextModalName: CartFlowModalName,
+    event?: React.FormEvent<HTMLFormElement>
+  ) => void;
 }
 
 export const CartModal = ({
@@ -79,13 +86,32 @@ export const CartModal = ({
   >(18);
   const [createPaymentIntentMessage, setCreatePaymentIntentMessage] =
     useState("");
-  const { mutateAsync: createPaymentIntent, isLoading } = useMutation<
+  const {
+    mutateAsync: createPaymentIntent,
+    isLoading: isCreatePaymentIntentLoading,
+  } = useMutation<
     CreatePaymentIntentResult,
     ApiErrorResponse,
     CreatePaymentIntentRequestBody
   >((variables) => fetchCreatePaymentIntent(variables.cart, variables.user), {
     mutationKey: ["create_payment_intent"],
   });
+  const { mutateAsync: createOtp, isLoading: isCreateOtpLoading } = useMutation<
+    CreateOtpResult,
+    ApiErrorResponse,
+    CreateOtpRequestBody
+  >(
+    (variables) =>
+      fetchCreateOtp(
+        variables.firstName,
+        variables.lastName,
+        variables.email,
+        variables.phoneNumber
+      ),
+    {
+      mutationKey: ["create_otp"],
+    }
+  );
 
   const { isShippingMethodValid, shippingMethodValidationMessage } =
     useShippingMethodValidation(cart?.restaurant, shippingMethod);
@@ -149,7 +175,7 @@ export const CartModal = ({
     }
   }, [highTip, lowTip, midTip, selectedTipPercent, setTip]);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (shippingMethod && (shippingMethod === "delivery" ? !!location : true)) {
@@ -173,18 +199,56 @@ export const CartModal = ({
         shippingMethod,
       };
 
-      createPaymentIntent({
-        cart: createPaymentIntentCart,
-        user: createPaymentIntentUser,
-      })
-        .then((result) => {
-          if (result && result.clientSecret) {
-            setPaymentIntentClientSecret(result.clientSecret);
-            setCreatePaymentIntentMessage("");
-            onRequestNext && onRequestNext();
+      setCreatePaymentIntentMessage("");
+
+      // First create the payment intent
+      try {
+        const result = await createPaymentIntent({
+          cart: createPaymentIntentCart,
+          user: createPaymentIntentUser,
+        });
+
+        if (result && result.clientSecret) {
+          setPaymentIntentClientSecret(result.clientSecret);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          setCreatePaymentIntentMessage(error.message);
+        } else {
+          setCreatePaymentIntentMessage(
+            "An unknown error occurred. Please try again."
+          );
+        }
+
+        captureException(error, { extra: { createPaymentIntentCart } });
+
+        return;
+      }
+
+      // If the payment intent creation is success, and they are joining the
+      // loyalty program, check if they need to verify their phone number.
+      if (
+        !userWithLoyaltyProgram &&
+        !cart?.didOptInToLoyaltyProgramWithThisOrder
+      ) {
+        onRequestNext && onRequestNext("checkout", event);
+      } else {
+        try {
+          const result = await createOtp({
+            firstName,
+            lastName,
+            phoneNumber,
+            email,
+          });
+
+          if (result && typeof result.otpRequired === "boolean") {
+            if (result.otpRequired) {
+              onRequestNext && onRequestNext("otp", event);
+            } else {
+              onRequestNext && onRequestNext("checkout", event);
+            }
           }
-        })
-        .catch((error) => {
+        } catch (error) {
           if (error instanceof Error) {
             setCreatePaymentIntentMessage(error.message);
           } else {
@@ -193,8 +257,20 @@ export const CartModal = ({
             );
           }
 
-          captureException(error, { extra: { createPaymentIntentCart } });
-        });
+          captureException(error, {
+            extra: {
+              otpVariables: {
+                firstName,
+                lastName,
+                phoneNumber,
+                email,
+              },
+            },
+          });
+
+          return;
+        }
+      }
     }
   };
 
@@ -546,7 +622,7 @@ export const CartModal = ({
               <>
                 Continue
                 <span className="bg-white/20 px-1 py-1 rounded">
-                  {isLoading ? (
+                  {isCreatePaymentIntentLoading || isCreateOtpLoading ? (
                     <Spinner
                       alt=""
                       color="currentColor"
@@ -568,9 +644,17 @@ export const CartModal = ({
             }
             primaryButtonProps={{
               className: classNames({
-                "opacity-50": !isRestaurantOrderValid || !isShippingMethodValid,
+                "opacity-50":
+                  !isRestaurantOrderValid ||
+                  !isShippingMethodValid ||
+                  isCreatePaymentIntentLoading ||
+                  isCreateOtpLoading,
               }),
-              disabled: !isRestaurantOrderValid || !isShippingMethodValid,
+              disabled:
+                !isRestaurantOrderValid ||
+                !isShippingMethodValid ||
+                isCreatePaymentIntentLoading ||
+                isCreateOtpLoading,
               type: "submit",
             }}
           />

@@ -5,11 +5,15 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
-import type { ApiErrorResponse, UserForVerification } from "types";
+import type {
+  ApiErrorResponse,
+  UserForVerification,
+  VerifyOtpResult,
+} from "types";
 
 async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<null | ApiErrorResponse>
+  res: NextApiResponse<VerifyOtpResult | ApiErrorResponse>
 ) {
   let phoneNumber: string =
     typeof req.body.phoneNumber === "string" ? req.body.phoneNumber : null;
@@ -78,7 +82,7 @@ async function handler(
     return res.status(500).json(createApiErrorResponse(err));
   }
 
-  return res.status(200);
+  return res.status(200).json({ otpValid: true });
 }
 
 export default withSentry(handler);
