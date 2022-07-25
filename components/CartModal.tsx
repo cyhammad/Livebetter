@@ -474,142 +474,145 @@ export const CartModal = ({
           bottom-0 border-t border-gray-200
         "
         >
-          <div
-            className="
+          {cart?.restaurant.loyaltyProgramAvailable ? (
+            <div
+              className="
               relative flex flex-col gap-0.5
               text-xs font-normal
               text-black w-full
               overflow-hidden
             "
-          >
-            <p className="flex gap-1 justify-center items-center">
-              {percentOfThreshold >= 100 ? (
-                <label>
-                  {!userWithLoyaltyProgram ? (
-                    <>
-                      <Checkbox
-                        checked={cart?.didOptInToLoyaltyProgramWithThisOrder}
-                        onChange={(event) =>
-                          setDidOptInToLoyaltyProgramWithThisOrder(
-                            event.target.checked
-                          )
-                        }
-                      />{" "}
-                      Join{" "}
-                      <span className="capitalize">
-                        {cart?.restaurant.Restaurant.toLowerCase()}&apos;s
-                      </span>{" "}
-                      rewards program to{" "}
-                    </>
-                  ) : (
-                    "You will "
-                  )}
-                  receive <b>1 point</b> for this order
-                  {(userWithLoyaltyProgram?.points ?? 0) + 1 >=
-                  (cart?.restaurant.discountUpon ?? Infinity) ? (
-                    <>
-                      , and{" "}
-                      <b>${cart?.restaurant.discountAmount?.toFixed(2)}</b> off
-                      your next order
-                    </>
-                  ) : null}
-                  !
-                </label>
-              ) : (
-                <label>
-                  {!userWithLoyaltyProgram ? (
-                    <>
-                      <Checkbox
-                        checked={cart?.didOptInToLoyaltyProgramWithThisOrder}
-                        onChange={(event) =>
-                          setDidOptInToLoyaltyProgramWithThisOrder(
-                            event.target.checked
-                          )
-                        }
-                      />{" "}
-                      Join{" "}
-                      <span className="capitalize">
-                        {cart?.restaurant.Restaurant.toLowerCase()}&apos;s
-                      </span>{" "}
-                      rewards program, and spend{" "}
-                    </>
-                  ) : (
-                    "Spend "
-                  )}
-                  <b>${dollarsToNextPoint.toFixed(2)}</b> more to receive a
-                  point for this order!
-                </label>
-              )}
-            </p>
-            <div className="border-2 border-gray-700 bg-gray-700 rounded-full relative h-5 shadow-xl">
-              <div
-                className="grid justify-evenly w-full absolute bottom-0 left-0 right-0 h-full "
-                style={{
-                  gridTemplateColumns: `repeat(${cart?.restaurant.discountUpon}, 1fr)`,
-                }}
-              >
-                {Array.from(
-                  { length: cart?.restaurant.discountUpon ?? 0 },
-                  (item, index) => {
-                    // If the customer is receiving a discount for this order,
-                    // show the number of points they will have _after_ this
-                    // order
-                    const visiblePoints =
-                      (userWithLoyaltyProgram?.points ?? 0) -
-                      (discount > 0 ? cart?.restaurant.discountUpon ?? 0 : 0);
-                    const isFullPoint = visiblePoints >= index + 1;
-                    const isCurrentPoint = visiblePoints + 1 === index + 1;
-                    const percentFull = isFullPoint
-                      ? "100"
-                      : isCurrentPoint
-                      ? percentOfThreshold
-                      : "0";
-
-                    const isLast = index + 1 === cart?.restaurant.discountUpon;
-
-                    return (
-                      <div
-                        key={index}
-                        className={classNames({
-                          "h-full relative  bg-white/30 overflow-hidden flex items-center justify-end pr-0.5":
-                            true,
-                          "border-r-gray-700 border-r-2": !isLast,
-                          "border-none": isLast,
-                          "rounded-l-full": index === 0,
-                          "rounded-r-full": isLast,
-                        })}
-                      >
-                        <div
-                          className={classNames({
-                            "bg-yellow-500 h-full flex-grow flex-shrink-0 absolute left-0 top-0 ":
-                              true,
-                          })}
-                          style={{
-                            width: `${percentFull}%`,
-                          }}
-                        ></div>
-                        <Star
-                          alt=""
-                          size={14}
-                          color="currentColor"
-                          className={classNames({
-                            relative: true,
-                            "text-gray-50":
-                              isFullPoint ||
-                              (percentOfThreshold >= 100 && isCurrentPoint),
-                            "text-yellow-500":
-                              !isFullPoint ||
-                              (percentOfThreshold < 100 && isCurrentPoint),
-                          })}
-                          weight="bold"
-                        />
-                      </div>
-                    );
-                  }
+            >
+              <p className="flex gap-1 justify-center items-center">
+                {percentOfThreshold >= 100 ? (
+                  <label>
+                    {!userWithLoyaltyProgram ? (
+                      <>
+                        <Checkbox
+                          checked={cart?.didOptInToLoyaltyProgramWithThisOrder}
+                          onChange={(event) =>
+                            setDidOptInToLoyaltyProgramWithThisOrder(
+                              event.target.checked
+                            )
+                          }
+                        />{" "}
+                        Join{" "}
+                        <span className="capitalize">
+                          {cart?.restaurant.Restaurant.toLowerCase()}&apos;s
+                        </span>{" "}
+                        rewards program to{" "}
+                      </>
+                    ) : (
+                      "You will "
+                    )}
+                    receive <b>1 point</b> for this order
+                    {(userWithLoyaltyProgram?.points ?? 0) + 1 >=
+                    (cart?.restaurant.discountUpon ?? Infinity) ? (
+                      <>
+                        , and{" "}
+                        <b>${cart?.restaurant.discountAmount?.toFixed(2)}</b>{" "}
+                        off your next order
+                      </>
+                    ) : null}
+                    !
+                  </label>
+                ) : (
+                  <label>
+                    {!userWithLoyaltyProgram ? (
+                      <>
+                        <Checkbox
+                          checked={cart?.didOptInToLoyaltyProgramWithThisOrder}
+                          onChange={(event) =>
+                            setDidOptInToLoyaltyProgramWithThisOrder(
+                              event.target.checked
+                            )
+                          }
+                        />{" "}
+                        Join{" "}
+                        <span className="capitalize">
+                          {cart?.restaurant.Restaurant.toLowerCase()}&apos;s
+                        </span>{" "}
+                        rewards program, and spend{" "}
+                      </>
+                    ) : (
+                      "Spend "
+                    )}
+                    <b>${dollarsToNextPoint.toFixed(2)}</b> more to receive a
+                    point for this order!
+                  </label>
                 )}
+              </p>
+              <div className="border-2 border-gray-700 bg-gray-700 rounded-full relative h-5 shadow-xl">
+                <div
+                  className="grid justify-evenly w-full absolute bottom-0 left-0 right-0 h-full "
+                  style={{
+                    gridTemplateColumns: `repeat(${cart?.restaurant.discountUpon}, 1fr)`,
+                  }}
+                >
+                  {Array.from(
+                    { length: cart?.restaurant.discountUpon ?? 0 },
+                    (item, index) => {
+                      // If the customer is receiving a discount for this order,
+                      // show the number of points they will have _after_ this
+                      // order
+                      const visiblePoints =
+                        (userWithLoyaltyProgram?.points ?? 0) -
+                        (discount > 0 ? cart?.restaurant.discountUpon ?? 0 : 0);
+                      const isFullPoint = visiblePoints >= index + 1;
+                      const isCurrentPoint = visiblePoints + 1 === index + 1;
+                      const percentFull = isFullPoint
+                        ? "100"
+                        : isCurrentPoint
+                        ? percentOfThreshold
+                        : "0";
+
+                      const isLast =
+                        index + 1 === cart?.restaurant.discountUpon;
+
+                      return (
+                        <div
+                          key={index}
+                          className={classNames({
+                            "h-full relative  bg-white/30 overflow-hidden flex items-center justify-end pr-0.5":
+                              true,
+                            "border-r-gray-700 border-r-2": !isLast,
+                            "border-none": isLast,
+                            "rounded-l-full": index === 0,
+                            "rounded-r-full": isLast,
+                          })}
+                        >
+                          <div
+                            className={classNames({
+                              "bg-yellow-500 h-full flex-grow flex-shrink-0 absolute left-0 top-0 ":
+                                true,
+                            })}
+                            style={{
+                              width: `${percentFull}%`,
+                            }}
+                          ></div>
+                          <Star
+                            alt=""
+                            size={14}
+                            color="currentColor"
+                            className={classNames({
+                              relative: true,
+                              "text-gray-50":
+                                isFullPoint ||
+                                (percentOfThreshold >= 100 && isCurrentPoint),
+                              "text-yellow-500":
+                                !isFullPoint ||
+                                (percentOfThreshold < 100 && isCurrentPoint),
+                            })}
+                            weight="bold"
+                          />
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          ) : null}
           {createPaymentIntentMessage ? (
             <p className="text-rose-600 text-sm sm:text-base font-semibold">
               {createPaymentIntentMessage}
