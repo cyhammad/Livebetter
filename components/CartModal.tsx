@@ -1,10 +1,10 @@
 import { captureException } from "@sentry/nextjs";
+import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
 import { motion } from "framer-motion";
 import { ArrowRight, Spinner, Star, Tote, Trash } from "phosphor-react";
 import { useEffect, useMemo, useState } from "react";
 import type React from "react";
-import { useMutation } from "react-query";
 
 import { CartChoicesList } from "components/CartChoicesList";
 import { Checkbox } from "components/Checkbox";

@@ -1,3 +1,9 @@
+import {
+  DehydratedState,
+  QueryClient,
+  dehydrate,
+  useQuery,
+} from "@tanstack/react-query";
 import classNames from "classnames";
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
@@ -9,7 +15,6 @@ import {
   useState,
   useTransition,
 } from "react";
-import { DehydratedState, QueryClient, dehydrate, useQuery } from "react-query";
 
 import { Header } from "components/Header";
 import { RestaurantList } from "components/RestaurantList";

@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { useCartContext } from "hooks/useCartContext";
 import { useUserContext } from "hooks/useUserContext";

@@ -1,10 +1,14 @@
 import "styles/globals.css";
 
+import {
+  Hydrate,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { useState } from "react";
 import ReactModal from "react-modal";
-import { Hydrate, QueryClient, QueryClientProvider } from "react-query";
 
 import { CartContextProvider } from "hooks/useCartContext";
 import { HomeContextProvider } from "hooks/useHomeContext";
