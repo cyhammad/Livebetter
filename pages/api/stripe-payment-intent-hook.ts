@@ -12,9 +12,12 @@ import {
 import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
+import twilio from "twilio";
 
+import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
+import { findRestaurant } from "lib/server/findRestaurant";
 import { getOrderEmail } from "lib/server/getOrderEmail";
 import type { ApiErrorResponse, PaymentIntentOrder } from "types";
 
@@ -28,6 +31,27 @@ const getPaymentIntentOrderDoc = async (event: Stripe.Event) => {
   return await getDoc(doc(db, "payment_intent_orders", paymentIntentId));
 };
 
+const handlePreSuccessEvent = async (event: Stripe.Event) => {
+  const paymentIntentOrderDoc = await getPaymentIntentOrderDoc(event);
+
+  if (paymentIntentOrderDoc && paymentIntentOrderDoc.exists()) {
+    const paymentIntentOrderDocRef = doc(
+      db,
+      "payment_intent_orders",
+      paymentIntentOrderDoc.id
+    );
+
+    const status = event.type.split(".")[1];
+
+    // Update our status if any of the above fail
+    await setDoc(
+      paymentIntentOrderDocRef,
+      { status, updatedAt: Timestamp.now() },
+      { merge: true }
+    );
+  }
+};
+
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiErrorResponse | { received: boolean }>
@@ -38,6 +62,11 @@ async function handler(
     apiVersion: "2020-08-27",
     typescript: true,
   });
+
+  const twilioClient = twilio(
+    process.env.TWILIO_ACCOUNT_SID,
+    process.env.TWILIO_AUTH_TOKEN
+  );
 
   sendGridMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -67,23 +96,16 @@ async function handler(
     case "payment_intent.created":
     case "payment_intent.payment_failed":
     case "payment_intent.processing": {
-      const paymentIntentOrderDoc = await getPaymentIntentOrderDoc(event);
+      try {
+        await handlePreSuccessEvent(event);
+      } catch (err) {
+        captureException(err);
 
-      if (paymentIntentOrderDoc && paymentIntentOrderDoc.exists()) {
-        const paymentIntentOrderDocRef = doc(
-          db,
-          "payment_intent_orders",
-          paymentIntentOrderDoc.id
-        );
+        await flush(2000);
 
-        const status = event.type.split(".")[1];
+        res.status(500).json(createApiErrorResponse(err));
 
-        // Update our status if any of the above fail
-        await setDoc(
-          paymentIntentOrderDocRef,
-          { status, updatedAt: Timestamp.now() },
-          { merge: true }
-        );
+        return;
       }
 
       break;
@@ -94,13 +116,14 @@ async function handler(
       if (paymentIntentOrderDoc && paymentIntentOrderDoc.exists()) {
         const paymentIntentOrder =
           paymentIntentOrderDoc.data() as PaymentIntentOrder;
-        const newOrderData = paymentIntentOrder.order;
+        const { didOptInToLoyaltyProgramWithThisOrder, order: newOrderData } =
+          paymentIntentOrder;
 
         newOrderData.charges_id = paymentIntentOrderDoc.id;
         newOrderData.created_at = Timestamp.now();
 
         // Move the order to the `orders` collection
-        const order = await addDoc(collection(db, "orders"), newOrderData);
+        const orderDoc = await addDoc(collection(db, "orders"), newOrderData);
 
         // Delete the payment intent order
         await deleteDoc(
@@ -116,7 +139,7 @@ async function handler(
               process.env.NODE_ENV === "production"
                 ? "livebetterphl@gmail.com"
                 : "atdrago@gmail.com",
-            subject: `New Order Notification ✔ (Order #${order.id})`,
+            subject: `New Order Notification ✔ (Order #${orderDoc.id})`,
             html: orderEmailHtml,
             headers: { Accept: "application/json" },
           }),
@@ -128,6 +151,113 @@ async function handler(
           captureException(sendGridResponse.reason, {
             extra: {
               message: "Failed to send email using SendGrid",
+            },
+          });
+        }
+
+        try {
+          if (
+            newOrderData.deliver_to.phoneNumber &&
+            newOrderData.restaurant_id
+          ) {
+            const phoneNumber = getNormalizedPhoneNumber(
+              newOrderData.deliver_to.phoneNumber
+            );
+            const restaurantName = newOrderData.restaurant_id;
+            const restaurantDoc = await findRestaurant(restaurantName);
+            const restaurant = restaurantDoc ? restaurantDoc.data() : null;
+
+            const existingLoyaltyDoc = await getDoc(
+              doc(
+                db,
+                "users-with-loyalty-program",
+                `${phoneNumber}-${restaurantName}`
+              )
+            );
+
+            if (
+              restaurant &&
+              restaurant.loyaltyProgramAvailable &&
+              (existingLoyaltyDoc.exists() ||
+                didOptInToLoyaltyProgramWithThisOrder)
+            ) {
+              const nextLoyaltyData = existingLoyaltyDoc.exists()
+                ? existingLoyaltyDoc.data()
+                : {
+                    created_at: Timestamp.now(),
+                    phoneNumber,
+                    points: 0,
+                    restaurantName,
+                  };
+
+              // First, we check if the customer received a discount for this
+              // order. If so, we deduct the loyalty points needed for that
+              // discount
+              const didReceiveDiscount =
+                nextLoyaltyData.points >= (restaurant.discountUpon ?? Infinity);
+
+              if (didReceiveDiscount) {
+                nextLoyaltyData.points -= restaurant.discountUpon ?? 0;
+              }
+
+              // Next, we check if we should award the customer a point for this
+              // order, and add the point if so.
+              const shouldAwardLoyaltyPoint =
+                (newOrderData.subTotal ?? 0) >=
+                (restaurant.threshold ?? Infinity);
+
+              if (shouldAwardLoyaltyPoint) {
+                nextLoyaltyData.points++;
+              }
+
+              await setDoc(
+                doc(
+                  db,
+                  "users-with-loyalty-program",
+                  `${phoneNumber}-${restaurantName}`
+                ),
+                nextLoyaltyData
+              );
+
+              let message = "";
+              const points = nextLoyaltyData.points;
+              const pointsPluralized = `point${points !== 1 ? "s" : ""}`;
+              const pointsTilNextReward =
+                (restaurant.discountUpon ?? 0) - points;
+              const pointsTilNextRewardPluralized = `point${
+                pointsTilNextReward !== 1 ? "s" : ""
+              }`;
+              const thresholdFormatted = restaurant.threshold?.toFixed(2);
+              const discountFormatted = restaurant.discountAmount?.toFixed(2);
+              const firstName = newOrderData.deliver_to.firstName;
+
+              if (didOptInToLoyaltyProgramWithThisOrder) {
+                message = `Welcome to ${restaurantName}'s Delivery Rewards Program! You currently have ${points} ${pointsPluralized}. Each time you spend more than $${thresholdFormatted} on a single order you gain 1 point! You are only ${pointsTilNextReward} ${pointsTilNextRewardPluralized} away from receiving $${discountFormatted} off!`;
+              } else if (shouldAwardLoyaltyPoint) {
+                const willReceiveDiscountNextPoint =
+                  nextLoyaltyData.points >=
+                  (restaurant.discountUpon ?? Infinity);
+
+                if (willReceiveDiscountNextPoint) {
+                  message = `Congrats ${firstName}! You just earned your reward. On your next order from ${restaurantName}, you will receive $${discountFormatted} off!`;
+                } else {
+                  message = `Hey there, ${firstName}. You just racked up a point with ${restaurantName}! You now have ${points} ${pointsPluralized}. You are only ${pointsTilNextReward} ${pointsTilNextRewardPluralized} away from receiving $${discountFormatted} off!`;
+                }
+              }
+
+              if (message) {
+                await twilioClient.messages.create({
+                  to: phoneNumber,
+                  from: "+18782313212",
+                  body: message,
+                });
+              }
+            }
+          }
+        } catch (err) {
+          captureException(err, {
+            extra: {
+              message: `Failed to assign loyalty points for order ${orderDoc.id}`,
             },
           });
         }

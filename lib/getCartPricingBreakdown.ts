@@ -4,9 +4,10 @@ import type { CartMenuItem, ShippingMethod } from "types";
 
 export const getCartFees = (
   subtotal: number,
-  shippingMethod?: ShippingMethod
+  shippingMethod?: ShippingMethod,
+  discount = 0
 ) => {
-  const tax = toMoney(subtotal * 0.08);
+  const tax = toMoney((subtotal - discount) * 0.08);
   const deliveryFee = shippingMethod === "delivery" ? 3.99 : 0;
   const processingFee = shippingMethod === "pickup" ? 2 : 0;
   const serviceFee =
@@ -26,11 +27,13 @@ export const getCartFees = (
 export const getCartProfit = (
   subtotal: number,
   tip: number,
-  shippingMethod?: ShippingMethod
+  shippingMethod?: ShippingMethod,
+  discount = 0
 ) => {
   const { deliveryFee, processingFee, serviceFee, smallOrderFee } = getCartFees(
-    subtotal,
-    shippingMethod
+    subtotal - discount,
+    shippingMethod,
+    discount
   );
 
   return deliveryFee + processingFee + serviceFee + smallOrderFee + tip;
@@ -39,16 +42,18 @@ export const getCartProfit = (
 export const getCartPricingBreakdown = (
   items?: CartMenuItem[],
   shippingMethod?: ShippingMethod,
-  tip = 0
+  tip = 0,
+  discount = 0
 ) => {
   // NOTE: Always run any mathematical calculations through `toMoney` to prevent
   // JS math issues. (Try `16 + 2.99` in the console. You will see `18.990000000000002`)
 
   const subtotal = getCartItemsSubtotal(items);
   const { tax, deliveryFee, processingFee, serviceFee, smallOrderFee } =
-    getCartFees(subtotal, shippingMethod);
+    getCartFees(subtotal - discount, shippingMethod);
   const total = toMoney(
-    subtotal +
+    subtotal -
+      discount +
       tax +
       tip +
       deliveryFee +
@@ -60,6 +65,7 @@ export const getCartPricingBreakdown = (
   return {
     amount: toMoney(total * 100),
     deliveryFee,
+    discount,
     processingFee,
     serviceFee,
     smallOrderFee,

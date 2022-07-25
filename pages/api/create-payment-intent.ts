@@ -3,6 +3,7 @@ import {
   Timestamp,
   collection,
   doc,
+  getDoc,
   getDocs,
   limit,
   query,
@@ -13,9 +14,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
 import { getCartPricingBreakdown } from "lib/getCartPricingBreakdown";
+import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { createOrder } from "lib/server/createOrder";
 import { db } from "lib/server/db";
+import { findRestaurant } from "lib/server/findRestaurant";
 import { reassignCartPrices } from "lib/server/reassignCartPrices";
 import type {
   ApiErrorResponse,
@@ -23,6 +26,7 @@ import type {
   CreatePaymentIntentResult,
   Order,
   PaymentIntentOrder,
+  UserWithLoyaltyProgram,
 } from "types";
 
 interface CreatePaymentIntentRequest extends NextApiRequest {
@@ -59,7 +63,7 @@ async function handler(
     });
 
     // Remove non-digits from the user's phone number before saving
-    user.phoneNumber = user.phoneNumber.replace(/\D/g, "");
+    user.phoneNumber = getNormalizedPhoneNumber(user.phoneNumber);
 
     const lastOrderDocFromEmail = await getDocs(
       query(
@@ -88,10 +92,37 @@ async function handler(
 
     await reassignCartPrices(cart);
 
+    const restaurantDoc = await findRestaurant(cart.restaurantName);
+    const restaurant = restaurantDoc ? restaurantDoc.data() : null;
+
+    let discount = 0;
+
+    if (restaurant && restaurant.loyaltyProgramAvailable) {
+      const existingLoyaltyDoc = await getDoc(
+        doc(
+          db,
+          "users-with-loyalty-program",
+          `${user.phoneNumber}-${cart.restaurantName}`
+        )
+      );
+
+      if (existingLoyaltyDoc.exists()) {
+        const userWithLoyaltyProgram =
+          existingLoyaltyDoc.data() as UserWithLoyaltyProgram;
+
+        if (
+          userWithLoyaltyProgram.points >= (restaurant.discountUpon ?? Infinity)
+        ) {
+          discount = restaurant.discountAmount ?? 0;
+        }
+      }
+    }
+
     const { amount, subtotal, total } = getCartPricingBreakdown(
       cart.items,
       user.shippingMethod,
-      cart.tip
+      cart.tip,
+      discount
     );
 
     const order = createOrder(
@@ -99,11 +130,14 @@ async function handler(
       user,
       customerId,
       subtotal,
+      discount,
       cart.tip,
       total
     );
 
     const paymentIntentOrder: PaymentIntentOrder = {
+      didOptInToLoyaltyProgramWithThisOrder:
+        cart.didOptInToLoyaltyProgramWithThisOrder,
       order,
       status: null,
       updatedAt: Timestamp.now(),

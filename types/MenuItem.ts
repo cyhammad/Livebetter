@@ -1,3 +1,5 @@
+import type { ApiRestaurant, CartMenuItemChoices, ShippingMethod } from "types";
+
 export interface MenuItem {
   category?: string;
   /**
@@ -49,4 +51,17 @@ export interface ApiMenuItem {
   outOfStock: boolean;
   picture: string | null;
   quantity: number | null;
+}
+
+export interface MenuItemData {
+  choices?: CartMenuItemChoices | undefined;
+  count: number;
+  menuItemCategory: string | null;
+  menuItemName: string;
+  menuItemNotes: string;
+  menuItemPrice: number;
+  optionalChoices?: CartMenuItemChoices | undefined;
+  restaurant: ApiRestaurant;
+  shippingMethod: ShippingMethod;
+  shouldVerifyContactInfo: boolean;
 }

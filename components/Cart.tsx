@@ -1,19 +1,18 @@
 import classNames from "classnames";
 import { AnimatePresence, HTMLMotionProps, motion } from "framer-motion";
-import { Tote } from "phosphor-react";
+import { Star, Tote } from "phosphor-react";
 import { useState } from "react";
 
 import { CartModal } from "components/CartModal";
 import { CheckoutModal } from "components/CheckoutModal";
-import { ContactInfoModal } from "components/ContactInfoModal";
 import { ModalGroupOverlay } from "components/ModalGroupOverlay";
 import { useCartContext } from "hooks/useCartContext";
 import { usePrevious } from "hooks/usePrevious";
 
-type ModalName = "cart" | "contact" | "checkout";
+type ModalName = "cart" | "checkout";
 
 export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
-  const { cart, count, total, subtotal } = useCartContext();
+  const { cart, count, subtotal } = useCartContext();
   const [currentModal, setCurrentModal] = useState<ModalName>();
   const previousModal = usePrevious(currentModal);
 
@@ -32,12 +31,25 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
 
   const handleRequestClose = () => setCurrentModal(undefined);
 
+  const isLoyaltyPillVisible = !!(
+    cart?.restaurant.loyaltyProgramAvailable && cart?.restaurant.threshold
+  );
+  const dollarsToNextPoint = cart?.restaurant.threshold
+    ? cart?.restaurant.threshold - subtotal
+    : 0;
+  const percentOfThreshold = Math.min(
+    cart?.restaurant.threshold
+      ? (subtotal / cart?.restaurant.threshold) * 100
+      : 0,
+    100
+  );
+
   return (
     <>
       <AnimatePresence>
         {count > 0 ? (
           <div
-            className="sticky mx-4 sm:mx-6 "
+            className="sticky mx-4 sm:mx-6"
             style={{
               bottom: "var(--modal-padding-bottom)",
             }}
@@ -47,8 +59,8 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
               className={classNames(
                 className,
                 `
-                  container mx-auto px-4 sm:px-6 rounded shadow-xl
-                  gap-2 flex flex-col max-w-3xl
+                  container mx-auto px-4 sm:px-6
+                  gap-1 flex flex-col max-w-3xl
                 `
               )}
               animate={currentModal ? "hidden" : "banner"}
@@ -60,6 +72,51 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
               }}
               variants={variants}
             >
+              {isLoyaltyPillVisible ? (
+                <div
+                  className="
+                    relative
+                    text-xs font-normal
+                    bg-gray-700 text-white py-1 px-3 rounded-full mx-auto
+                    shadow-xl overflow-hidden
+                    border border-gray-700
+                  "
+                >
+                  <p className="flex gap-1 justify-center items-center">
+                    {percentOfThreshold >= 100 ? (
+                      <span>
+                        You will receive <b>1 point</b> for this order!
+                      </span>
+                    ) : (
+                      <span>
+                        Spend <b>${dollarsToNextPoint.toFixed(2)}</b> more to
+                        receive a point for this order!
+                      </span>
+                    )}
+                    <Star
+                      alt=""
+                      size={14}
+                      color="currentColor"
+                      className={classNames({
+                        "-mt-0.5": true,
+                        "text-white": percentOfThreshold < 100,
+                        "text-yellow-500": percentOfThreshold >= 100,
+                      })}
+                      weight={percentOfThreshold < 100 ? "bold" : "fill"}
+                    />
+                  </p>
+                  <div className="w-full absolute bottom-0 left-0 right-0 h-1 bg-white/30">
+                    <div
+                      className={classNames({
+                        "bg-yellow-500 h-full": true,
+                      })}
+                      style={{
+                        width: `${percentOfThreshold}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              ) : null}
               <button
                 onClick={() => setCurrentModal("cart")}
                 className={classNames(
@@ -70,20 +127,30 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                   `
                 )}
               >
-                <span className="flex gap-2 items-center">
-                  <Tote
-                    size={24}
-                    color="currentColor"
-                    className="text-white"
-                    weight="duotone"
-                  />
-                  <span>
+                <span className="flex gap-3 items-center">
+                  <span className="grid items-center justify-center">
+                    <Tote
+                      alt="Your cart"
+                      size={32}
+                      color="currentColor"
+                      className="text-white"
+                      weight="duotone"
+                      style={{ gridArea: "1/1" }}
+                    />
+                    <small
+                      className="-mb-1 text-center text-xs"
+                      style={{ gridArea: "1/1" }}
+                    >
+                      {count}
+                    </small>
+                  </span>
+                  <div className="flex flex-col">
                     <span className="capitalize">
                       {cart?.restaurant?.Restaurant.toLowerCase()}
-                    </span>{" "}
-                    <small>({cart?.items.length ?? 0})</small>
-                  </span>
+                    </span>
+                  </div>
                 </span>
+
                 <span className="bg-white/20 px-2 py-1 rounded">
                   ${subtotal.toFixed(2)}
                 </span>
@@ -99,29 +166,16 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
       <CartModal
         isOpen={currentModal === "cart"}
         onRequestClose={handleRequestClose}
-        onRequestNext={() => setCurrentModal("contact")}
-        origin={
-          [currentModal, previousModal].includes("contact")
-            ? "carousel-left"
-            : "default"
-        }
-      />
-      <ContactInfoModal
-        isOpen={currentModal === "contact"}
-        onRequestClose={handleRequestClose}
-        onRequestPrevious={() => setCurrentModal("cart")}
         onRequestNext={() => setCurrentModal("checkout")}
         origin={
-          [currentModal, previousModal].includes("cart")
-            ? "carousel-right"
-            : [currentModal, previousModal].includes("checkout")
+          [currentModal, previousModal].includes("checkout")
             ? "carousel-left"
             : "default"
         }
       />
       <CheckoutModal
         isOpen={currentModal === "checkout"}
-        onRequestPrevious={() => setCurrentModal("contact")}
+        onRequestPrevious={() => setCurrentModal("cart")}
         onRequestClose={handleRequestClose}
         origin={!currentModal ? "default" : "carousel-right"}
       />

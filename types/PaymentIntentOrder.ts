@@ -11,6 +11,7 @@ export type PaymentIntentStatus =
   | "succeeded";
 
 export interface PaymentIntentOrder {
+  didOptInToLoyaltyProgramWithThisOrder: boolean;
   order: Order;
   status:
     | null

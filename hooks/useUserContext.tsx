@@ -10,6 +10,8 @@ import {
 } from "react";
 
 import { usePersistentState } from "hooks/usePersistentState";
+import { getFormattedPhoneNumber } from "lib/getFormattedPhoneNumber";
+import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
 import type {
   Coordinates,
   DeliveryDropOffPreference,
@@ -117,26 +119,7 @@ export const UserContextProvider = ({
 
   const setPhoneNumber = useCallback(
     (nextPhoneNumber: string) => {
-      const cleanPhone = nextPhoneNumber.replace(/\D/g, "");
-
-      const [_, group1, group2, group3] =
-        cleanPhone.match(/(\d{0,3})(\d{0,3})(\d{0,4})/) ?? [];
-
-      let formattedPhone = "";
-
-      if (group1) {
-        formattedPhone = "(" + group1;
-      }
-
-      if (group2) {
-        formattedPhone += ") " + group2;
-      }
-
-      if (group3) {
-        formattedPhone += "-" + group3;
-      }
-
-      setPhoneNumberInternal(formattedPhone);
+      setPhoneNumberInternal(getFormattedPhoneNumber(nextPhoneNumber));
     },
     [setPhoneNumberInternal]
   );
@@ -154,7 +137,7 @@ export const UserContextProvider = ({
       return [false, "Phone number is required."];
     }
 
-    const cleanPhone = phoneNumber.replace(/\D/g, "");
+    const cleanPhone = getNormalizedPhoneNumber(phoneNumber);
 
     if (cleanPhone.length !== 10) {
       return [false, "Please make sure your phone number is valid."];

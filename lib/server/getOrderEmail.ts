@@ -1,4 +1,4 @@
-import { getCartFees } from "lib/getCartPricingBreakdown";
+import { getCartProfit } from "lib/getCartPricingBreakdown";
 import { toMoney } from "lib/toMoney";
 import { Choice, Order, OrderItem } from "types";
 
@@ -31,13 +31,11 @@ const getProducts = (products?: Array<OrderItem>) => {
 };
 
 export const getOrderEmail = (order: Order) => {
-  const { deliveryFee, processingFee, serviceFee, smallOrderFee } = getCartFees(
+  const profit = getCartProfit(
     order.subTotal ?? 0,
-    order.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery"
-  );
-
-  const profit = toMoney(
-    deliveryFee + processingFee + serviceFee + smallOrderFee + order.tip
+    order.tip,
+    order.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery",
+    order.discount
   );
 
   return `
@@ -139,17 +137,22 @@ export const getOrderEmail = (order: Order) => {
           </tr>
 
           <tr>
-            <th role="row">SubTotal Amount</th>
+            <th role="row">Subtotal</th>
             <td>$${order.subTotal}</td>
           </tr>
 
           <tr>
-            <th role="row">Profit</th>
-            <td>$${profit}</td>
+            <th role="row">Discount</th>
+            <td>$${order.discount ?? 0}</td>
           </tr>
 
           <tr>
-            <th role="row">Total Amount</th>
+            <th role="row">Profit</th>
+            <td>$${toMoney(profit)}</td>
+          </tr>
+
+          <tr>
+            <th role="row">Total</th>
             <td>$${order.total}</td>
           </tr>
         </tbody>

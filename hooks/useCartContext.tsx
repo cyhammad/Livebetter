@@ -1,24 +1,19 @@
-import {
-  Dispatch,
-  PropsWithChildren,
-  SetStateAction,
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-} from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
+import type React from "react";
+import { useQuery } from "react-query";
 
 import { usePersistentState } from "hooks/usePersistentState";
+import { useUserContext } from "hooks/useUserContext";
+import { fetchUserWithLoyaltyProgram } from "lib/client/fetchUserWithLoyaltyProgram";
 import { getCartItemsSubtotal } from "lib/getCartItemsSubtotal";
 import { getCartPricingBreakdown } from "lib/getCartPricingBreakdown";
+import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
 import type {
   ApiRestaurant,
   Cart,
   CartMenuItem,
   CartMenuItemChoices,
 } from "types";
-
-import { useUserContext } from "./useUserContext";
 
 interface CartContextDefaultValue {
   addToCart: (
@@ -37,12 +32,15 @@ interface CartContextDefaultValue {
    */
   count: number;
   deliveryFee: number;
+  discount: number;
   emptyCart: () => void;
   processingFee: number;
   removeMenuItem: (menuItemIndex: number) => void;
   serviceFee: number;
-  setCart: Dispatch<SetStateAction<Cart | undefined>>;
+  setCart: React.Dispatch<React.SetStateAction<Cart | undefined>>;
+  setDidOptInToLoyaltyProgramWithThisOrder: (didOptIn: boolean) => void;
   setMenuItemCount: (menuItemIndex: number, count: number) => void;
+  setPaymentIntentClientSecret: (secret: string) => void;
   setTip: (tip: number) => void;
   smallOrderFee: number;
   subtotal: number;
@@ -52,36 +50,49 @@ interface CartContextDefaultValue {
    * The total price of the cart
    */
   total: number;
-  setPaymentIntentClientSecret: (secret: string) => void;
 }
 
 export const CartContext = createContext<CartContextDefaultValue>({
   addToCart: () => undefined,
   count: 0,
   deliveryFee: 0,
+  discount: 0,
   emptyCart: () => undefined,
   processingFee: 0,
   removeMenuItem: () => undefined,
   serviceFee: 0,
   setCart: () => undefined,
+  setDidOptInToLoyaltyProgramWithThisOrder: () => undefined,
   setMenuItemCount: () => undefined,
+  setPaymentIntentClientSecret: () => undefined,
   setTip: () => undefined,
   smallOrderFee: 0,
   subtotal: 0,
   tax: 0,
   tip: 0,
   total: 0,
-  setPaymentIntentClientSecret: () => undefined,
 });
 
 export const CartContextProvider = ({
   children,
-}: PropsWithChildren<unknown>) => {
-  const { shippingMethod } = useUserContext();
+}: React.PropsWithChildren<unknown>) => {
+  const { phoneNumber, shippingMethod } = useUserContext();
+
   const [cart, setCart] = usePersistentState<Cart | undefined>(
     "cart",
     undefined
   );
+
+  const { data: userWithLoyaltyProgramData } = useQuery(
+    ["loyalty-program-info", phoneNumber, cart?.restaurant.Restaurant ?? ""],
+    () =>
+      fetchUserWithLoyaltyProgram({
+        phoneNumber: getNormalizedPhoneNumber(phoneNumber),
+        restaurantName: cart?.restaurant.Restaurant ?? "",
+      })
+  );
+
+  const itemCount = cart?.items.length ?? 0;
 
   const addToCart: CartContextDefaultValue["addToCart"] = useCallback(
     (
@@ -110,7 +121,8 @@ export const CartContextProvider = ({
           prevCart?.restaurant.Restaurant !== restaurant.Restaurant;
 
         return {
-          ...prevCart,
+          didOptInToLoyaltyProgramWithThisOrder:
+            !!prevCart?.didOptInToLoyaltyProgramWithThisOrder,
           // If the restaurant changed, we reset the cart
           items: didRestaurantChange
             ? [addedItem]
@@ -127,19 +139,23 @@ export const CartContextProvider = ({
 
   const removeMenuItem: CartContextDefaultValue["removeMenuItem"] = useCallback(
     (menuItemIndex) => {
-      setCart((prevCart) => {
-        if (prevCart) {
-          return {
-            ...prevCart,
-            items:
-              prevCart?.items.filter(
-                (item, index) => index !== menuItemIndex
-              ) ?? [],
-          };
-        }
-      });
+      if (itemCount === 1) {
+        setCart(undefined);
+      } else {
+        setCart((prevCart) => {
+          if (prevCart) {
+            return {
+              ...prevCart,
+              items:
+                prevCart?.items.filter(
+                  (item, index) => index !== menuItemIndex
+                ) ?? [],
+            };
+          }
+        });
+      }
     },
-    [setCart]
+    [itemCount, setCart]
   );
 
   const setMenuItemCount: CartContextDefaultValue["setMenuItemCount"] =
@@ -190,6 +206,21 @@ export const CartContextProvider = ({
     [setCart]
   );
 
+  const setDidOptInToLoyaltyProgramWithThisOrder: CartContextDefaultValue["setDidOptInToLoyaltyProgramWithThisOrder"] =
+    useCallback(
+      (didOptIn) => {
+        setCart((prevCart) => {
+          if (prevCart) {
+            return {
+              ...prevCart,
+              didOptInToLoyaltyProgramWithThisOrder: didOptIn,
+            };
+          }
+        });
+      },
+      [setCart]
+    );
+
   const emptyCart = useCallback(() => {
     setCart(undefined);
   }, [setCart]);
@@ -199,6 +230,12 @@ export const CartContextProvider = ({
     [cart?.items]
   );
 
+  const discount =
+    (userWithLoyaltyProgramData?.user?.points ?? 0) >=
+    (cart?.restaurant.discountUpon ?? Infinity)
+      ? cart?.restaurant.discountAmount ?? 0
+      : 0;
+
   const {
     total,
     deliveryFee,
@@ -207,28 +244,35 @@ export const CartContextProvider = ({
     smallOrderFee,
     tax,
     tip,
-  } = getCartPricingBreakdown(cart?.items ?? [], shippingMethod, cart?.tip);
+  } = getCartPricingBreakdown(
+    cart?.items ?? [],
+    shippingMethod,
+    cart?.tip,
+    discount
+  );
 
   return (
     <CartContext.Provider
       value={{
         addToCart,
         cart,
-        count: cart?.items.length ?? 0,
+        count: itemCount,
         deliveryFee,
+        discount,
         emptyCart,
         processingFee,
         removeMenuItem,
         serviceFee,
         setCart,
+        setDidOptInToLoyaltyProgramWithThisOrder,
         setMenuItemCount,
+        setPaymentIntentClientSecret,
         setTip,
         smallOrderFee,
         subtotal,
         tax,
         tip,
         total,
-        setPaymentIntentClientSecret,
       }}
     >
       {children}

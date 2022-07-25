@@ -2,6 +2,7 @@ import { captureException, flush, withSentry } from "@sentry/nextjs";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
 import type { ApiErrorResponse, UserForVerification } from "types";
@@ -28,7 +29,7 @@ async function handler(
       .json(createApiErrorResponse("Missing `code` property in request body"));
   }
 
-  phoneNumber = phoneNumber.replace(/\D/g, "");
+  phoneNumber = getNormalizedPhoneNumber(phoneNumber);
 
   if (phoneNumber.length !== 10) {
     return res

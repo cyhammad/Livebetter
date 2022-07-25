@@ -66,7 +66,7 @@ export const OrderConfirmationDetails = ({
     order?.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery";
 
   const { tax, deliveryFee, processingFee, serviceFee, smallOrderFee } =
-    getCartFees(order?.subTotal ?? 0, shippingMethod);
+    getCartFees(order?.subTotal ?? 0, shippingMethod, order?.discount);
 
   return (
     <div className="flex flex-col gap-6">
@@ -127,6 +127,14 @@ export const OrderConfirmationDetails = ({
               <b>Subtotal:</b>{" "}
               <b className="font-semibold">${order.subTotal?.toFixed(2)}</b>
             </p>
+            {order.discount ?? 0 > 0 ? (
+              <p className="text-right tabular-nums flex justify-between">
+                <b>Discount:</b>{" "}
+                <b className="font-semibold text-emerald-600">
+                  -${order.discount?.toFixed(2)}
+                </b>
+              </p>
+            ) : null}
             <div className="flex flex-col gap-0">
               {serviceFee ? (
                 <p className="text-sm text-right tabular-nums flex justify-between">

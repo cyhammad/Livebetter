@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Image from "next/future/image";
 import { Browser, MapPin } from "phosphor-react";
@@ -6,8 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import { Element, Events, Link, scrollSpy, scroller } from "react-scroll";
 
 import { Cart } from "components/Cart";
+import { ContactInfoModal } from "components/ContactInfoModal";
 import { Head } from "components/Head";
 import { Header } from "components/Header";
+import { ModalGroupOverlay } from "components/ModalGroupOverlay";
 import { RestaurantCuisine } from "components/RestaurantCuisine";
 import { RestaurantMenuItem } from "components/RestaurantMenuItem";
 import { RestaurantMenuItemModal } from "components/RestaurantMenuItemModal";
@@ -16,13 +18,22 @@ import { RestaurantPhoneNumber } from "components/RestaurantPhoneNumber";
 import { RestaurantPickAndDelivery } from "components/RestaurantPickAndDelivery";
 import { Select } from "components/Select";
 import { Toolbar } from "components/Toolbar";
+import { useCartContext } from "hooks/useCartContext";
+import { usePrevious } from "hooks/usePrevious";
 import { useUserContext } from "hooks/useUserContext";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { db } from "lib/server/db";
+import { findRestaurant } from "lib/server/findRestaurant";
 import { toApiMenuItem } from "lib/server/toApiMenuItem";
 import { toApiRestaurant } from "lib/server/toApiRestaurant";
 import { urlParamToRestaurantName } from "lib/urlParamToRestaurantName";
-import type { ApiMenuItem, ApiRestaurant, MenuItem, Restaurant } from "types";
+import type {
+  ApiMenuItem,
+  ApiRestaurant,
+  MenuItem,
+  MenuItemData,
+  Restaurant,
+} from "types";
 
 interface RestaurantDetailPageProps {
   restaurant: ApiRestaurant;
@@ -60,16 +71,14 @@ export const getStaticProps: GetStaticProps<
     typeof params?.restaurantName === "string"
       ? urlParamToRestaurantName(params.restaurantName)
       : null;
-  const restaurantsRef = collection(db, "Restaurants Philadelphia");
-  const restaurantQuery = query(
-    restaurantsRef,
-    where("Restaurant", "==", restaurantName),
-    limit(1)
-  );
 
-  const restaurantDocs = await getDocs(restaurantQuery);
+  if (!restaurantName) {
+    return {
+      notFound: true,
+    };
+  }
 
-  const restaurantDoc = restaurantDocs.docs[0];
+  const restaurantDoc = await findRestaurant(restaurantName);
 
   if (!restaurantDoc) {
     return {
@@ -140,7 +149,7 @@ export const getStaticProps: GetStaticProps<
     };
   });
 
-  const restaurant = restaurantDoc.data() as Restaurant;
+  const restaurant = restaurantDoc.data();
 
   return {
     props: {
@@ -163,10 +172,14 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
   const [selectedCategory, setSelectedCategory] = useState(
     menu.find(({ category }) => !!category)?.category ?? ""
   );
+  const [menuItemData, setMenuItemData] = useState<MenuItemData>();
   const [isScrolling, setIsScrolling] = useState(false);
-  const [isMenuItemModalOpen, setIsMenuItemModalOpen] = useState(false);
+  const [currentModal, setCurrentModal] = useState<"menu-item" | "contact">();
   const [selectedMenuItem, setSelectedMenuItem] = useState<ApiMenuItem>();
   const scrollOffsetRef = useRef(0);
+  const { setShippingMethod } = useUserContext();
+  const { addToCart } = useCartContext();
+  const previousModal = usePrevious(currentModal);
 
   const distance = getDistanceToCoordinates({
     latitude: parseFloat(restaurant.Latitude),
@@ -183,6 +196,11 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
     if (!isScrolling) {
       setSelectedCategory(to);
     }
+  };
+
+  const handleRequestClose = () => {
+    setCurrentModal(undefined);
+    setMenuItemData(undefined);
   };
 
   useEffect(() => {
@@ -230,6 +248,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 {restaurant.Restaurant}
               </h2>
               <Select
+                className="md:text-lg"
                 onChange={(event) => {
                   setSelectedCategory(event.target.value);
 
@@ -348,7 +367,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                               menuItem={menuItem}
                               onClick={() => {
                                 setSelectedMenuItem(menuItem);
-                                setIsMenuItemModalOpen(true);
+                                setCurrentModal("menu-item");
                               }}
                             />
                           ))}
@@ -363,13 +382,67 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
           <Cart className="mt-4" />
         </section>
       </main>
+      <ModalGroupOverlay
+        isOpen={!!currentModal}
+        onRequestClose={handleRequestClose}
+      />
       <RestaurantMenuItemModal
+        origin={
+          [currentModal, previousModal].includes("contact")
+            ? "carousel-left"
+            : "default"
+        }
         restaurant={restaurant}
         menuItem={selectedMenuItem}
-        isOpen={isMenuItemModalOpen}
-        onRequestClose={() => {
-          setIsMenuItemModalOpen(false);
+        isOpen={currentModal === "menu-item"}
+        onRequestClose={handleRequestClose}
+        onRequestNext={(data) => {
+          setMenuItemData(data);
+          setShippingMethod(data.shippingMethod);
+
+          if (data.shouldVerifyContactInfo) {
+            setCurrentModal("contact");
+          } else {
+            addToCart(
+              restaurant,
+              data.menuItemName,
+              data.menuItemPrice,
+              data.menuItemCategory,
+              1,
+              data.menuItemNotes,
+              data.choices,
+              data.optionalChoices
+            );
+
+            handleRequestClose();
+          }
         }}
+      />
+      <ContactInfoModal
+        isOpen={currentModal === "contact"}
+        onRequestClose={handleRequestClose}
+        onRequestPrevious={() => setCurrentModal("menu-item")}
+        onRequestNext={() => {
+          if (menuItemData) {
+            addToCart(
+              restaurant,
+              menuItemData.menuItemName,
+              menuItemData.menuItemPrice,
+              menuItemData.menuItemCategory,
+              1,
+              menuItemData.menuItemNotes,
+              menuItemData.choices,
+              menuItemData.optionalChoices
+            );
+
+            handleRequestClose();
+          }
+        }}
+        origin={
+          [currentModal, previousModal].includes("menu-item")
+            ? "carousel-right"
+            : "default"
+        }
       />
     </>
   );

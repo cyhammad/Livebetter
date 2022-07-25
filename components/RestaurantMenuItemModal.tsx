@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import Image from "next/future/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactModal from "react-modal";
+import type React from "react";
 
 import { Checkbox } from "components/Checkbox";
 import { InputCounter } from "components/InputCounter";
@@ -20,18 +20,25 @@ import type {
   ApiMenuItem,
   ApiRestaurant,
   CartMenuItemChoicesInput,
+  MenuItemData,
+  ModalProps,
   ShippingMethod,
 } from "types";
 
-interface RestaurantMenuItemModalProps extends ReactModal.Props {
+interface RestaurantMenuItemModalProps extends ModalProps {
   menuItem?: ApiMenuItem;
   restaurant: ApiRestaurant;
+  onRequestNext?: (
+    data: MenuItemData,
+    event?: React.MouseEvent | React.KeyboardEvent
+  ) => void;
 }
 
 export const RestaurantMenuItemModal = ({
   restaurant,
   menuItem,
   onRequestClose,
+  onRequestNext,
   isOpen,
   ...props
 }: RestaurantMenuItemModalProps) => {
@@ -41,8 +48,8 @@ export const RestaurantMenuItemModal = ({
     Restaurant: restaurantName,
   } = restaurant;
 
-  const { cart, addToCart, count: cartCount } = useCartContext();
-  const { shippingMethod, setShippingMethod } = useUserContext();
+  const { cart, count: cartCount } = useCartContext();
+  const { shippingMethod } = useUserContext();
   const [selectedChoices, setSelectedChoices] =
     useState<CartMenuItemChoicesInput>();
   const [selectedOptionalChoices, setSelectedOptionalChoices] =
@@ -176,12 +183,16 @@ export const RestaurantMenuItemModal = ({
 
   return (
     <Modal
+      {...props}
       className="flex flex-col overflow-auto"
       isOpen={isOpen}
-      onRequestClose={(event) => {
-        onRequestClose && onRequestClose(event);
+      onRequestClose={onRequestClose}
+      style={{
+        overlay: {
+          background: "transparent",
+          backdropFilter: "none",
+        },
       }}
-      {...props}
     >
       {!menuItem ? null : (
         <>
@@ -482,23 +493,27 @@ export const RestaurantMenuItemModal = ({
                     return;
                   }
 
-                  setShippingMethod(selectedShippingMethod);
-
-                  addToCart(
-                    restaurant,
-                    menuItem.name,
-                    menuItem.mealPrice,
-                    menuItem.category,
-                    1,
-                    menuItemNotes,
-                    selectedChoices
-                      ? toCartMenuItemChoices(selectedChoices)
-                      : undefined,
-                    selectedOptionalChoices
-                      ? toCartMenuItemChoices(selectedOptionalChoices)
-                      : undefined
-                  );
-                  onRequestClose && onRequestClose(event);
+                  if (onRequestNext) {
+                    onRequestNext(
+                      {
+                        shippingMethod: selectedShippingMethod,
+                        restaurant,
+                        menuItemName: menuItem.name,
+                        menuItemPrice: menuItem.mealPrice,
+                        menuItemCategory: menuItem.category,
+                        count: 1,
+                        menuItemNotes,
+                        choices: selectedChoices
+                          ? toCartMenuItemChoices(selectedChoices)
+                          : undefined,
+                        optionalChoices: selectedOptionalChoices
+                          ? toCartMenuItemChoices(selectedOptionalChoices)
+                          : undefined,
+                        shouldVerifyContactInfo: didRestaurantChange,
+                      },
+                      event
+                    );
+                  }
                 },
               }}
               primaryButtonLabel={

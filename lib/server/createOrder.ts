@@ -13,6 +13,7 @@ export const createOrder = (
   user: CreatePaymentIntentUser,
   customerId: string,
   subtotal: number,
+  discount: number,
   tip: number,
   total: number
 ): Order => {
@@ -50,6 +51,7 @@ export const createOrder = (
     created_at: Timestamp.now(),
     customers_id: customerId,
     deliver_to,
+    discount,
     order_items: cart.items.map(
       ({
         choices,

@@ -3,6 +3,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import twilio from "twilio";
 
+import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
 import type { ApiErrorResponse, UserForVerification } from "types";
@@ -25,8 +26,10 @@ async function handler(
     typeof req.body.lastName === "string" ? req.body.lastName : null;
   const email: string =
     typeof req.body.email === "string" ? req.body.email : null;
-  let phoneNumber: string =
-    typeof req.body.phoneNumber === "string" ? req.body.phoneNumber : null;
+  const phoneNumber: string | null =
+    typeof req.body.phoneNumber === "string"
+      ? getNormalizedPhoneNumber(req.body.phoneNumber)
+      : null;
 
   if (!phoneNumber) {
     return res
@@ -35,8 +38,6 @@ async function handler(
         createApiErrorResponse("Missing `phoneNumber` property in request body")
       );
   }
-
-  phoneNumber = phoneNumber.replace(/\D/g, "");
 
   if (phoneNumber.length !== 10) {
     return res

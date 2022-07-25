@@ -1,5 +1,7 @@
 import { Phone } from "phosphor-react";
 
+import { getFormattedPhoneNumber } from "lib/getFormattedPhoneNumber";
+import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
 import type { ApiRestaurant } from "types";
 
 interface RestaurantPhoneNumberProps {
@@ -9,20 +11,14 @@ interface RestaurantPhoneNumberProps {
 export const RestaurantPhoneNumber = ({
   restaurant,
 }: RestaurantPhoneNumberProps) => {
-  const digits = restaurant.Phone?.replace(/\D/g, "") ?? "";
-  const isPhoneVisible =
-    !!restaurant.Phone && (digits.length === 10 || digits.length === 11);
+  const digits = getNormalizedPhoneNumber(restaurant.Phone);
+  const isPhoneVisible = digits.length === 10;
 
   if (!isPhoneVisible) {
     return null;
   }
 
-  const phoneTenDigits = digits.length === 11 ? digits.slice(1) : digits;
-  const phoneFormatted = [
-    phoneTenDigits.slice(0, 3),
-    phoneTenDigits.slice(3, 6),
-    phoneTenDigits.slice(6),
-  ].join("-");
+  const phoneFormatted = getFormattedPhoneNumber(digits);
 
   return (
     <div className="flex gap-2 items-center">

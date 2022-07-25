@@ -9,6 +9,7 @@ export interface Order {
   order_items: OrderItem[];
   restaurant_id: string;
   subTotal?: number;
+  discount?: number;
   tip: number;
   total: number;
 }

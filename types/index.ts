@@ -11,3 +11,4 @@ export * from "./Order";
 export * from "./PaymentIntentOrder";
 export * from "./Restaurant";
 export * from "./UserForVerification";
+export * from "./UserWithLoyaltyProgram";
