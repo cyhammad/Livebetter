@@ -15,6 +15,7 @@ import Stripe from "stripe";
 import twilio from "twilio";
 
 import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
+import { getRandomNumber } from "lib/getRandomNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
 import { findRestaurant } from "lib/server/findRestaurant";
@@ -197,6 +198,7 @@ async function handler(
               );
 
               let message = "";
+              let mediaUrl: string | undefined;
               const points = nextLoyaltyData.points;
               const pointsPluralized = `point${points !== 1 ? "s" : ""}`;
               const pointsTilNextReward =
@@ -211,9 +213,19 @@ async function handler(
               if (didOptInToLoyaltyProgramWithThisOrder) {
                 message = `Welcome to ${restaurantName}'s Delivery Rewards Program! You currently have ${points} ${pointsPluralized}. Each time you spend more than $${thresholdFormatted} on a single order you gain 1 point! You are only ${pointsTilNextReward} ${pointsTilNextRewardPluralized} away from receiving $${discountFormatted} off!`;
               } else if (shouldAwardLoyaltyPoint) {
+                const shouldSeeRewardGif =
+                  typeof restaurant.discountUpon === "number" &&
+                  nextLoyaltyData.points === restaurant.discountUpon - 1;
                 const willReceiveDiscountNextPoint =
                   nextLoyaltyData.points >=
                   (restaurant.discountUpon ?? Infinity);
+
+                mediaUrl = shouldSeeRewardGif
+                  ? `https://www.livebetterphl.com/reward-${getRandomNumber(
+                      1,
+                      5
+                    )}.gif`
+                  : undefined;
 
                 if (willReceiveDiscountNextPoint) {
                   message = `Congrats ${firstName}! You just earned your reward. On your next order from ${restaurantName}, you will receive $${discountFormatted} off!`;
@@ -227,6 +239,7 @@ async function handler(
                   to: phoneNumber,
                   from: "+18782313212",
                   body: message,
+                  mediaUrl,
                 });
               }
             }
