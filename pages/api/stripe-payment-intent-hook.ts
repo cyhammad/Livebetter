@@ -130,30 +130,7 @@ async function handler(
           doc(db, "payment_intent_orders", paymentIntentOrderDoc.id)
         );
 
-        const orderEmailHtml = getOrderEmail(newOrderData);
-
-        const [sendGridResponse] = await Promise.allSettled([
-          await sendGridMail.send({
-            from: "livebetterphl@gmail.com",
-            to:
-              process.env.VERCEL_ENV === "development"
-                ? "atdrago@gmail.com"
-                : "livebetterphl@gmail.com",
-            subject: `New Order Notification ✔ (Order #${orderDoc.id})`,
-            html: orderEmailHtml,
-            headers: { Accept: "application/json" },
-          }),
-        ]);
-
-        const didSendGridFail = sendGridResponse.status === "rejected";
-
-        if (didSendGridFail) {
-          captureException(sendGridResponse.reason, {
-            extra: {
-              message: "Failed to send email using SendGrid",
-            },
-          });
-        }
+        let shouldAwardLoyaltyPoint = false;
 
         try {
           if (
@@ -202,7 +179,7 @@ async function handler(
 
               // Next, we check if we should award the customer a point for this
               // order, and add the point if so.
-              const shouldAwardLoyaltyPoint =
+              shouldAwardLoyaltyPoint =
                 (newOrderData.subTotal ?? 0) >=
                 (restaurant.threshold ?? Infinity);
 
@@ -261,6 +238,34 @@ async function handler(
             },
           });
         }
+
+        const orderEmailHtml = getOrderEmail(
+          newOrderData,
+          shouldAwardLoyaltyPoint
+        );
+
+        const [sendGridResponse] = await Promise.allSettled([
+          await sendGridMail.send({
+            from: "livebetterphl@gmail.com",
+            to:
+              process.env.VERCEL_ENV === "development"
+                ? "atdrago@gmail.com"
+                : "livebetterphl@gmail.com",
+            subject: `New Order Notification ✔ (Order #${orderDoc.id})`,
+            html: orderEmailHtml,
+            headers: { Accept: "application/json" },
+          }),
+        ]);
+
+        const didSendGridFail = sendGridResponse.status === "rejected";
+
+        if (didSendGridFail) {
+          captureException(sendGridResponse.reason, {
+            extra: {
+              message: "Failed to send email using SendGrid",
+            },
+          });
+        }
       }
 
       break;
@@ -270,7 +275,9 @@ async function handler(
       break;
   }
 
-  res.status(200).json({ received: true });
+  res.status(200).json({
+    received: true,
+  });
 }
 
 export default withSentry(handler);
