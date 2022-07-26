@@ -10,7 +10,11 @@ const MyError = ({ statusCode, hasGetInitialPropsRun, err }) => {
     // Flushing is not required in this case as it only happens on the client
   }
 
-  return <NextErrorComponent statusCode={statusCode} />;
+  return (
+    <main>
+      <NextErrorComponent statusCode={statusCode} />
+    </main>
+  );
 };
 
 MyError.getInitialProps = async (context) => {
