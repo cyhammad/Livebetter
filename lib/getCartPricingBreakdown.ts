@@ -30,13 +30,52 @@ export const getCartProfit = (
   shippingMethod?: ShippingMethod,
   discount = 0
 ) => {
-  const { deliveryFee, processingFee, serviceFee, smallOrderFee } = getCartFees(
-    subtotal - discount,
-    shippingMethod,
-    discount
+  const { deliveryFee, processingFee, serviceFee, smallOrderFee, tax } =
+    getCartFees(subtotal - discount, shippingMethod, discount);
+
+  /**
+   * Stripe's fee is currently 2.9% + 30 cents, per transaction
+   */
+  const stripeFee = toMoney(
+    getTotal(
+      subtotal,
+      discount,
+      tax,
+      tip,
+      deliveryFee,
+      processingFee,
+      serviceFee,
+      smallOrderFee
+    ) *
+      0.029 +
+      0.3
   );
 
-  return deliveryFee + processingFee + serviceFee + smallOrderFee + tip;
+  return (
+    deliveryFee + processingFee + serviceFee + smallOrderFee + tip - stripeFee
+  );
+};
+
+const getTotal = (
+  subtotal: number,
+  discount: number,
+  tax: number,
+  tip: number,
+  deliveryFee: number,
+  processingFee: number,
+  serviceFee: number,
+  smallOrderFee: number
+): number => {
+  return toMoney(
+    subtotal -
+      discount +
+      tax +
+      tip +
+      deliveryFee +
+      processingFee +
+      serviceFee +
+      smallOrderFee
+  );
 };
 
 export const getCartPricingBreakdown = (
@@ -51,15 +90,15 @@ export const getCartPricingBreakdown = (
   const subtotal = getCartItemsSubtotal(items);
   const { tax, deliveryFee, processingFee, serviceFee, smallOrderFee } =
     getCartFees(subtotal - discount, shippingMethod);
-  const total = toMoney(
-    subtotal -
-      discount +
-      tax +
-      tip +
-      deliveryFee +
-      processingFee +
-      serviceFee +
-      smallOrderFee
+  const total = getTotal(
+    subtotal,
+    discount,
+    tax,
+    tip,
+    deliveryFee,
+    processingFee,
+    serviceFee,
+    smallOrderFee
   );
 
   return {
