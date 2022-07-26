@@ -90,7 +90,9 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
       ${
         didAwardLoyaltyPoint
           ? `
-            <p style="font-weight: 700; margin-bottom: 8px;">Customer receive 1 point for this order.</p>
+            <p style="font-weight: 700; margin-bottom: 8px; text-align: center;">
+              Customer received 1 point for this order.
+            </p>
           `
           : ""
       }
