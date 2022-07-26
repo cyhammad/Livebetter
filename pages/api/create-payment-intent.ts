@@ -165,7 +165,6 @@ async function handler(
         currency: "usd",
         customer: customerId,
         description: `Order from ${cart.restaurantName} created by ${user.email}`,
-        setup_future_usage: "off_session",
         receipt_email: user.email,
       });
     }
