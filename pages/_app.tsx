@@ -29,6 +29,10 @@ export default function App({ Component, pageProps }: AppProps) {
             name="viewport"
             content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
           />
+          <meta
+            name="description"
+            content="Find and order vegan food near you."
+          />
         </Head>
         <UserContextProvider>
           <CartContextProvider>
