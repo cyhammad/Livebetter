@@ -67,7 +67,7 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
         th,
         td {
           border: 0;
-          padding: 4px 8px;
+          padding: 8px;
           vertical-align: top;
         }
         ul, ol {
