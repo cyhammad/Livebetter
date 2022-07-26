@@ -103,17 +103,9 @@ export const CheckoutForm = ({
           }
           primaryButtonProps={{
             className: classNames({
-              "opacity-50":
-                process.env.NODE_ENV === "production" ||
-                !stripe ||
-                !elements ||
-                isLoading,
+              "opacity-50": !stripe || !elements || isLoading,
             }),
-            disabled:
-              process.env.NODE_ENV === "production" ||
-              !stripe ||
-              !elements ||
-              isLoading,
+            disabled: !stripe || !elements || isLoading,
             type: "submit",
           }}
         />
