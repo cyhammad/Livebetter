@@ -514,7 +514,17 @@ export const CartModal = ({
                         off your next order
                       </>
                     ) : null}
-                    !
+                    !{" "}
+                    {!userWithLoyaltyProgram ? (
+                      <a
+                        style={{ textDecoration: "underline" }}
+                        target="_blank"
+                        href="https://www.termsfeed.com/live/84acfc2d-ba7f-453e-85d5-f5365e6a2e6f"
+                        rel="noreferrer"
+                      >
+                        Terms apply
+                      </a>
+                    ) : null}
                   </label>
                 ) : (
                   <label>
@@ -538,7 +548,17 @@ export const CartModal = ({
                       "Spend "
                     )}
                     <b>${dollarsToNextPoint.toFixed(2)}</b> more to receive a
-                    point for this order!
+                    point for this order!{" "}
+                    {!userWithLoyaltyProgram ? (
+                      <a
+                        style={{ textDecoration: "underline" }}
+                        target="_blank"
+                        href="https://www.termsfeed.com/live/84acfc2d-ba7f-453e-85d5-f5365e6a2e6f"
+                        rel="noreferrer"
+                      >
+                        Terms apply
+                      </a>
+                    ) : null}
                   </label>
                 )}
               </p>
