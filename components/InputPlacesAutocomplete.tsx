@@ -138,6 +138,15 @@ export const InputPlacesAutocomplete = ({
             address: formatted_address,
           });
         }
+      })
+      .catch((err) => {
+        captureException(err, {
+          extra: {
+            message: "Failed to reverse geocode coordinates",
+            latitude: currentPositionLatitude,
+            longitude: currentPositionLongitude,
+          },
+        });
       });
   }, [
     currentPositionLatitude,

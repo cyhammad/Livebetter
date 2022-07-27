@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/nextjs";
 import { useStripe } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
 
@@ -30,36 +31,44 @@ export const OrderConfirmationDetails = ({
       return;
     }
 
-    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-      switch (paymentIntent?.status) {
-        case "succeeded":
-          setPaymentMessage("Payment succeeded!");
+    stripe
+      .retrievePaymentIntent(clientSecret)
+      .then(({ paymentIntent }) => {
+        switch (paymentIntent?.status) {
+          case "succeeded":
+            setPaymentMessage("Payment succeeded!");
 
-          // Check if our current cart's client secret matches the client secret
-          // for this order. If it does, that means the user was just redirected
-          // here from a successful order (vs just viewing this order later), so
-          // we should clear their cart.
-          if (cart?.paymentIntentClientSecret === clientSecret) {
-            emptyCart();
-          }
+            // Check if our current cart's client secret matches the client secret
+            // for this order. If it does, that means the user was just redirected
+            // here from a successful order (vs just viewing this order later), so
+            // we should clear their cart.
+            if (cart?.paymentIntentClientSecret === clientSecret) {
+              emptyCart();
+            }
 
-          break;
-        case "processing":
-          setPaymentMessage("Your payment is processing.");
+            break;
+          case "processing":
+            setPaymentMessage("Your payment is processing.");
 
-          break;
-        case "requires_payment_method":
-          setPaymentMessage(
-            "Your payment was not successful, please try again."
-          );
+            break;
+          case "requires_payment_method":
+            setPaymentMessage(
+              "Your payment was not successful, please try again."
+            );
 
-          break;
-        default:
-          setPaymentMessage("Something went wrong.");
+            break;
+          default:
+            setPaymentMessage("Something went wrong.");
 
-          break;
-      }
-    });
+            break;
+        }
+      })
+      .catch((err) => {
+        captureException(err, {
+          extra: { message: "Failed to retrieve payment intent", clientSecret },
+        });
+        setPaymentMessage("Something went wrong.");
+      });
   }, [cart?.paymentIntentClientSecret, emptyCart, stripe]);
 
   const shippingMethod: ShippingMethod =
