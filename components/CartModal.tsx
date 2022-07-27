@@ -180,7 +180,7 @@ export const CartModal = ({
     event.preventDefault();
 
     reportEvent({
-      action: "submit",
+      action: "begin_checkout",
       category: "Checkout",
       label: "Submit cart",
     });

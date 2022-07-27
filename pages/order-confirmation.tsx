@@ -81,7 +81,7 @@ const OrderConfirmation: NextPage<OrderConfirmationProps> = ({ order }) => {
 
   useEffect(() => {
     reportEvent({
-      action: "view",
+      action: "purchase",
       category: "Checkout",
       label: "Order successful",
       value: `${order?.total}`,

@@ -31,7 +31,7 @@ export const CheckoutForm = ({
     event.preventDefault();
 
     reportEvent({
-      action: "submit",
+      action: "add_payment_info",
       category: "Checkout",
       label: "Submit payment",
     });

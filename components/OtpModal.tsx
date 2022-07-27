@@ -47,7 +47,7 @@ export const OtpModal = ({
     event.preventDefault();
 
     reportEvent({
-      action: "submit",
+      action: "submit_otp",
       category: "Checkout",
       label: "Submit otp",
     });
