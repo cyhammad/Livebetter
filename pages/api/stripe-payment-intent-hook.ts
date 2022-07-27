@@ -1,5 +1,10 @@
 import sendGridMail from "@sendgrid/mail";
-import { captureException, flush, withSentry } from "@sentry/nextjs";
+import {
+  captureException,
+  captureMessage,
+  flush,
+  withSentry,
+} from "@sentry/nextjs";
 import {
   Timestamp,
   addDoc,
@@ -50,6 +55,10 @@ const handlePreSuccessEvent = async (event: Stripe.Event) => {
       { status, updatedAt: Timestamp.now() },
       { merge: true }
     );
+  } else {
+    captureMessage("Failed to find and update payment intent order doc", {
+      extra: { event },
+    });
   }
 };
 
@@ -103,7 +112,12 @@ async function handler(
       try {
         await handlePreSuccessEvent(event);
       } catch (err) {
-        captureException(err);
+        captureException(err, {
+          extra: {
+            message: "Failed to update payment intent order doc",
+            event,
+          },
+        });
 
         await flush(2000);
 
@@ -282,6 +296,10 @@ async function handler(
             },
           });
         }
+      } else {
+        captureMessage("Failed to find and update payment intent order doc", {
+          extra: { event },
+        });
       }
 
       break;
