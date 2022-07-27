@@ -10,6 +10,7 @@ import { FormEvent, KeyboardEvent, MouseEvent, useState } from "react";
 
 import { ModalButtons } from "components/ModalButtons";
 import { useUserContext } from "hooks/useUserContext";
+import { reportEvent } from "lib/client/gtag";
 
 interface CheckoutFormProps {
   onRequestPrevious?: (event?: MouseEvent | KeyboardEvent) => void;
@@ -28,6 +29,12 @@ export const CheckoutForm = ({
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+
+    reportEvent({
+      action: "submit",
+      category: "Checkout",
+      label: "Submit payment",
+    });
 
     if (!stripe || !elements) {
       return null;

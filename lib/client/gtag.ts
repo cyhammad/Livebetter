@@ -15,7 +15,7 @@ interface EventOptions {
   action: string;
   category: string;
   label: string;
-  value: string;
+  value?: string;
 }
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events

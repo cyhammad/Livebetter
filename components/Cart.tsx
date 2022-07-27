@@ -9,6 +9,7 @@ import { ModalGroupOverlay } from "components/ModalGroupOverlay";
 import { OtpModal } from "components/OtpModal";
 import { useCartContext } from "hooks/useCartContext";
 import { usePrevious } from "hooks/usePrevious";
+import { reportEvent } from "lib/client/gtag";
 import type { CartFlowModalName } from "types";
 
 export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
@@ -118,7 +119,15 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                 </div>
               ) : null}
               <button
-                onClick={() => setCurrentModal("cart")}
+                onClick={() => {
+                  reportEvent({
+                    action: "click",
+                    category: "Checkout",
+                    label: "View cart",
+                  });
+
+                  setCurrentModal("cart");
+                }}
                 className={classNames(
                   `
                     bg-emerald-700 rounded text-white py-2 pr-2 pl-4 font-bold

@@ -10,11 +10,12 @@ import {
 } from "firebase/firestore";
 import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { Header } from "components/Header";
 import { OrderConfirmationDetails } from "components/OrderConfirmationDetails";
 import { Toolbar } from "components/Toolbar";
+import { reportEvent } from "lib/client/gtag";
 import { getStripePromise } from "lib/getStripePromise";
 import { db } from "lib/server/db";
 import { ApiOrder, Order, PaymentIntentOrder, ShippingMethod } from "types";
@@ -77,6 +78,15 @@ const OrderConfirmation: NextPage<OrderConfirmationProps> = ({ order }) => {
 
   const shippingMethod: ShippingMethod =
     order?.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery";
+
+  useEffect(() => {
+    reportEvent({
+      action: "view",
+      category: "Checkout",
+      label: "Order successful",
+      value: `${order?.total}`,
+    });
+  }, [order?.total]);
 
   return (
     <>

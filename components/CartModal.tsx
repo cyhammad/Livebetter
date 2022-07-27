@@ -21,6 +21,7 @@ import { useShippingMethodValidation } from "hooks/useShippingMethodValidation";
 import { useUserContext } from "hooks/useUserContext";
 import { fetchCreateOtp } from "lib/client/fetchCreateOtp";
 import { fetchCreatePaymentIntent } from "lib/client/fetchCreatePaymentIntent";
+import { reportEvent } from "lib/client/gtag";
 import { toMoney } from "lib/toMoney";
 import type {
   ApiErrorResponse,
@@ -177,6 +178,12 @@ export const CartModal = ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    reportEvent({
+      action: "submit",
+      category: "Checkout",
+      label: "Submit cart",
+    });
 
     if (shippingMethod && (shippingMethod === "delivery" ? !!location : true)) {
       const createPaymentIntentCart: CreatePaymentIntentCart = {

@@ -9,6 +9,7 @@ import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";
 import { useUserContext } from "hooks/useUserContext";
 import { fetchVerifyOtp } from "lib/client/fetchVerifyOtp";
+import { reportEvent } from "lib/client/gtag";
 import type {
   ApiErrorResponse,
   ModalProps,
@@ -44,6 +45,12 @@ export const OtpModal = ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    reportEvent({
+      action: "submit",
+      category: "Checkout",
+      label: "Submit otp",
+    });
 
     setMessage("");
 
