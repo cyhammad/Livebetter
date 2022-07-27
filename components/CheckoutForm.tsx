@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/nextjs";
 import {
   PaymentElement,
   useElements,
@@ -32,28 +33,37 @@ export const CheckoutForm = ({
       return null;
     }
 
+    setMessage("");
     setIsLoading(true);
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/order-confirmation`,
-        receipt_email: email,
-      },
-    });
+    try {
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/order-confirmation`,
+          receipt_email: email,
+        },
+      });
 
-    // This point will only be reached if there is an immediate error when
-    // confirming the payment. Otherwise, your customer will be redirected to
-    // your `return_url`. For some payment methods like iDEAL, your customer will
-    // be redirected to an intermediate site first to authorize the payment, then
-    // redirected to the `return_url`.
-    if (error.type === "card_error" || error.type === "validation_error") {
-      setMessage(error.message);
-    } else {
-      setMessage("An unexpected error occurred.");
+      // This point will only be reached if there is an immediate error when
+      // confirming the payment. Otherwise, your customer will be redirected to
+      // your `return_url`. For some payment methods like iDEAL, your customer will
+      // be redirected to an intermediate site first to authorize the payment, then
+      // redirected to the `return_url`.
+      if (error.type === "card_error" || error.type === "validation_error") {
+        setMessage(error.message);
+      } else {
+        setMessage("An unexpected error occurred.");
+      }
+
+      setIsLoading(false);
+    } catch (err) {
+      setMessage("An unknown error occurred. Please try again.");
+
+      captureException(err, {
+        extra: { message: "Failed to charge customer", email },
+      });
     }
-
-    setIsLoading(false);
   };
 
   return (
