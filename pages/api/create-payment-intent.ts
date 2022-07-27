@@ -78,6 +78,26 @@ async function handler(
 
     let customerId = lastOrderFromEmail?.customers_id;
 
+    /**
+     * Attempt to find the customer id in previous payment intent orders
+     */
+    if (!customerId) {
+      const lastPaymentIntentOrderDocFromEmail = await getDocs(
+        query(
+          collection(db, "payment_intent_orders"),
+          where("order.deliver_to.email", "==", user.email),
+          limit(1)
+        )
+      );
+
+      const lastPaymentIntentOrderFromEmail =
+        lastPaymentIntentOrderDocFromEmail.docs[0]?.data() as Order | null;
+
+      if (lastPaymentIntentOrderFromEmail) {
+        customerId = lastPaymentIntentOrderFromEmail.customers_id;
+      }
+    }
+
     if (!customerId) {
       const customerCreateParams: Stripe.CustomerCreateParams = {
         email: user.email,
