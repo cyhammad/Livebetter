@@ -93,10 +93,13 @@ async function handler(
 
   // Handle the event
   switch (event.type) {
+    case "payment_intent.amount_capturable_updated":
     case "payment_intent.canceled":
     case "payment_intent.created":
     case "payment_intent.payment_failed":
-    case "payment_intent.processing": {
+    case "payment_intent.processing":
+    case "payment_intent.requires_action":
+    case "payment_intent.partially_funded": {
       try {
         await handlePreSuccessEvent(event);
       } catch (err) {
@@ -287,6 +290,8 @@ async function handler(
       // Do nothing;
       break;
   }
+
+  await flush(2000);
 
   res.status(200).json({
     received: true,
