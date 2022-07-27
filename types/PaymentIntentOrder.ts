@@ -13,7 +13,7 @@ export type PaymentIntentStatus =
 export interface PaymentIntentOrder {
   didOptInToLoyaltyProgramWithThisOrder: boolean;
   order: Order;
-  status:
+  status?:
     | null
     | "canceled"
     | "created"

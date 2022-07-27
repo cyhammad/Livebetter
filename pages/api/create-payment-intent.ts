@@ -159,7 +159,6 @@ async function handler(
       didOptInToLoyaltyProgramWithThisOrder:
         cart.didOptInToLoyaltyProgramWithThisOrder,
       order,
-      status: null,
       updatedAt: Timestamp.now(),
     };
 
@@ -191,7 +190,8 @@ async function handler(
 
     await setDoc(
       doc(db, "payment_intent_orders", paymentIntent.id),
-      paymentIntentOrder
+      paymentIntentOrder,
+      { merge: true }
     );
 
     const result: CreatePaymentIntentResult = {
