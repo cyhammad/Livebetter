@@ -9,6 +9,7 @@ import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";
 import { Radio } from "components/Radio";
 import { useUserContext } from "hooks/useUserContext";
+import { reportEvent } from "lib/client/gtag";
 import type { ModalProps } from "types";
 
 interface ContactInfoModalProps extends ModalProps {
@@ -57,6 +58,13 @@ export const ContactInfoModal = ({
       (shippingMethod === "delivery" ? !!location : true)
     ) {
       onRequestNext && onRequestNext();
+
+      reportEvent({
+        action: "add_to_cart",
+        currency: "USD",
+        value: `${menuItem?.mealPrice}`,
+        items: [{ item_id: `${menuItem?.name}` }],
+      });
     }
   };
 

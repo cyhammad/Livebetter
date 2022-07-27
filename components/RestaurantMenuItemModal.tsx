@@ -14,6 +14,7 @@ import { useCartContext } from "hooks/useCartContext";
 import { useRestaurantOrderValidation } from "hooks/useRestaurantOrderValidation";
 import { useShippingMethodValidation } from "hooks/useShippingMethodValidation";
 import { useUserContext } from "hooks/useUserContext";
+import { reportEvent } from "lib/client/gtag";
 import { getChoicesCount } from "lib/getChoicesCount";
 import { toCartMenuItemChoices } from "lib/toCartMenuItemChoices";
 import type {
@@ -164,6 +165,12 @@ export const RestaurantMenuItemModal = ({
           : null
       );
       setMenuItemNotes("");
+      reportEvent({
+        action: "view_item",
+        currency: "USD",
+        value: `${menuItem?.mealPrice}`,
+        items: [{ item_id: `${menuItem?.name}` }],
+      });
     }
 
     prevIsOpenRef.current = isOpen;
@@ -175,9 +182,11 @@ export const RestaurantMenuItemModal = ({
     isOpen,
     isPickUpAvailable,
     menuItem?.choices,
+    menuItem?.mealPrice,
+    menuItem?.name,
     menuItem?.quantity,
-    shippingMethod,
     setShouldShowShippingMethodOptions,
+    shippingMethod,
     shouldUseDropdownForChoices,
   ]);
 
@@ -513,6 +522,13 @@ export const RestaurantMenuItemModal = ({
                       },
                       event
                     );
+
+                    reportEvent({
+                      action: "add_to_cart",
+                      currency: "USD",
+                      value: `${menuItem?.mealPrice}`,
+                      items: [{ item_id: `${menuItem?.name}` }],
+                    });
                   }
                 },
               }}
