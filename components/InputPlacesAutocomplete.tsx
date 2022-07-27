@@ -1,10 +1,13 @@
+import { captureException } from "@sentry/nextjs";
 import classNames from "classnames";
 import Script from "next/script";
 import { MapPin, NavigationArrow } from "phosphor-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type React from "react";
 
 import { useCurrentPosition } from "hooks/useCurrentPosition";
 import { useInputPlacesAutocompleteContext } from "hooks/useInputPlacesAutocompleteContext";
+import { usePrevious } from "hooks/usePrevious";
 import { useUserContext } from "hooks/useUserContext";
 
 interface InputPlacesAutocompleteProps {
@@ -31,23 +34,39 @@ export const InputPlacesAutocomplete = ({
   const { location, setLocation } = useUserContext();
   const [address, setAddress] = useState("");
   const addressInputRef = useRef<HTMLInputElement | null>(null);
-  const prevLatitudeRef = useRef<number>();
-  const prevLongitudeRef = useRef<number>();
-  const prevShouldQueryLocationRef = useRef<boolean>(shouldQueryLocation);
+  const prevLatitude = usePrevious(currentPositionLatitude);
+  const prevLongitude = usePrevious(currentPositionLongitude);
+  const isPlacesAutocompleteInitializingRef = useRef(false);
+  const didPlaceChange = useRef(false);
 
   const initPlacesAutocomplete = useCallback(() => {
+    if (
+      (addressInputRef.current &&
+        addressInputRef.current.classList.contains("pac-target-input")) ||
+      isPlacesAutocompleteInitializingRef.current
+    ) {
+      return;
+    }
+
+    isPlacesAutocompleteInitializingRef.current = true;
+
+    document.querySelectorAll(".pac-container").forEach((element) => {
+      element.remove();
+    });
+
     setMapsApiStatus("loading");
 
     if (addressInputRef.current) {
       const autoComplete = new window.google.maps.places.Autocomplete(
         addressInputRef.current,
         {
-          componentRestrictions: { country: ["us"] },
+          componentRestrictions: { country: "us" },
           fields: ["formatted_address", "geometry.location"],
         }
       );
 
       autoComplete.addListener("place_changed", () => {
+        didPlaceChange.current = true;
         const { formatted_address, geometry } = autoComplete.getPlace();
 
         if (!formatted_address || !geometry?.location) {
@@ -77,6 +96,10 @@ export const InputPlacesAutocomplete = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initPlacesAutocomplete]);
 
+  /**
+   * Handles reverse geocoding the address if the user's current location
+   * changes after clicking
+   */
   useEffect(() => {
     if (currentPositionError) {
       setShouldQueryLocation(false);
@@ -87,15 +110,12 @@ export const InputPlacesAutocomplete = ({
     const didPositionChange =
       currentPositionLatitude &&
       currentPositionLongitude &&
-      currentPositionLatitude !== prevLatitudeRef.current &&
-      currentPositionLongitude !== prevLongitudeRef.current;
+      currentPositionLatitude !== prevLatitude &&
+      currentPositionLongitude !== prevLongitude;
 
     if (!didPositionChange) {
       return;
     }
-
-    prevLatitudeRef.current = currentPositionLatitude;
-    prevLongitudeRef.current = currentPositionLongitude;
 
     const geocoder = new window.google.maps.Geocoder();
 
@@ -125,15 +145,86 @@ export const InputPlacesAutocomplete = ({
     currentPositionError,
     setLocation,
     setShouldQueryLocation,
+    prevLatitude,
+    prevLongitude,
   ]);
 
   useEffect(() => {
     setAddress(location?.address ?? "");
-  }, [location]);
+  }, [location, setAddress]);
 
-  useEffect(() => {
-    prevShouldQueryLocationRef.current = shouldQueryLocation;
-  }, [shouldQueryLocation]);
+  /**
+   * Handles the case where the user changes the address input, but did not
+   * select a place in the Places Autocomplete dropdown. Since a blur will also
+   * happen if the user _did_ select a place, we wait 500ms to allow the
+   * place_changed event to occur before running this function. If a
+   * place_changed event does occur, we do not run this function.
+   */
+  const handleBlur = () => {
+    setTimeout(async () => {
+      if (
+        address &&
+        location?.address !== address &&
+        mapsApiStatus !== "loading" &&
+        !didPlaceChange.current
+      ) {
+        didPlaceChange.current = false;
+
+        const sessionToken =
+          new window.google.maps.places.AutocompleteSessionToken();
+        const autocompleteService =
+          new window.google.maps.places.AutocompleteService();
+        const placesService = new window.google.maps.places.PlacesService(
+          addressInputRef.current as HTMLDivElement
+        );
+
+        try {
+          const result = await autocompleteService.getPlacePredictions({
+            input: address,
+            componentRestrictions: { country: "us" },
+            sessionToken,
+          });
+
+          const prediction = result.predictions[0];
+
+          if (prediction) {
+            const { place_id } = prediction;
+
+            placesService.getDetails(
+              {
+                placeId: place_id,
+                sessionToken,
+                fields: ["formatted_address", "geometry.location"],
+              },
+              (placeResult) => {
+                if (placeResult) {
+                  const { formatted_address, geometry } = placeResult;
+
+                  if (geometry?.location && formatted_address) {
+                    setLocation({
+                      latitude: geometry.location.lat(),
+                      longitude: geometry.location.lng(),
+                      address: formatted_address,
+                    });
+                  }
+                }
+              }
+            );
+          }
+        } catch (error) {
+          captureException(error, {
+            extra: {
+              message:
+                "Failed to populate address after autocomplete prediction.",
+              input: address,
+            },
+          });
+        }
+      }
+
+      didPlaceChange.current = false;
+    }, 500);
+  };
 
   return (
     <>
@@ -156,17 +247,15 @@ export const InputPlacesAutocomplete = ({
           style={{ gridArea: "1 / 1" }}
           weight="duotone"
           className={classNames({
-            "text-gray-600 fill-gray-600":
+            "text-gray-600":
               (!location && mapsApiStatus !== "failure") ||
               location?.address !== address,
-            "text-emerald-600 fill-emerald-600":
-              mapsApiStatus !== "failure" && !!location,
-            "text-amber-600 fill-amber-600": mapsApiStatus === "failure",
+            "text-emerald-600": mapsApiStatus !== "failure" && !!location,
+            "text-amber-600": mapsApiStatus === "failure",
             "h-5 w-5 sm:h-7 sm:w-7": true,
             "animate-pulse": mapsApiStatus === "loading",
           })}
         />
-
         <input
           type="text"
           className={classNames(
@@ -188,6 +277,7 @@ export const InputPlacesAutocomplete = ({
           onChange={(event) => {
             setAddress(event.target.value);
           }}
+          onBlur={handleBlur}
           placeholder="Enter your address"
         />
         <button
