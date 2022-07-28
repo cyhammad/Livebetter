@@ -30,12 +30,6 @@ export const CheckoutForm = ({
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    reportEvent({
-      action: "add_payment_info",
-      category: "Checkout",
-      label: "Submit payment",
-    });
-
     if (!stripe || !elements) {
       return null;
     }
@@ -44,6 +38,12 @@ export const CheckoutForm = ({
     setIsLoading(true);
 
     try {
+      reportEvent({
+        action: "add_payment_info",
+        category: "Checkout",
+        label: "Submit payment",
+      });
+
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
