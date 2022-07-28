@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-query";
 import classNames from "classnames";
 import type { GetStaticProps, NextPage } from "next";
-import Head from "next/head";
 import { MagnifyingGlass, Sliders, Spinner } from "phosphor-react";
 import {
   ChangeEvent,
@@ -16,6 +15,7 @@ import {
   useTransition,
 } from "react";
 
+import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { RestaurantList } from "components/RestaurantList";
 import { Toolbar } from "components/Toolbar";
@@ -117,10 +117,17 @@ const Home: NextPage<HomeProps> = () => {
 
   return (
     <>
-      <Head>
-        <title>Live Better</title>
-        <meta name="description" content="Vegan dining and delivery" />
-      </Head>
+      <Head
+        titles={["Restaurants"]}
+        description={`Search and filter through all vegan restaurants near you.`}
+        ogMetadata={{
+          description: `Search and filter through all vegan restaurants near you.`,
+          title: "Restaurants - Live Better PHL",
+          image: "https://www.livebetterphl.com/logo.png",
+          type: "website",
+          url: "https://www.livebetterphl.com/",
+        }}
+      ></Head>
       <main className="flex flex-col mb-6">
         <Header />
         <section className="flex flex-col gap-0 container mx-auto">
