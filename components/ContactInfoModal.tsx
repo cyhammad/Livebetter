@@ -58,13 +58,6 @@ export const ContactInfoModal = ({
       (shippingMethod === "delivery" ? !!location : true)
     ) {
       onRequestNext && onRequestNext();
-
-      reportEvent({
-        action: "add_to_cart",
-        currency: "USD",
-        value: `${menuItem?.mealPrice}`,
-        items: [{ item_id: `${menuItem?.name}` }],
-      });
     }
   };
 
