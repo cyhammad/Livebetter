@@ -80,13 +80,16 @@ const OrderConfirmation: NextPage<OrderConfirmationProps> = ({ order }) => {
     order?.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery";
 
   useEffect(() => {
-    reportEvent({
-      action: "purchase",
-      category: "Checkout",
-      label: "Order successful",
-      value: `${order?.total}`,
-    });
-  }, [order?.total]);
+    if (order?.total && order?.charges_id) {
+      reportEvent({
+        action: "purchase",
+        category: "Checkout",
+        label: "Order successful",
+        value: `${order?.total}`,
+        transactionId: order?.charges_id,
+      });
+    }
+  }, [order?.total, order?.charges_id]);
 
   return (
     <>

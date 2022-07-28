@@ -14,10 +14,11 @@ export const reportPageView = (url: string) => {
 interface EventOptions {
   action: string;
   category?: string;
-  label?: string;
-  value?: string;
   currency?: string;
   items?: Array<{ item_id: string }>;
+  label?: string;
+  transactionId?: string;
+  value?: string;
 }
 
 // https://developers.google.com/analytics/devguides/collection/gtagjs/events
@@ -28,12 +29,14 @@ export const reportEvent = ({
   value,
   currency,
   items,
+  transactionId,
 }: EventOptions) => {
   window.gtag("event", action, {
+    currency,
     event_category: category,
     event_label: label,
-    value,
-    currency,
     items,
+    transaction_id: transactionId,
+    value,
   });
 };
