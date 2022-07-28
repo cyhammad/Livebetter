@@ -383,12 +383,25 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               </section>
             </div>
             {menu && (
-              <div className="flex flex-col gap-7">
+              <div
+                className="flex flex-col gap-7"
+                itemProp="hasMenu"
+                itemScope
+                itemType="https://schema.org/Menu"
+              >
                 {menu.map(({ category, menuItems }) => {
                   return (
-                    <section key={category}>
+                    <section
+                      itemProp="hasMenuSection"
+                      itemScope
+                      itemType="https://schema.org/MenuSection"
+                      key={category}
+                    >
                       <Element name={category} className="flex flex-col gap-3">
-                        <h4 className="text-xl sm:text-3xl uppercase font-bold">
+                        <h4
+                          className="text-xl sm:text-3xl uppercase font-bold"
+                          itemProp="name"
+                        >
                           {category}
                         </h4>
                         <ul className="grid grid-cols-12 gap-4">

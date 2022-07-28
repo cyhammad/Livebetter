@@ -20,6 +20,9 @@ export const RestaurantMenuItem = ({
 
   return (
     <li
+      itemProp="hasMenuItem"
+      itemScope
+      itemType="https://schema.org/MenuItem"
       role="button"
       onClick={onClick}
       className={classNames({
@@ -37,6 +40,7 @@ export const RestaurantMenuItem = ({
             src={menuItem.picture}
             width={224}
             className="object-cover"
+            itemProp="image"
           />
         </div>
       ) : null}
@@ -49,12 +53,16 @@ export const RestaurantMenuItem = ({
               "line-clamp-2": isDescriptionShort,
               "line-clamp-3": isDescriptionEmpty,
             })}
+            itemProp="name"
           >
             {menuItem.name}
           </span>
         ) : null}
         {menuItem.mealDescription ? (
-          <span className="text-sm line-clamp-2 sm:leading-6 text-gray-700">
+          <span
+            className="text-sm line-clamp-2 sm:leading-6 text-gray-700"
+            itemProp="description"
+          >
             {menuItem.mealDescription}
           </span>
         ) : null}
