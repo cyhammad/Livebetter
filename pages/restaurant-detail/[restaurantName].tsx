@@ -190,7 +190,6 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
 
   const isAddressVisible = !!restaurant.Address;
   const isDistanceVisible = typeof distance === "number" && !isNaN(distance);
-  const isWebsiteVisible = !!restaurant.Website;
 
   const handleCategoryScrollChange = (to: string) => {
     if (!isScrolling) {
@@ -224,6 +223,16 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
       Events.scrollEvent.remove("end");
     };
   }, []);
+
+  let websiteUrl = null;
+
+  try {
+    websiteUrl = restaurant.Website
+      ? new URL(restaurant.Website).toString()
+      : null;
+  } catch (err) {
+    // Do nothing
+  }
 
   return (
     <>
@@ -331,23 +340,27 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                     </div>
                   ) : null}
                   <RestaurantPhoneNumber restaurant={restaurant} />
-                  {isWebsiteVisible ? (
-                    <div className="flex gap-2 items-center">
-                      <Browser
-                        className="flex-none w-[16px] sm:w-[20px] text-black"
-                        size={20}
-                        color="currentColor"
-                      />
+                  <div className="flex gap-2 items-center">
+                    <Browser
+                      className="flex-none w-[16px] sm:w-[20px] text-black"
+                      size={20}
+                      color="currentColor"
+                    />
+                    {websiteUrl ? (
                       <a
-                        href={restaurant.Website}
+                        href={websiteUrl}
                         className="text-sm sm:text-base underline underline-offset-4"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {restaurant.Website}
+                        {websiteUrl}
                       </a>
-                    </div>
-                  ) : null}
+                    ) : (
+                      <span className="text-sm sm:text-base">
+                        Website unavailable
+                      </span>
+                    )}
+                  </div>
                 </div>
               </section>
             </div>
