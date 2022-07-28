@@ -229,7 +229,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
     <>
       <Head
         titles={[restaurant.Restaurant]}
-        description={"Vegan dining and delivery"}
+        description={`View ${restaurant.Restaurant}'s menu.`}
         ogMetadata={{
           title: restaurant.Restaurant,
           image: restaurant.Image ?? "",

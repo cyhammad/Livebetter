@@ -20,6 +20,7 @@ export const Head = ({ description, ogMetadata, titles }: HeadProps) => {
           <meta property="og:image" content={ogMetadata.image} />
           <meta property="og:type" content={ogMetadata.type} />
           <meta property="og:url" content={ogMetadata.url} />
+          <meta property="og:locale" content="en_US" />
           <meta property="og:site_name" content="Live Better PHL" />
           {ogMetadata.audio && (
             <meta property="og:audio" content={ogMetadata.audio} />
@@ -27,13 +28,9 @@ export const Head = ({ description, ogMetadata, titles }: HeadProps) => {
           {ogMetadata.description && (
             <meta property="og:description" content={truncatedDescription} />
           )}
-          {ogMetadata.locale && (
-            <meta property="og:locale" content={ogMetadata.locale} />
-          )}
           {ogMetadata.video && (
             <meta property="og:video" content={ogMetadata.video} />
           )}
-
           <meta name="twitter:card" content="summary_large_image" />
           <meta property="twitter:domain" content="livebetterphl.com" />
           <meta property="twitter:url" content={ogMetadata.url} />
@@ -42,7 +39,10 @@ export const Head = ({ description, ogMetadata, titles }: HeadProps) => {
           <meta name="twitter:image" content={ogMetadata.image} />
         </>
       )}
-
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+      />
       <link
         href="/apple-touch-icon.png"
         rel="apple-touch-icon"

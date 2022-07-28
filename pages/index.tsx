@@ -6,9 +6,9 @@ import {
 } from "@tanstack/react-query";
 import classNames from "classnames";
 import type { GetStaticProps, NextPage } from "next";
-import Head from "next/head";
 import { useRef } from "react";
 
+import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { HomeHero } from "components/HomeHero";
 import { RestaurantCard } from "components/RestaurantCard";
@@ -89,10 +89,17 @@ const Home: NextPage<HomeProps> = () => {
 
   return (
     <>
-      <Head>
-        <title>Live Better</title>
-        <meta name="description" content="Vegan dining and delivery" />
-      </Head>
+      <Head
+        titles={[]}
+        description={`Find and order vegan food near you.`}
+        ogMetadata={{
+          description: `Find and order vegan food near you.`,
+          title: "Live Better PHL",
+          image: "https://www.livebetterphl.com/logo.png",
+          type: "website",
+          url: "https://www.livebetterphl.com/",
+        }}
+      ></Head>
       <main className="flex flex-col mb-6">
         <Header />
         <HomeHero />
