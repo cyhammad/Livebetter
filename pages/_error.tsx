@@ -1,13 +1,26 @@
-import { captureException, flush } from "@sentry/nextjs";
+import { captureException, captureMessage, flush } from "@sentry/nextjs";
+import type { NextPageContext } from "next";
 import NextErrorComponent from "next/error";
+import type { ErrorProps } from "next/error";
 
-const MyError = ({ statusCode, hasGetInitialPropsRun, err }) => {
+interface ErrorPageProps extends ErrorProps {
+  hasGetInitialPropsRun?: boolean;
+  err?: NextPageContext["err"];
+}
+
+const ErrorPage = ({
+  statusCode,
+  hasGetInitialPropsRun,
+  err,
+}: ErrorPageProps) => {
   if (!hasGetInitialPropsRun && err) {
     // getInitialProps is not called in case of
     // https://github.com/vercel/next.js/issues/8592. As a workaround, we pass
     // err via _app.js so it can be captured
     captureException(err);
     // Flushing is not required in this case as it only happens on the client
+  } else {
+    captureMessage(`Error page with status of ${statusCode} seen.`);
   }
 
   return (
@@ -17,14 +30,18 @@ const MyError = ({ statusCode, hasGetInitialPropsRun, err }) => {
   );
 };
 
-MyError.getInitialProps = async (context) => {
-  const errorInitialProps = await NextErrorComponent.getInitialProps(context);
+ErrorPage.getInitialProps = async (
+  context: NextPageContext
+): Promise<ErrorPageProps> => {
+  const errorInitialProps: ErrorPageProps =
+    await NextErrorComponent.getInitialProps(context);
 
   const { res, err, asPath } = context;
 
   // Workaround for https://github.com/vercel/next.js/issues/8592, mark when
   // getInitialProps has run
   errorInitialProps.hasGetInitialPropsRun = true;
+  errorInitialProps.err = err;
 
   // Returning early because we don't want to log 404 errors to Sentry.
   if (res?.statusCode === 404) {
@@ -65,4 +82,4 @@ MyError.getInitialProps = async (context) => {
   return errorInitialProps;
 };
 
-export default MyError;
+export default ErrorPage;
