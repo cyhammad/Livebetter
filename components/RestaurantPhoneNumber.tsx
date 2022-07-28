@@ -30,9 +30,8 @@ export const RestaurantPhoneNumber = ({
       <a
         href={`tel:${phoneFormatted}`}
         className="text-sm sm:text-base underline underline-offset-4"
-        itemProp="telephone"
       >
-        {phoneFormatted}
+        <span itemProp="telephone">{phoneFormatted}</span>
       </a>
     </div>
   );
