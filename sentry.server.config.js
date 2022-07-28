@@ -11,7 +11,7 @@ Sentry.init({
     SENTRY_DSN ||
     "https://771c3e6cbf5942e8a80fcf5fd48db12e@o949194.ingest.sentry.io/6553363",
   // Adjust this value in production, or use tracesSampler for greater control
-  tracesSampleRate: 1.0,
+  tracesSampleRate: 0.3,
   // ...
   // Note: if you want to override the automatic release value, do not set a
   // `release` value here - use the environment variable `SENTRY_RELEASE`, so
