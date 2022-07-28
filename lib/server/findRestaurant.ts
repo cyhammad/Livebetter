@@ -59,7 +59,7 @@ export const findRestaurant = async (
 
   const restaurantByNameDoc = restaurantByNameDocs.docs[0];
 
-  if (restaurantByNameDoc.exists()) {
+  if (restaurantByNameDoc && restaurantByNameDoc.exists()) {
     return restaurantByNameDoc;
   }
 

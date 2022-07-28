@@ -63,8 +63,8 @@ const sectionKeyToHeadingMap: Record<FeaturedSection, string> = {
 };
 
 const Home: NextPage<HomeProps> = () => {
-  const { location } = useUserContext();
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
+  const { location } = useUserContext();
   const { latitude, longitude } = location || {};
   const userPosition: Coordinates | null =
     latitude && longitude ? { latitude, longitude } : null;
