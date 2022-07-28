@@ -19,7 +19,11 @@ import { UserContextProvider } from "hooks/useUserContext";
 import { reportPageView } from "lib/client/gtag";
 
 // Every page must have 1 main element
-ReactModal.setAppElement("main");
+try {
+  ReactModal.setAppElement("main");
+} catch (err) {
+  // Do nothing
+}
 
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient());
