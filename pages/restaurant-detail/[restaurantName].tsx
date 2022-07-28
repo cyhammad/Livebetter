@@ -97,7 +97,7 @@ export const getStaticProps: GetStaticProps<
 
       return menuItem;
     })
-    .sort((a, b) => {
+    .sort((a: ApiMenuItem, b: ApiMenuItem) => {
       const aCategory = a.category?.toLowerCase() ?? "";
       const bCategory = b.category?.toLowerCase() ?? "";
       const isANonVegan = aCategory.includes("non vegan");
