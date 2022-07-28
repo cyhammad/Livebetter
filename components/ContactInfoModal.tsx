@@ -9,7 +9,6 @@ import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";
 import { Radio } from "components/Radio";
 import { useUserContext } from "hooks/useUserContext";
-import { reportEvent } from "lib/client/gtag";
 import type { ModalProps } from "types";
 
 interface ContactInfoModalProps extends ModalProps {
