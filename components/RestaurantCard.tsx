@@ -28,48 +28,53 @@ export const RestaurantCard = ({
   const { status } = getOpeningHoursInfo(restaurant);
 
   return (
-    <Link
-      href={`/restaurant-detail/${restaurantNameToUrlParam(
-        restaurant.Restaurant
-      )}`}
-    >
-      <a
-        className={classNames({
-          [className ?? ""]: true,
-          "flex flex-col gap-1 justify-items-stretch": true,
-          "sm:flex-row sm:items-center sm:gap-5": layout === "auto",
-          "w-80 sm:w-96": layout === "vertical",
-          "opacity-60": ["closed-today", "closed-earlier"].includes(status),
-        })}
+    <div itemScope itemType="https://schema.org/Restaurant">
+      <Link
+        href={`/restaurant-detail/${restaurantNameToUrlParam(
+          restaurant.Restaurant
+        )}`}
       >
-        <div
-          className={classNames("flex flex-col gap-2 sm:gap-3 ", {
-            "sm:w-52 md:w-80 lg:w-96": layout === "auto",
+        <a
+          className={classNames({
+            [className ?? ""]: true,
+            "flex flex-col gap-1 justify-items-stretch": true,
+            "sm:flex-row sm:items-center sm:gap-5": layout === "auto",
             "w-80 sm:w-96": layout === "vertical",
+            "opacity-60": ["closed-today", "closed-earlier"].includes(status),
           })}
+          itemProp="url"
         >
-          {restaurant.Image && (
-            <div
-              className={classNames(
-                "w-full h-44 sm:h-52 rounded-lg overflow-hidden flex-none flex",
-                {
-                  "md:w-80 lg:w-96": layout === "auto",
-                }
-              )}
-            >
-              <Image
-                className="w-full object-cover"
-                height={155}
-                width={320}
-                src={restaurant.Image}
-                alt=""
-              />
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 sm:gap-4 w-full">
+          <div
+            className={classNames("flex flex-col gap-2 sm:gap-3 ", {
+              "sm:w-52 md:w-80 lg:w-96": layout === "auto",
+              "w-80 sm:w-96": layout === "vertical",
+            })}
+          >
+            {restaurant.Image && (
+              <div
+                className={classNames(
+                  "w-full h-44 sm:h-52 rounded-lg overflow-hidden flex-none flex",
+                  {
+                    "md:w-80 lg:w-96": layout === "auto",
+                  }
+                )}
+              >
+                <Image
+                  className="w-full object-cover"
+                  height={155}
+                  width={320}
+                  src={restaurant.Image}
+                  alt=""
+                  itemProp="image"
+                />
+              </div>
+            )}
+          </div>
           <div className="flex flex-col gap-1 sm:gap-2">
-            <h3 className="text-xl font-bold sm:text-2xl -mb-0.5 sm:mb-0">
+            <h3
+              className="text-xl font-bold sm:text-2xl -mb-0.5 sm:mb-0"
+              itemProp="name"
+            >
               {restaurant.Restaurant}
               {process.env.NODE_ENV === "development" ? (
                 <small>
@@ -91,7 +96,9 @@ export const RestaurantCard = ({
                 <p className="text-sm sm:text-base flex items-center gap-2 line-clamp-1">
                   {isDistanceVisible ? `${restaurant.distance} mi` : null}
                   {isDistanceVisible && isAddressVisible ? " ∙ " : null}
-                  {isAddressVisible ? restaurant.Address : null}
+                  {isAddressVisible ? (
+                    <span itemProp="address">{restaurant.Address}</span>
+                  ) : null}
                 </p>
               </div>
             ) : null}
@@ -104,8 +111,8 @@ export const RestaurantCard = ({
               />
             </p>
           </div>
-        </div>
-      </a>
-    </Link>
+        </a>
+      </Link>
+    </div>
   );
 };

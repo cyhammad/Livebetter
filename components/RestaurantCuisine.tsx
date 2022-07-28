@@ -18,7 +18,9 @@ export const RestaurantCuisine = ({ restaurant }: RestaurantCuisineProps) => {
         size={20}
         color="currentColor"
       />
-      <p className="text-sm sm:text-base line-clamp-1">{restaurant.Cuisine}</p>
+      <p className="text-sm sm:text-base line-clamp-1" itemProp="servesCuisine">
+        {restaurant.Cuisine}
+      </p>
     </div>
   );
 };
