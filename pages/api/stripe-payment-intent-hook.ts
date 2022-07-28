@@ -56,9 +56,12 @@ const handlePreSuccessEvent = async (event: Stripe.Event) => {
       { merge: true }
     );
   } else {
-    captureMessage("Failed to find and update payment intent order doc", {
-      extra: { event },
-    });
+    captureMessage(
+      `Failed to find and update payment intent order doc during "${event.type}" event`,
+      {
+        extra: { event: JSON.stringify(event) },
+      }
+    );
   }
 };
 
@@ -114,7 +117,7 @@ async function handler(
       } catch (err) {
         captureException(err, {
           extra: {
-            message: "Failed to update payment intent order doc",
+            message: `Failed to update payment intent order doc during "${event.type}" event`,
             event,
           },
         });
@@ -297,9 +300,12 @@ async function handler(
           });
         }
       } else {
-        captureMessage("Failed to find and update payment intent order doc", {
-          extra: { event },
-        });
+        captureMessage(
+          `Failed to find and update payment intent order doc during "${event.type}" event`,
+          {
+            extra: { event: JSON.stringify(event) },
+          }
+        );
       }
 
       break;
