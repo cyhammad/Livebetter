@@ -93,8 +93,10 @@ export const RestaurantCard = ({
                   size={20}
                   color="currentColor"
                 />
-                <p className="text-sm sm:text-base flex items-center gap-2 line-clamp-1">
-                  {isDistanceVisible ? `${restaurant.distance} mi` : null}
+                <p className="text-sm sm:text-base line-clamp-1">
+                  {isDistanceVisible ? (
+                    <span>{restaurant.distance} mi</span>
+                  ) : null}
                   {isDistanceVisible && isAddressVisible ? " ∙ " : null}
                   {isAddressVisible ? (
                     <span itemProp="address">{restaurant.Address}</span>

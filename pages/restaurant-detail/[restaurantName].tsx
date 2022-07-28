@@ -234,12 +234,22 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
     // Do nothing
   }
 
+  const metaDescription =
+    restaurant.isDeliveryAvailable && restaurant.isPickUpAvailable
+      ? `Order delivery or pickup from  ${restaurant.Restaurant}`
+      : restaurant.isDeliveryAvailable
+      ? `Order delivery from  ${restaurant.Restaurant}`
+      : restaurant.isPickUpAvailable
+      ? `Order pickup from ${restaurant.Restaurant}`
+      : `View ${restaurant.Restaurant}'s menu`;
+
   return (
     <>
       <Head
         titles={[restaurant.Restaurant]}
-        description={`View ${restaurant.Restaurant}'s menu.`}
+        description={metaDescription}
         ogMetadata={{
+          description: metaDescription,
           title: restaurant.Restaurant,
           image: restaurant.Image ?? "",
           type: "website",
@@ -248,12 +258,16 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
           )}`,
         }}
       ></Head>
-      <main className="flex flex-col mb-6">
+      <main
+        className="flex flex-col mb-6"
+        itemScope
+        itemType="https://schema.org/Restaurant"
+      >
         <Header ref={headerRef} />
         <section className="flex flex-col gap-0 container mx-auto">
           <Toolbar ref={toolbarRef} scrollAreaTopRef={scrollAreaTopRef}>
             <div className="flex flex-col gap-1 sm:gap-4 md:flex-row justify-between md:items-center">
-              <h2 className="text-2xl sm:text-4xl font-bold">
+              <h2 className="text-2xl sm:text-4xl font-bold" itemProp="name">
                 {restaurant.Restaurant}
               </h2>
               <Select
@@ -307,6 +321,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                     priority={true}
                     src={restaurant.Image}
                     width={960}
+                    itemProp="image"
                   />
                 </div>
               )}
@@ -332,10 +347,12 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                         size={20}
                         color="currentColor"
                       />
-                      <p className="text-sm sm:text-base flex items-center gap-2">
-                        {isDistanceVisible ? `${distance} mi` : null}
-                        {isDistanceVisible && isAddressVisible ? " ∙ " : null}
-                        {isAddressVisible ? restaurant.Address : null}
+                      <p className="text-sm sm:text-base flex items-center gap-1">
+                        {isDistanceVisible ? <span>{distance} mi</span> : null}
+                        {isDistanceVisible && isAddressVisible ? "∙" : null}
+                        {isAddressVisible ? (
+                          <span itemProp="address">{restaurant.Address}</span>
+                        ) : null}
                       </p>
                     </div>
                   ) : null}
@@ -352,6 +369,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                         className="text-sm sm:text-base underline underline-offset-4"
                         target="_blank"
                         rel="noopener noreferrer"
+                        itemProp="sameAs"
                       >
                         {websiteUrl}
                       </a>
