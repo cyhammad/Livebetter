@@ -91,10 +91,10 @@ async function handler(
       );
 
       const lastPaymentIntentOrderFromEmail =
-        lastPaymentIntentOrderDocFromEmail.docs[0]?.data() as Order | null;
+        lastPaymentIntentOrderDocFromEmail.docs[0]?.data() as PaymentIntentOrder | null;
 
       if (lastPaymentIntentOrderFromEmail) {
-        customerId = lastPaymentIntentOrderFromEmail.customers_id;
+        customerId = lastPaymentIntentOrderFromEmail.order.customers_id;
       }
     }
 
