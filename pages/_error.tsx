@@ -5,14 +5,16 @@ import type { ErrorProps } from "next/error";
 import { useRouter } from "next/router";
 
 interface ErrorPageProps extends ErrorProps {
-  hasGetInitialPropsRun?: boolean;
   err?: NextPageContext["err"];
+  hasGetInitialPropsRun?: boolean;
+  refererUrl?: string;
 }
 
 const ErrorPage = ({
   statusCode,
   hasGetInitialPropsRun,
   err,
+  refererUrl,
 }: ErrorPageProps) => {
   const { asPath } = useRouter();
 
@@ -24,7 +26,9 @@ const ErrorPage = ({
     // Flushing is not required in this case as it only happens on the client
   } else {
     captureMessage(
-      `Error page with status of ${statusCode} seen at "${asPath}".`
+      `Error page with status of ${statusCode} seen at "${asPath}".${
+        refererUrl ? ` Referred by ${refererUrl}.` : ""
+      }`
     );
   }
 
@@ -41,12 +45,16 @@ ErrorPage.getInitialProps = async (
   const errorInitialProps: ErrorPageProps =
     await NextErrorComponent.getInitialProps(context);
 
-  const { res, err, asPath } = context;
+  const { res, err, asPath, req } = context;
 
   // Workaround for https://github.com/vercel/next.js/issues/8592, mark when
   // getInitialProps has run
   errorInitialProps.hasGetInitialPropsRun = true;
   errorInitialProps.err = err;
+
+  if (req) {
+    errorInitialProps.refererUrl = req.headers.referer;
+  }
 
   // Returning early because we don't want to log 404 errors to Sentry.
   if (res?.statusCode === 404) {
