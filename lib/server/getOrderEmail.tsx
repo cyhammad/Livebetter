@@ -114,7 +114,7 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
                   <th style={thStyles} role="row">
                     Apartment
                   </th>
-                  <td style={tdStyles}>`${order.deliver_to.appartmentNo}`</td>
+                  <td style={tdStyles}>{order.deliver_to.appartmentNo}</td>
                 </tr>
               ) : null}
               {order.order_items ? (
