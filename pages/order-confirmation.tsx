@@ -9,9 +9,9 @@ import {
   where,
 } from "firebase/firestore";
 import type { GetServerSideProps, NextPage } from "next";
-import Head from "next/head";
 import { useEffect, useRef } from "react";
 
+import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { OrderConfirmationDetails } from "components/OrderConfirmationDetails";
 import { Toolbar } from "components/Toolbar";
@@ -93,10 +93,10 @@ const OrderConfirmation: NextPage<OrderConfirmationProps> = ({ order }) => {
 
   return (
     <>
-      <Head>
-        <title>Live Better</title>
-        <meta name="description" content="Vegan dining and delivery" />
-      </Head>
+      <Head
+        titles={["Order Confirmation", order?.restaurant_id ?? ""]}
+        description=""
+      />
       <main className="flex flex-col mb-6">
         <Header ref={headerRef} />
         <Elements stripe={getStripePromise()}>
