@@ -2,6 +2,7 @@ import { captureException, captureMessage, flush } from "@sentry/nextjs";
 import type { NextPageContext } from "next";
 import NextErrorComponent from "next/error";
 import type { ErrorProps } from "next/error";
+import { useRouter } from "next/router";
 
 interface ErrorPageProps extends ErrorProps {
   hasGetInitialPropsRun?: boolean;
@@ -13,6 +14,8 @@ const ErrorPage = ({
   hasGetInitialPropsRun,
   err,
 }: ErrorPageProps) => {
+  const { pathname } = useRouter();
+
   if (!hasGetInitialPropsRun && err) {
     // getInitialProps is not called in case of
     // https://github.com/vercel/next.js/issues/8592. As a workaround, we pass
@@ -20,7 +23,9 @@ const ErrorPage = ({
     captureException(err);
     // Flushing is not required in this case as it only happens on the client
   } else {
-    captureMessage(`Error page with status of ${statusCode} seen.`);
+    captureMessage(
+      `Error page with status of ${statusCode} seen at "${pathname}".`
+    );
   }
 
   return (
