@@ -14,7 +14,7 @@ const ErrorPage = ({
   hasGetInitialPropsRun,
   err,
 }: ErrorPageProps) => {
-  const { pathname } = useRouter();
+  const { asPath } = useRouter();
 
   if (!hasGetInitialPropsRun && err) {
     // getInitialProps is not called in case of
@@ -24,7 +24,7 @@ const ErrorPage = ({
     // Flushing is not required in this case as it only happens on the client
   } else {
     captureMessage(
-      `Error page with status of ${statusCode} seen at "${pathname}".`
+      `Error page with status of ${statusCode} seen at "${asPath}".`
     );
   }
 
