@@ -116,20 +116,15 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
           </tr>
           <tr style="${getRowBg(index++)}">
             <th role="row">Address</th>
-            <td>${order.deliver_to.address}</td>
+            <td>
+              ${order.deliver_to.address}
+              ${
+                order.deliver_to.appartmentNo
+                  ? `<br />Apartment ${order.deliver_to.appartmentNo}`
+                  : ""
+              }
+            </td>
           </tr>
-          ${
-            order.deliver_to.appartmentNo
-              ? `
-                <tr style="${getRowBg(index++)}">
-                  <th role="row">Apartment</th>
-                  <td>
-                    ${order.deliver_to.appartmentNo}
-                  </td>
-                </tr>
-              `
-              : ""
-          }
           <tr style="${getRowBg(index++)}">
             <th role="row">Restaurant</th>
             <td>${order.restaurant_id}</td>
@@ -137,7 +132,7 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
           <tr style="${getRowBg(index++)}">
             <th role="row">Products</th>
             <td>
-              <ol>
+              <ol style="padding: 0;">
                 ${getProducts(order.order_items)}
               </ol>
             </td>
