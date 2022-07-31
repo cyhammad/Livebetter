@@ -5,6 +5,7 @@ import {
   flush,
   withSentry,
 } from "@sentry/nextjs";
+import { format } from "date-fns";
 import {
   Timestamp,
   addDoc,
@@ -26,6 +27,12 @@ import { db } from "lib/server/db";
 import { findRestaurant } from "lib/server/findRestaurant";
 import { getOrderEmail } from "lib/server/getOrderEmail";
 import type { ApiErrorResponse, PaymentIntentOrder } from "types";
+
+interface LoyaltyVisit {
+  date: string;
+  restaurantName: string;
+  visits: number;
+}
 
 export const config = { api: { bodyParser: false } };
 
@@ -212,6 +219,32 @@ async function handler(
 
               if (shouldAwardLoyaltyPoint) {
                 nextLoyaltyData.points++;
+
+                const loyaltyVisitsDate = format(new Date(), "yyyy-MM-dd");
+
+                const existingLoyaltyVisitsDoc = await getDoc(
+                  doc(
+                    db,
+                    "restaurant-loyalty-visits",
+                    `${restaurantName}-${loyaltyVisitsDate}`
+                  )
+                );
+
+                const nextLoyaltyVisits: LoyaltyVisit =
+                  existingLoyaltyVisitsDoc && existingLoyaltyVisitsDoc.exists()
+                    ? (existingLoyaltyVisitsDoc.data() as LoyaltyVisit)
+                    : { date: loyaltyVisitsDate, restaurantName, visits: 0 };
+
+                nextLoyaltyVisits.visits++;
+
+                await setDoc(
+                  doc(
+                    db,
+                    "restaurant-loyalty-visits",
+                    `${restaurantName}-${loyaltyVisitsDate}`
+                  ),
+                  nextLoyaltyVisits
+                );
               }
 
               await setDoc(
