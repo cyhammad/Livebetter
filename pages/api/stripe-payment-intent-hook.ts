@@ -144,7 +144,13 @@ async function handler(
         newOrderData.created_at = Timestamp.now();
 
         // Move the order to the `orders` collection
-        const orderDoc = await addDoc(collection(db, "orders"), newOrderData);
+        const orderDoc = await addDoc(
+          collection(
+            db,
+            process.env.VERCEL_ENV === "production" ? "orders" : "__dev_orders"
+          ),
+          newOrderData
+        );
 
         // Delete the payment intent order
         await deleteDoc(
