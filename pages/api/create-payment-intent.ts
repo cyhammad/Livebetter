@@ -67,7 +67,10 @@ async function handler(
 
     const lastOrderDocFromEmail = await getDocs(
       query(
-        collection(db, "orders"),
+        collection(
+          db,
+          process.env.VERCEL_ENV === "production" ? "orders" : "__dev_orders"
+        ),
         where("deliver_to.email", "==", user.email),
         limit(1)
       )

@@ -11,6 +11,7 @@ declare namespace NodeJS {
     STRIPE_WEBHOOK_SECRET: string;
     TWILIO_ACCOUNT_SID: string;
     TWILIO_AUTH_TOKEN: string;
+    NEXT_PUBLIC_VERCEL_ENV: string;
     VERCEL_ENV: string;
   }
 }

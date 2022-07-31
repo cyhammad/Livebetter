@@ -48,7 +48,10 @@ export const getServerSideProps: GetServerSideProps<
 
   const orderDoc = await getDocs(
     query(
-      collection(db, "orders"),
+      collection(
+        db,
+        process.env.VERCEL_ENV === "production" ? "orders" : "__dev_orders"
+      ),
       where("charges_id", "==", paymentIntentId),
       limit(1)
     )
@@ -56,6 +59,12 @@ export const getServerSideProps: GetServerSideProps<
 
   const order =
     (orderDoc.docs[0]?.data() as Order) ?? paymentIntentOrder?.order ?? null;
+
+  if (!order) {
+    return {
+      notFound: true,
+    };
+  }
 
   const apiOrder: ApiOrder = {
     ...order,

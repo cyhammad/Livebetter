@@ -1,7 +1,7 @@
-import { getApps, initializeApp } from "firebase/app";
+import { FirebaseOptions, getApps, initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-const firebaseConfig = {
+const firebaseConfig: FirebaseOptions = {
   apiKey: "AIzaSyAJXBht6uUT0xoNa6xv0wbMWn_-_QgDxlk",
   authDomain: "new-practice-6441a.firebaseapp.com",
   databaseURL: "https://new-practice-6441a.firebaseio.com",
