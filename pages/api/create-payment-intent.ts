@@ -188,6 +188,16 @@ async function handler(
         customer: customerId,
         description: `Order from ${cart.restaurantName} created by ${user.email}`,
         receipt_email: user.email,
+        /**
+         * Full statement descriptor cannot be more than 22 characters. We have
+         * a static statement descriptor of LIVEBETTER (10 chars), so our suffix
+         * can only be 12 characters. We also remove all non-letters and non-
+         * spaces to be compatible with statement descriptor requirements
+         * @see https://stripe.com/docs/account/statement-descriptors#requirements
+         */
+        statement_descriptor_suffix: cart.restaurantName
+          .replace(/[^a-zA-Z ]/g, "")
+          .slice(0, 12),
       });
     }
 
