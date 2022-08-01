@@ -30,7 +30,7 @@
     "haversine-distance": "^1.2.1",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2",
-    "micro": "^9.4.0",
+    "micro": "^9.4.1",
     "next": "^12.2.3",
     "phosphor-react": "^1.4.1",
     "react": "18.2.0",
