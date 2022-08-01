@@ -225,7 +225,9 @@ async function handler(
                 const existingLoyaltyVisitsDoc = await getDoc(
                   doc(
                     db,
-                    "restaurant-loyalty-visits",
+                    process.env.VERCEL_ENV === "production"
+                      ? "restaurant-loyalty-visits"
+                      : "__dev_restaurant-loyalty-visits",
                     `${restaurantName}-${loyaltyVisitsDate}`
                   )
                 );
@@ -240,7 +242,9 @@ async function handler(
                 await setDoc(
                   doc(
                     db,
-                    "restaurant-loyalty-visits",
+                    process.env.VERCEL_ENV === "production"
+                      ? "restaurant-loyalty-visits"
+                      : "__dev_restaurant-loyalty-visits",
                     `${restaurantName}-${loyaltyVisitsDate}`
                   ),
                   nextLoyaltyVisits
