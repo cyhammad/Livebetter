@@ -133,7 +133,7 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
                               marginTop: itemIndex === 0 ? 0 : 8,
                             }}
                           >
-                            {item.qty} x {item.item_id}
+                            {item.qty} × {item.item_id}
                             {item.choices ? (
                               <ul style={ulStyles}>
                                 {item.choices.map((choice, choiceIndex) => (
@@ -141,7 +141,7 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
                                     style={{ ...liStyles, ...nestedLiStyles }}
                                     key={choiceIndex}
                                   >
-                                    {choice.qty} x {choice.name}
+                                    {choice.qty} × {choice.name}
                                   </li>
                                 ))}
                               </ul>
@@ -154,7 +154,7 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
                                       style={{ ...liStyles, ...nestedLiStyles }}
                                       key={choiceIndex}
                                     >
-                                      {choice.qty} x {choice.name}
+                                      {choice.qty} × {choice.name}
                                     </li>
                                   )
                                 )}

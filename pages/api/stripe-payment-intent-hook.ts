@@ -26,6 +26,7 @@ import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
 import { findRestaurant } from "lib/server/findRestaurant";
 import { getOrderEmail } from "lib/server/getOrderEmail";
+import { getReceiptEmail } from "lib/server/getReceiptEmail";
 import type { ApiErrorResponse, PaymentIntentOrder } from "types";
 
 interface LoyaltyVisit {
@@ -320,25 +321,48 @@ async function handler(
           shouldAwardLoyaltyPoint
         );
 
-        const [sendGridResponse] = await Promise.allSettled([
-          await sendGridMail.send({
-            from: "livebetterphl@gmail.com",
-            to:
-              process.env.VERCEL_ENV === "development"
-                ? "atdrago@gmail.com"
-                : "livebetterphl@gmail.com",
-            subject: `New Order Notification ✔ (Order #${orderDoc.id})`,
-            html: orderEmailHtml,
-            headers: { Accept: "application/json" },
-          }),
-        ]);
+        const receiptEmailHtml = await getReceiptEmail({
+          order: newOrderData,
+          orderId: orderDoc.id,
+          paymentIntentId: newOrderData.charges_id,
+        });
 
-        const didSendGridFail = sendGridResponse.status === "rejected";
+        const [orderEmailResponse, receiptEmailResponse] =
+          await Promise.allSettled([
+            await sendGridMail.send({
+              from: "livebetterphl@gmail.com",
+              to:
+                process.env.VERCEL_ENV === "development"
+                  ? "atdrago@gmail.com"
+                  : "livebetterphl@gmail.com",
+              subject: `New Order Notification ✔ (Order #${orderDoc.id})`,
+              html: orderEmailHtml,
+              headers: { Accept: "application/json" },
+            }),
+            await sendGridMail.send({
+              from: "livebetterphl@gmail.com",
+              to: newOrderData.deliver_to.email,
+              subject: `LiveBetter receipt`,
+              html: receiptEmailHtml,
+              headers: { Accept: "application/json" },
+            }),
+          ]);
 
-        if (didSendGridFail) {
-          captureException(sendGridResponse.reason, {
+        const didOrderEmailFail = orderEmailResponse.status === "rejected";
+        const didReceiptEmailFail = receiptEmailResponse.status === "rejected";
+
+        if (didOrderEmailFail) {
+          captureException(orderEmailResponse.reason, {
             extra: {
-              message: "Failed to send email using SendGrid",
+              message: "Failed to send order email using SendGrid",
+            },
+          });
+        }
+
+        if (didReceiptEmailFail) {
+          captureException(receiptEmailResponse.reason, {
+            extra: {
+              message: "Failed to send receipt email using SendGrid",
             },
           });
         }

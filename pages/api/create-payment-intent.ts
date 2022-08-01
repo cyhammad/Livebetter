@@ -141,12 +141,12 @@ async function handler(
       }
     }
 
-    const { amount, subtotal, total } = getCartPricingBreakdown(
-      cart.items,
-      user.shippingMethod,
-      cart.tip,
-      discount
-    );
+    const { amount, subtotal, total } = getCartPricingBreakdown({
+      items: cart.items,
+      shippingMethod: user.shippingMethod,
+      tip: cart.tip,
+      discount,
+    });
 
     const order = createOrder(
       cart,
@@ -187,7 +187,6 @@ async function handler(
         currency: "usd",
         customer: customerId,
         description: `Order from ${cart.restaurantName} created by ${user.email}`,
-        receipt_email: user.email,
         /**
          * Full statement descriptor cannot be more than 22 characters. We have
          * a static statement descriptor of LIVEBETTER (10 chars), so our suffix

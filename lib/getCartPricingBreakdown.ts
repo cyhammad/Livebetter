@@ -78,16 +78,25 @@ const getTotal = (
   );
 };
 
-export const getCartPricingBreakdown = (
-  items?: CartMenuItem[],
-  shippingMethod?: ShippingMethod,
+interface GetCartPricingBreakdownOptions {
+  subtotal?: number;
+  items?: CartMenuItem[];
+  shippingMethod?: ShippingMethod;
+  tip?: number;
+  discount?: number;
+}
+
+export const getCartPricingBreakdown = ({
+  items,
+  shippingMethod,
+  subtotal,
   tip = 0,
-  discount = 0
-) => {
+  discount = 0,
+}: GetCartPricingBreakdownOptions) => {
   // NOTE: Always run any mathematical calculations through `toMoney` to prevent
   // JS math issues. (Try `16 + 2.99` in the console. You will see `18.990000000000002`)
 
-  const subtotal = getCartItemsSubtotal(items);
+  subtotal = subtotal ?? getCartItemsSubtotal(items);
   const { tax, deliveryFee, processingFee, serviceFee, smallOrderFee } =
     getCartFees(subtotal - discount, shippingMethod);
   const total = getTotal(

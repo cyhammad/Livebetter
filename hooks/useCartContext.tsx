@@ -244,12 +244,12 @@ export const CartContextProvider = ({
     smallOrderFee,
     tax,
     tip,
-  } = getCartPricingBreakdown(
-    cart?.items ?? [],
+  } = getCartPricingBreakdown({
+    items: cart?.items ?? [],
     shippingMethod,
-    cart?.tip,
-    discount
-  );
+    tip: cart?.tip,
+    discount,
+  });
 
   return (
     <CartContext.Provider
