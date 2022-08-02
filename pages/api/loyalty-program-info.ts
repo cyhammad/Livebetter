@@ -2,7 +2,7 @@ import { captureException, flush, withSentry } from "@sentry/nextjs";
 import { doc, getDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
+import { getTenDigitPhoneNumber } from "lib/getTenDigitPhoneNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
 import type {
@@ -19,7 +19,7 @@ async function handler(
 ) {
   const phoneNumber =
     typeof req.query.phoneNumber === "string"
-      ? getNormalizedPhoneNumber(req.query.phoneNumber)
+      ? getTenDigitPhoneNumber(req.query.phoneNumber)
       : undefined;
   const restaurantName =
     typeof req.query.restaurantName === "string"

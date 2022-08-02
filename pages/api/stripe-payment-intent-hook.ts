@@ -20,8 +20,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import twilio from "twilio";
 
-import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
 import { getRandomNumber } from "lib/getRandomNumber";
+import { getTenDigitPhoneNumber } from "lib/getTenDigitPhoneNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
 import { findRestaurant } from "lib/server/findRestaurant";
@@ -172,7 +172,7 @@ async function handler(
             newOrderData.deliver_to.phoneNumber &&
             newOrderData.restaurant_id
           ) {
-            const phoneNumber = getNormalizedPhoneNumber(
+            const phoneNumber = getTenDigitPhoneNumber(
               newOrderData.deliver_to.phoneNumber
             );
             const restaurantName = newOrderData.restaurant_id;

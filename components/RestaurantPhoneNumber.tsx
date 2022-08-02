@@ -1,7 +1,7 @@
 import { Phone } from "phosphor-react";
 
 import { getFormattedPhoneNumber } from "lib/getFormattedPhoneNumber";
-import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
+import { getTenDigitPhoneNumber } from "lib/getTenDigitPhoneNumber";
 import type { ApiRestaurant } from "types";
 
 interface RestaurantPhoneNumberProps {
@@ -11,7 +11,7 @@ interface RestaurantPhoneNumberProps {
 export const RestaurantPhoneNumber = ({
   restaurant,
 }: RestaurantPhoneNumberProps) => {
-  const digits = getNormalizedPhoneNumber(restaurant.Phone);
+  const digits = getTenDigitPhoneNumber(restaurant.Phone);
   const isPhoneVisible = digits.length === 10;
 
   if (!isPhoneVisible) {

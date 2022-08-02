@@ -3,7 +3,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import twilio from "twilio";
 
-import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
+import { getTenDigitPhoneNumber } from "lib/getTenDigitPhoneNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { db } from "lib/server/db";
 import type { ApiErrorResponse, UserForVerification } from "types";
@@ -28,7 +28,7 @@ async function handler(
     typeof req.body.email === "string" ? req.body.email : null;
   const phoneNumber: string | null =
     typeof req.body.phoneNumber === "string"
-      ? getNormalizedPhoneNumber(req.body.phoneNumber)
+      ? getTenDigitPhoneNumber(req.body.phoneNumber)
       : null;
 
   if (!phoneNumber) {

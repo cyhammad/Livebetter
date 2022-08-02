@@ -7,7 +7,7 @@ import { useUserContext } from "hooks/useUserContext";
 import { fetchUserWithLoyaltyProgram } from "lib/client/fetchUserWithLoyaltyProgram";
 import { getCartItemsSubtotal } from "lib/getCartItemsSubtotal";
 import { getCartPricingBreakdown } from "lib/getCartPricingBreakdown";
-import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
+import { getTenDigitPhoneNumber } from "lib/getTenDigitPhoneNumber";
 import type {
   ApiRestaurant,
   Cart,
@@ -83,13 +83,18 @@ export const CartContextProvider = ({
     undefined
   );
 
+  const isLoyaltyProgramInfoQueryEnabled =
+    getTenDigitPhoneNumber(phoneNumber).length === 10 &&
+    !!cart?.restaurant.Restaurant;
+
   const { data: userWithLoyaltyProgramData } = useQuery(
     ["loyalty-program-info", phoneNumber, cart?.restaurant.Restaurant ?? ""],
     () =>
       fetchUserWithLoyaltyProgram({
-        phoneNumber: getNormalizedPhoneNumber(phoneNumber),
+        phoneNumber: getTenDigitPhoneNumber(phoneNumber),
         restaurantName: cart?.restaurant.Restaurant ?? "",
-      })
+      }),
+    { enabled: isLoyaltyProgramInfoQueryEnabled }
   );
 
   const itemCount = cart?.items.length ?? 0;

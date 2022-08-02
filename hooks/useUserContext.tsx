@@ -11,7 +11,7 @@ import {
 
 import { usePersistentState } from "hooks/usePersistentState";
 import { getFormattedPhoneNumber } from "lib/getFormattedPhoneNumber";
-import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
+import { getTenDigitPhoneNumber } from "lib/getTenDigitPhoneNumber";
 import type {
   Coordinates,
   DeliveryDropOffPreference,
@@ -137,7 +137,7 @@ export const UserContextProvider = ({
       return [false, "Phone number is required."];
     }
 
-    const cleanPhone = getNormalizedPhoneNumber(phoneNumber);
+    const cleanPhone = getTenDigitPhoneNumber(phoneNumber);
 
     if (cleanPhone.length !== 10) {
       return [false, "Please make sure your phone number is valid."];

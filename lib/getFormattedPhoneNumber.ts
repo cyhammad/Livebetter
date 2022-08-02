@@ -1,7 +1,7 @@
-import { getNormalizedPhoneNumber } from "./getNormalizedPhoneNumber";
+import { getTenDigitPhoneNumber } from "lib/getTenDigitPhoneNumber";
 
 export const getFormattedPhoneNumber = (phoneNumber?: string): string => {
-  const cleanPhone = getNormalizedPhoneNumber(phoneNumber);
+  const cleanPhone = getTenDigitPhoneNumber(phoneNumber);
 
   const [_, group1, group2, group3] =
     cleanPhone.match(/(\d{0,3})(\d{0,3})(\d{0,4})/) ?? [];

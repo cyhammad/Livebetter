@@ -14,7 +14,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
 import { getCartPricingBreakdown } from "lib/getCartPricingBreakdown";
-import { getNormalizedPhoneNumber } from "lib/getNormalizedPhoneNumber";
+import { getTenDigitPhoneNumber } from "lib/getTenDigitPhoneNumber";
 import { createApiErrorResponse } from "lib/server/createApiErrorResponse";
 import { createOrder } from "lib/server/createOrder";
 import { db } from "lib/server/db";
@@ -63,7 +63,7 @@ async function handler(
     });
 
     // Remove non-digits from the user's phone number before saving
-    user.phoneNumber = getNormalizedPhoneNumber(user.phoneNumber);
+    user.phoneNumber = getTenDigitPhoneNumber(user.phoneNumber);
 
     const lastOrderDocFromEmail = await getDocs(
       query(
