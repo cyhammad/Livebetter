@@ -2,6 +2,7 @@ import classNames from "classnames";
 import React, { forwardRef, useEffect, useState } from "react";
 
 import { HEADER_HEIGHT } from "components/Header";
+import { isIntersectionObserverSupported } from "lib/client/isIntersectionObserverSupported";
 
 interface ToolbarProps {
   isShadowVisible?: boolean;
@@ -16,10 +17,14 @@ export const Toolbar = forwardRef<
 >(function Toolbar({ children, isShadowVisible, scrollAreaTopRef }, ref) {
   const [isToolbarPinned, setIsToolbarPinned] = useState(false);
   /**
-   * Update the `isPinned` state variable whenever the Toolbar becomes "pinned"
+   * Update the `isToolbarPinned` state variable whenever the Toolbar becomes "pinned"
    * to the top of the viewport.
    */
   useEffect(() => {
+    if (!isIntersectionObserverSupported()) {
+      return;
+    }
+
     const topRef = scrollAreaTopRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {

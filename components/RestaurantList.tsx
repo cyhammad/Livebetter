@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import { RestaurantCard } from "components/RestaurantCard";
+import { isIntersectionObserverSupported } from "lib/client/isIntersectionObserverSupported";
 import { ApiRestaurant } from "types";
 
 interface RestaurantListProps {
@@ -15,6 +16,10 @@ export const RestaurantList = ({
   const bottomIntersectionObserverRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (!isIntersectionObserverSupported()) {
+      return;
+    }
+
     const ref = bottomIntersectionObserverRef.current;
     const observer = new IntersectionObserver(
       ([entry]) => {
