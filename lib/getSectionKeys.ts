@@ -1,7 +1,9 @@
+import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
+
 import type { FeaturedSection } from "types";
 
 export const getSectionKeys = (): FeaturedSection[] => {
-  const now = new Date();
+  const now = utcToZonedTime(new Date(), "America/New_York");
   const hours = now.getHours();
   const day = now.getDay();
 
