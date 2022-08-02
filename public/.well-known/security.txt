@@ -1,0 +1,5 @@
+Contact: mailto:atdrago@gmail.com
+Contact: mailto:livebetterphl@gmail.com
+Expires: 2023-01-01T05:01:00.000Z
+Preferred-Languages: en
+Canonical: https://www.livebetterphl.com/security.txt
