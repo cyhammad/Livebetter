@@ -86,17 +86,14 @@ export const getStaticProps: GetStaticProps<
     };
   }
 
-  const restaurantMenuRef = collection(restaurantDoc.ref, "Restaurant_Menu");
-  const restaurantMenuDocs = await getDocs(restaurantMenuRef);
+  const restaurantMenuDocs = await getDocs(
+    collection(restaurantDoc.ref, "Restaurant_Menu")
+  );
 
   const menuItemsByCategory: Record<string, ApiMenuItem[]> = {};
 
   restaurantMenuDocs.docs
-    .map((doc) => {
-      const menuItem = toApiMenuItem(doc.id, doc.data() as MenuItem);
-
-      return menuItem;
-    })
+    .map((doc) => toApiMenuItem(doc.id, doc.data() as MenuItem))
     .sort((a: ApiMenuItem, b: ApiMenuItem) => {
       const aCategory = a.category?.toLowerCase() ?? "";
       const bCategory = b.category?.toLowerCase() ?? "";
@@ -368,8 +365,8 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                         href={websiteUrl}
                         className="text-sm sm:text-base underline underline-offset-4"
                         target="_blank"
-                        rel="noopener noreferrer"
                         itemProp="sameAs"
+                        rel="noopener"
                       >
                         {websiteUrl}
                       </a>
