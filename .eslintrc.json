@@ -81,6 +81,13 @@
     "prefer-const": "warn",
     "prefer-object-spread": "warn",
     "prefer-rest-params": "warn",
+    // https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/jsx-no-target-blank.md#when-to-override-it
+    "react/jsx-no-target-blank": [
+      "error",
+      {
+        "allowReferrer": true
+      }
+    ],
     "yoda": "error"
   }
 }
