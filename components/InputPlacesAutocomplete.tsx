@@ -238,6 +238,7 @@ export const InputPlacesAutocomplete = ({
   return (
     <>
       <Script
+        id="google-maps-script"
         onError={() => {
           setMapsApiStatus("failure");
         }}
