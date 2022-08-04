@@ -1,6 +1,8 @@
 import classNames from "classnames";
 import type { ReactNode } from "react";
 
+import { ButtonPrimary } from "components/ButtonPrimary";
+
 interface ModalButtonsProps {
   primaryButtonProps: JSX.IntrinsicElements["button"];
   primaryButtonLabel: ReactNode;
@@ -33,20 +35,9 @@ export const ModalButtons = ({
       >
         {secondaryButtonLabel}
       </button>
-      <button
-        type="button"
-        className={classNames(
-          primaryButtonClassName,
-          `
-            bg-emerald-600 text-white py-2 pr-2 pl-4 rounded font-bold
-            flex gap-2 sm:gap-4 items-center justify-between
-            w-full transition-opacity
-          `
-        )}
-        {...restPrimary}
-      >
+      <ButtonPrimary className={primaryButtonClassName} {...restPrimary}>
         {primaryButtonLabel}
-      </button>
+      </ButtonPrimary>
     </div>
   );
 };

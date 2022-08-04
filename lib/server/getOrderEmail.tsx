@@ -57,168 +57,168 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
   let rowIndex = 1;
 
   return ReactDomServer.renderToStaticMarkup(
-    <>
-      {/* <!DOCTYPE html> */}
-      <html lang="en">
-        <body>
-          {didAwardLoyaltyPoint ? (
-            <p style={pStyles}>Customer received 1 point for this order.</p>
-          ) : null}
-          <table
-            style={{
-              borderCollapse: "collapse",
-              width: "100%",
-              margin: "0 auto",
-              maxWidth: 480,
-            }}
-          >
-            <tbody>
+    <html lang="en">
+      <body>
+        {didAwardLoyaltyPoint ? (
+          <p style={pStyles}>Customer received 1 point for this order.</p>
+        ) : null}
+        <table
+          style={{
+            borderCollapse: "collapse",
+            width: "100%",
+            margin: "0 auto",
+            maxWidth: 480,
+          }}
+        >
+          <tbody>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Name
+              </th>
+              <td style={tdStyles}>
+                {order.deliver_to.firstName} {order.deliver_to.lastName}
+              </td>
+            </tr>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Email
+              </th>
+              <td style={tdStyles}>
+                <a href={`mailto:${order.deliver_to.email}`}>
+                  {order.deliver_to.email}
+                </a>
+              </td>
+            </tr>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Phone
+              </th>
+              <td style={tdStyles}>{order.deliver_to.phoneNumber}</td>
+            </tr>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Address
+              </th>
+              <td style={tdStyles}>{order.deliver_to.address}</td>
+            </tr>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Restaurant
+              </th>
+              <td style={tdStyles}>{order.restaurant_id}</td>
+            </tr>
+            {order.deliver_to.appartmentNo ? (
               <tr style={getRowBg(rowIndex++)}>
                 <th style={thStyles} role="row">
-                  Name
+                  Apartment
+                </th>
+                <td style={tdStyles}>{order.deliver_to.appartmentNo}</td>
+              </tr>
+            ) : null}
+            {order.order_items ? (
+              <tr style={getRowBg(rowIndex++)}>
+                <th style={thStyles} role="row">
+                  Products
                 </th>
                 <td style={tdStyles}>
-                  {order.deliver_to.firstName} {order.deliver_to.lastName}
-                </td>
-              </tr>
-              <tr style={getRowBg(rowIndex++)}>
-                <th style={thStyles} role="row">
-                  Email
-                </th>
-                <td style={tdStyles}>
-                  <a href="mailto:${order.deliver_to.email}">
-                    {order.deliver_to.email}
-                  </a>
-                </td>
-              </tr>
-              <tr style={getRowBg(rowIndex++)}>
-                <th style={thStyles} role="row">
-                  Phone
-                </th>
-                <td style={tdStyles}>{order.deliver_to.phoneNumber}</td>
-              </tr>
-              <tr style={getRowBg(rowIndex++)}>
-                <th style={thStyles} role="row">
-                  Address
-                </th>
-                <td style={tdStyles}>{order.deliver_to.address}</td>
-              </tr>
-              <tr style={getRowBg(rowIndex++)}>
-                <th style={thStyles} role="row">
-                  Restaurant
-                </th>
-                <td style={tdStyles}>{order.restaurant_id}</td>
-              </tr>
-              {order.deliver_to.appartmentNo ? (
-                <tr style={getRowBg(rowIndex++)}>
-                  <th style={thStyles} role="row">
-                    Apartment
-                  </th>
-                  <td style={tdStyles}>{order.deliver_to.appartmentNo}</td>
-                </tr>
-              ) : null}
-              {order.order_items ? (
-                <tr style={getRowBg(rowIndex++)}>
-                  <th style={thStyles} role="row">
-                    Products
-                  </th>
-                  <td style={tdStyles}>
-                    <ol style={listStyles}>
-                      {order.order_items.map((item, itemIndex) => {
-                        return (
-                          <li
-                            key={itemIndex}
-                            style={{
-                              ...liStyles,
-                              marginTop: itemIndex === 0 ? 0 : 8,
-                            }}
-                          >
-                            {item.qty} × {item.item_id}
-                            {item.choices ? (
-                              <ul style={ulStyles}>
-                                {item.choices.map((choice, choiceIndex) => (
+                  <ol style={listStyles}>
+                    {order.order_items.map((item, itemIndex) => {
+                      return (
+                        <li
+                          key={itemIndex}
+                          style={{
+                            ...liStyles,
+                            marginTop: itemIndex === 0 ? 0 : 8,
+                          }}
+                        >
+                          {item.qty} × {item.item_id}
+                          {item.choices ? (
+                            <ul style={ulStyles}>
+                              {item.choices.map((choice, choiceIndex) => (
+                                <li
+                                  style={{ ...liStyles, ...nestedLiStyles }}
+                                  key={choiceIndex}
+                                >
+                                  {choice.qty} × {choice.name}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : null}
+                          {item.optionalChoices ? (
+                            <ul style={ulStyles}>
+                              {item.optionalChoices.map(
+                                (choice, choiceIndex) => (
                                   <li
                                     style={{ ...liStyles, ...nestedLiStyles }}
                                     key={choiceIndex}
                                   >
                                     {choice.qty} × {choice.name}
                                   </li>
-                                ))}
-                              </ul>
-                            ) : null}
-                            {item.optionalChoices ? (
-                              <ul style={ulStyles}>
-                                {item.optionalChoices.map(
-                                  (choice, choiceIndex) => (
-                                    <li
-                                      style={{ ...liStyles, ...nestedLiStyles }}
-                                      key={choiceIndex}
-                                    >
-                                      {choice.qty} × {choice.name}
-                                    </li>
-                                  )
-                                )}
-                              </ul>
-                            ) : null}
-                            {item.item_description ? (
-                              <b>Note: {item.item_description}</b>
-                            ) : null}
-                          </li>
-                        );
-                      })}
-                    </ol>
-                  </td>
-                </tr>
-              ) : null}
+                                )
+                              )}
+                            </ul>
+                          ) : null}
+                          {item.item_description ? (
+                            <b>Note: {item.item_description}</b>
+                          ) : null}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </td>
+              </tr>
+            ) : null}
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Drop-off preference
+              </th>
+              <td style={tdStyles}>{order.deliver_to.dropoff}</td>
+            </tr>
+            {order.deliver_to.dropoff_note ? (
               <tr style={getRowBg(rowIndex++)}>
                 <th style={thStyles} role="row">
-                  Drop-off preference
+                  Drop-off note
                 </th>
-                <td style={tdStyles}>{order.deliver_to.dropoff}</td>
+                <td style={tdStyles}>{order.deliver_to.dropoff_note}</td>
               </tr>
-              $
-              {order.deliver_to.dropoff_note ? (
-                <tr style={getRowBg(rowIndex++)}>
-                  <th style={thStyles} role="row">
-                    Drop-off note
-                  </th>
-                  <td style={tdStyles}>{order.deliver_to.dropoff_note}</td>
-                </tr>
-              ) : null}
-              <tr style={getRowBg(rowIndex++)}>
-                <th style={thStyles} role="row">
-                  Tip
-                </th>
-                <td style={tdStyles}>${order.tip}</td>
-              </tr>
-              <tr style={getRowBg(rowIndex++)}>
-                <th style={thStyles} role="row">
-                  Subtotal
-                </th>
-                <td style={tdStyles}>${order.subTotal}</td>
-              </tr>
-              <tr style={getRowBg(rowIndex++)}>
-                <th style={thStyles} role="row">
-                  Discount
-                </th>
-                <td style={tdStyles}>${order.discount ?? 0}</td>
-              </tr>
-              <tr style={getRowBg(rowIndex++)}>
-                <th style={thStyles} role="row">
-                  Profit
-                </th>
-                <td style={tdStyles}>${toMoney(profit)}</td>
-              </tr>
-              <tr style={getRowBg(rowIndex++)}>
-                <th style={thStyles} role="row">
-                  Total
-                </th>
-                <td style={tdStyles}>${order.total}</td>
-              </tr>
-            </tbody>
-          </table>
-        </body>
-      </html>
-    </>
+            ) : null}
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Tip
+              </th>
+              <td style={tdStyles}>
+                ${(order.tip ?? 0).toFixed(2)} (
+                {(((order.tip ?? 0) / (order.subTotal ?? 1)) * 100).toFixed(2)}
+                %)
+              </td>
+            </tr>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Subtotal
+              </th>
+              <td style={tdStyles}>${(order.subTotal ?? 0).toFixed(2)}</td>
+            </tr>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Discount
+              </th>
+              <td style={tdStyles}>${(order.discount ?? 0).toFixed(2)}</td>
+            </tr>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Profit
+              </th>
+              <td style={tdStyles}>${toMoney(profit)}</td>
+            </tr>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
+                Total
+              </th>
+              <td style={tdStyles}>${order.total}</td>
+            </tr>
+          </tbody>
+        </table>
+      </body>
+    </html>
   );
 };

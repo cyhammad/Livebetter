@@ -148,7 +148,7 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                       style={{ gridArea: "1/1" }}
                     />
                     <small
-                      className="-mb-1 text-center text-xs"
+                      className="-mb-1.5 text-center text-xs"
                       style={{ gridArea: "1/1" }}
                     >
                       {count}

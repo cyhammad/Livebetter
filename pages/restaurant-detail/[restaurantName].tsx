@@ -449,7 +449,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               data.menuItemName,
               data.menuItemPrice,
               data.menuItemCategory,
-              1,
+              data.count,
               data.menuItemNotes,
               data.choices,
               data.optionalChoices
@@ -470,7 +470,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               menuItemData.menuItemName,
               menuItemData.menuItemPrice,
               menuItemData.menuItemCategory,
-              1,
+              menuItemData.count,
               menuItemData.menuItemNotes,
               menuItemData.choices,
               menuItemData.optionalChoices

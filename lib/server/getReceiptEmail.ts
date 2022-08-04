@@ -7,6 +7,7 @@ import Handlebars from "handlebars";
 import Stripe from "stripe";
 
 import { getCartPricingBreakdown } from "lib/getCartPricingBreakdown";
+import { getOrderMenuItemTotal } from "lib/getOrderMenuItemTotal";
 import { restaurantNameToStatementDescriptorSuffix } from "lib/restaurantNameToStatementDescriptorSuffix";
 import type { Order } from "types";
 
@@ -51,19 +52,24 @@ export const getReceiptEmail = async ({
     ? paymentMethod.card.brand.toUpperCase()
     : "";
 
-  const receiptDetails = order.order_items.map((item) => {
+  const items = order.order_items.map((item) => {
     return {
       description: item.item_id,
-      amount: `$${item.item_price?.toFixed(2)}`,
-      choices: [...item.choices, ...(item.optionalChoices ?? [])].map(
-        (choice) => {
-          return {
-            name:
-              choice.qty > 1 ? `${choice.qty} × ${choice.name}` : choice.name,
-            price: choice.price ? `$${choice.price?.toFixed(2)}` : "",
-          };
-        }
-      ),
+      price: `$${getOrderMenuItemTotal(
+        item.item_price ?? 0,
+        item.qty,
+        item.choices,
+        item.optionalChoices
+      ).toFixed(2)}`,
+      priced: `$${item.item_price?.toFixed(2)}`,
+      choices: [...item.choices, ...(item.optionalChoices ?? [])]
+        .map((choice) => {
+          return choice.qty > 1
+            ? `${choice.qty} × ${choice.name}`
+            : choice.name;
+        })
+        .join(", "),
+      count: item.qty,
       note: item.item_description,
     };
   });
@@ -94,7 +100,7 @@ export const getReceiptEmail = async ({
     dropoffNote: order.deliver_to.dropoff_note,
     name: order.deliver_to.firstName,
     processingFee: processingFee ? `$${processingFee.toFixed(2)}` : null,
-    receiptDetails,
+    items,
     receiptId: orderId.slice(0, 7),
     receiptUrl: `${
       process.env.VERCEL_ENV === "production"

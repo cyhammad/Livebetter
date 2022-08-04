@@ -97,7 +97,7 @@ export const CartContextProvider = ({
     { enabled: isLoyaltyProgramInfoQueryEnabled }
   );
 
-  const itemCount = cart?.items.length ?? 0;
+  const itemCount = cart?.items.reduce((acc, item) => acc + item.count, 0) ?? 0;
 
   const addToCart: CartContextDefaultValue["addToCart"] = useCallback(
     (
@@ -144,7 +144,7 @@ export const CartContextProvider = ({
 
   const removeMenuItem: CartContextDefaultValue["removeMenuItem"] = useCallback(
     (menuItemIndex) => {
-      if (itemCount === 1) {
+      if (cart?.items.length === 1) {
         setCart(undefined);
       } else {
         setCart((prevCart) => {
@@ -160,7 +160,7 @@ export const CartContextProvider = ({
         });
       }
     },
-    [itemCount, setCart]
+    [cart?.items.length, setCart]
   );
 
   const setMenuItemCount: CartContextDefaultValue["setMenuItemCount"] =

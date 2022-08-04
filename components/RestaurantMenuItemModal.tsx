@@ -1,20 +1,23 @@
 import classNames from "classnames";
 import Image from "next/future/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { X } from "phosphor-react";
+import { useEffect, useMemo, useState } from "react";
 import type React from "react";
 
+import { ButtonPrimary } from "components/ButtonPrimary";
 import { Checkbox } from "components/Checkbox";
 import { InputCounter } from "components/InputCounter";
 import { InputTextarea } from "components/InputTextarea";
 import { Modal } from "components/Modal";
-import { ModalButtons } from "components/ModalButtons";
 import { Select } from "components/Select";
 import { SelectShippingMethod } from "components/SelectShippingMethod";
 import { useCartContext } from "hooks/useCartContext";
+import { usePrevious } from "hooks/usePrevious";
 import { useRestaurantOrderValidation } from "hooks/useRestaurantOrderValidation";
 import { useShippingMethodValidation } from "hooks/useShippingMethodValidation";
 import { useUserContext } from "hooks/useUserContext";
 import { reportEvent } from "lib/client/gtag";
+import { getCartMenuItemTotal } from "lib/getCartMenuItemTotal";
 import { getChoicesCount } from "lib/getChoicesCount";
 import { toCartMenuItemChoices } from "lib/toCartMenuItemChoices";
 import type {
@@ -68,28 +71,25 @@ export const RestaurantMenuItemModal = ({
         : null
     );
   const [menuItemNotes, setMenuItemNotes] = useState("");
+  const [menuItemCount, setMenuItemCount] = useState(1);
 
   const didRestaurantChange =
     !cart?.restaurant.Restaurant ||
     cart?.restaurant.Restaurant !== restaurantName;
 
-  const prevIsOpenRef = useRef(isOpen);
+  const wasOpen = usePrevious(isOpen);
 
   const shouldUseDropdownForChoices =
     menuItem &&
     menuItem.quantity === Object.keys(menuItem?.choices ?? {}).length;
 
-  const choicesTotal = Object.entries(selectedChoices ?? {})
-    .flatMap(([, choices]) => {
-      return choices.map(({ price, count }) => price * (count ?? 0));
-    })
-    .reduce((acc, curr) => acc + curr, 0);
+  const menuItemTotal = getCartMenuItemTotal(
+    menuItem?.mealPrice ?? 0,
+    menuItemCount,
+    selectedChoices,
+    selectedOptionalChoices
+  );
 
-  const optionalChoicesTotal = Object.entries(selectedOptionalChoices ?? {})
-    .flatMap(([, choices]) => {
-      return choices.map(({ price, count }) => price * (count ?? 0));
-    })
-    .reduce((acc, curr) => acc + curr, 0);
   const hasNoChoices = Object.keys(menuItem?.choices ?? {}).length === 0;
 
   const {
@@ -126,7 +126,7 @@ export const RestaurantMenuItemModal = ({
    * will add multiple modals to the page otherwise).
    */
   useEffect(() => {
-    if (isOpen && !prevIsOpenRef.current) {
+    if (isOpen && !wasOpen) {
       setSelectedChoices(
         menuItem?.choices &&
           menuItem.quantity &&
@@ -165,6 +165,8 @@ export const RestaurantMenuItemModal = ({
           : null
       );
       setMenuItemNotes("");
+      setMenuItemCount(1);
+
       reportEvent({
         action: "view_item",
         currency: "USD",
@@ -172,9 +174,8 @@ export const RestaurantMenuItemModal = ({
         items: [{ item_id: `${menuItem?.name}` }],
       });
     }
-
-    prevIsOpenRef.current = isOpen;
   }, [
+    wasOpen,
     allowedShippingMethods,
     cartCount,
     didRestaurantChange,
@@ -205,6 +206,19 @@ export const RestaurantMenuItemModal = ({
     >
       {!menuItem ? null : (
         <>
+          <button
+            aria-label="Close menu item"
+            className="
+              sticky top-3 ml-auto mr-3 z-50 -mb-10 p-2
+              flex items-center justify-center
+              leading-none text-2xl shadow-md bg-slate-50 rounded-full
+              opacity-80
+            "
+            type="button"
+            onClick={onRequestClose}
+          >
+            <X alt="" size={20} weight="bold" />
+          </button>
           {menuItem.picture ? (
             <div className="z-10 flex flex-row gap-2 overflow-hidden flex-none h-64 w-full sm:h-80 md:h-96 sticky top-0">
               <Image
@@ -481,23 +495,31 @@ export const RestaurantMenuItemModal = ({
                 ) : null}
               </div>
             ) : null}
-            <ModalButtons
-              secondaryButtonLabel="Cancel"
-              secondaryButtonProps={{ onClick: onRequestClose }}
-              primaryButtonProps={{
-                className: classNames({
+            <div className="flex items-stretch gap-4 sm:justify-end">
+              <InputCounter
+                className="border-2 border-slate-200"
+                value={menuItemCount}
+                onChange={(nextValue) => {
+                  if (nextValue && nextValue > 0) {
+                    setMenuItemCount(nextValue);
+                  }
+                }}
+              />
+              <ButtonPrimary
+                className={classNames({
                   "bg-amber-600": menuItem.outOfStock,
                   "opacity-50":
                     !isFormValid ||
                     !isShippingMethodValid ||
                     !isRestaurantOrderValid,
-                }),
-                disabled:
+                })}
+                disabled={
                   menuItem.outOfStock ||
                   !isFormValid ||
                   !isShippingMethodValid ||
-                  !isRestaurantOrderValid,
-                onClick: (event) => {
+                  !isRestaurantOrderValid
+                }
+                onClick={(event) => {
                   if (!selectedShippingMethod) {
                     return;
                   }
@@ -510,7 +532,7 @@ export const RestaurantMenuItemModal = ({
                         menuItemName: menuItem.name,
                         menuItemPrice: menuItem.mealPrice,
                         menuItemCategory: menuItem.category,
-                        count: 1,
+                        count: menuItemCount,
                         menuItemNotes,
                         choices: selectedChoices
                           ? toCartMenuItemChoices(selectedChoices)
@@ -530,24 +552,16 @@ export const RestaurantMenuItemModal = ({
                       items: [{ item_id: `${menuItem?.name}` }],
                     });
                   }
-                },
-              }}
-              primaryButtonLabel={
-                <>
-                  <span>
-                    {menuItem.outOfStock ? "Out of stock" : "Add to cart"}
-                  </span>
-                  <span className="bg-white/20 px-2 py-1 rounded">
-                    $
-                    {(
-                      menuItem.mealPrice +
-                      choicesTotal +
-                      optionalChoicesTotal
-                    ).toFixed(2)}
-                  </span>
-                </>
-              }
-            />
+                }}
+              >
+                <span>
+                  {menuItem.outOfStock ? "Out of stock" : "Add to cart"}
+                </span>
+                <span className="bg-white/20 px-2 py-1 rounded">
+                  ${menuItemTotal.toFixed(2)}
+                </span>
+              </ButtonPrimary>
+            </div>
           </div>
         </>
       )}

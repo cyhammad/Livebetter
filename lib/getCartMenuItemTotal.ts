@@ -1,15 +1,15 @@
-import type { CartMenuItemChoices } from "types";
+import type { CartMenuItemChoices, CartMenuItemChoicesInput } from "types";
 
 export const getCartMenuItemTotal = (
   mealPrice: number,
   count: number,
-  choices?: CartMenuItemChoices,
-  optionalChoices?: CartMenuItemChoices
+  choices?: CartMenuItemChoices | CartMenuItemChoicesInput,
+  optionalChoices?: CartMenuItemChoices | CartMenuItemChoicesInput
 ): number => {
   const choicesTotal = Object.entries(choices ?? {})
     .flatMap(([, options]) => {
       return options.map(
-        ({ price, count: optionCount }) => price * optionCount
+        ({ price, count: optionCount }) => price * (optionCount ?? 0)
       );
     })
     .reduce((acc, curr) => acc + curr, 0);
@@ -17,7 +17,7 @@ export const getCartMenuItemTotal = (
   const optionalChoicesTotal = Object.entries(optionalChoices ?? {})
     .flatMap(([, options]) => {
       return options.map(
-        ({ price, count: optionCount }) => price * optionCount
+        ({ price, count: optionCount }) => price * (optionCount ?? 0)
       );
     })
     .reduce((acc, curr) => acc + curr, 0);

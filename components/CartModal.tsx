@@ -1,7 +1,6 @@
 import { captureException } from "@sentry/nextjs";
 import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
-import { motion } from "framer-motion";
 import { ArrowRight, Spinner, Star, Tote, Trash } from "phosphor-react";
 import { useEffect, useMemo, useState } from "react";
 import type React from "react";
@@ -22,6 +21,7 @@ import { useUserContext } from "hooks/useUserContext";
 import { fetchCreateOtp } from "lib/client/fetchCreateOtp";
 import { fetchCreatePaymentIntent } from "lib/client/fetchCreatePaymentIntent";
 import { reportEvent } from "lib/client/gtag";
+import { getCartMenuItemTotal } from "lib/getCartMenuItemTotal";
 import { toMoney } from "lib/toMoney";
 import type {
   ApiErrorResponse,
@@ -324,13 +324,32 @@ export const CartModal = ({
           </h5>
           <ul className="flex flex-col gap-2">
             {cart?.items.map((item, index) => {
+              const menuItemPrice = getCartMenuItemTotal(
+                item.mealPrice,
+                item.count,
+                item.choices,
+                item.optionalChoices
+              );
+
               return (
-                <motion.li className="flex flex-col gap-1" key={index}>
-                  <div
-                    className="grid justify-between items-start"
-                    style={{ gridTemplateColumns: "1fr auto auto" }}
-                  >
-                    <b>{item.name}</b>
+                <li className="flex gap-2 items-center" key={index}>
+                  <span className="flex-none font-bold">{item.count} ×</span>
+                  <div className="flex flex-col gap-0 w-full">
+                    <p
+                      className="grid justify-between items-start line-clamp-1"
+                      style={{ gridTemplateColumns: "1fr auto auto" }}
+                    >
+                      {item.name}
+                    </p>
+                    <CartChoicesList choices={item.choices} />
+                    <CartChoicesList choices={item.optionalChoices} />
+                    {item.notes ? (
+                      <p className="text-sm text-gray-600">
+                        Notes: {item.notes}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="flex gap-1">
                     <button
                       className="py-1"
                       onClick={() => removeMenuItem(index)}
@@ -344,18 +363,11 @@ export const CartModal = ({
                         className="text-rose-800 w-4 h-4"
                       />
                     </button>
-                    <p className="min-w-[60px] text-right tabular-nums">
-                      ${(item.mealPrice * item.count).toFixed(2)}
-                    </p>
+                    <span className="min-w-[60px] text-right tabular-nums">
+                      ${menuItemPrice.toFixed(2)}
+                    </span>
                   </div>
-                  <CartChoicesList choices={item.choices} />
-                  <CartChoicesList choices={item.optionalChoices} />
-                  {item.notes ? (
-                    <p className="text-sm text-gray-600 ml-4">
-                      <b>Notes</b> {item.notes}
-                    </p>
-                  ) : null}
-                </motion.li>
+                </li>
               );
             })}
           </ul>

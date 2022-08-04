@@ -804,6 +804,30 @@
                                         margin: 0;
                                       "
                                     >
+                                      #
+                                    </p>
+                                  </th>
+                                  <th
+                                    class="purchase_heading"
+                                    align="left"
+                                    style="
+                                      font-family: Helvetica, Arial, sans-serif;
+                                      font-size: 16px;
+                                      padding-bottom: 8px;
+                                      border-bottom-width: 1px;
+                                      border-bottom-color: #eaeaec;
+                                      border-bottom-style: solid;
+                                    "
+                                  >
+                                    <p
+                                      class="f-fallback"
+                                      style="
+                                        font-size: 12px;
+                                        line-height: 1.625;
+                                        color: #85878e;
+                                        margin: 0;
+                                      "
+                                    >
                                       Description
                                     </p>
                                   </th>
@@ -832,10 +856,10 @@
                                     </p>
                                   </th>
                                 </tr>
-                                {{#each receiptDetails}}
+                                {{#each items}}
                                 <tr>
                                   <td
-                                    width="80%"
+                                    width="10%"
                                     class="purchase_item"
                                     style="
                                       word-break: break-word;
@@ -846,28 +870,10 @@
                                       padding: 10px 0;
                                     "
                                   >
-                                    <span class="f-fallback"
-                                      >{{description}}</span
-                                    >
+                                    <b class="f-fallback">{{count}} ×</b>
                                   </td>
                                   <td
-                                    class="align-right"
-                                    width="20%"
-                                    style="
-                                      word-break: break-word;
-                                      font-family: Helvetica, Arial, sans-serif;
-                                      font-size: 16px;
-                                      text-align: right;
-                                    "
-                                    align="right"
-                                  >
-                                    <span class="f-fallback">{{amount}}</span>
-                                  </td>
-                                </tr>
-                                {{#each choices}}
-                                <tr>
-                                  <td
-                                    width="80%"
+                                    width="70%"
                                     class="purchase_item"
                                     style="
                                       word-break: break-word;
@@ -875,10 +881,27 @@
                                       font-size: 15px;
                                       color: #51545e;
                                       line-height: 18px;
-                                      padding: 8px 0 8px 8px;
+                                      padding: 10px 0;
                                     "
                                   >
-                                    <span class="f-fallback">{{name}}</span>
+                                    <p style="margin: 0" class="f-fallback">
+                                      {{description}}
+                                    </p>
+                                    <p
+                                      style="
+                                        word-break: break-word;
+                                        font-family: Helvetica, Arial,
+                                          sans-serif;
+                                        font-size: 15px;
+                                        color: #51545e;
+                                        line-height: 18px;
+                                        padding: 0;
+                                        margin: 0;
+                                      "
+                                      class="f-fallback"
+                                    >
+                                      {{choices}}
+                                    </p>
                                   </td>
                                   <td
                                     class="align-right"
@@ -894,10 +917,10 @@
                                     <span class="f-fallback">{{price}}</span>
                                   </td>
                                 </tr>
-                                {{/each}} {{#if note}}
+                                {{#if note}}
                                 <tr>
                                   <td
-                                    colspan="2"
+                                    colspan="3"
                                     width="100%"
                                     class="purchase_item"
                                     style="
@@ -917,6 +940,7 @@
                                 {{/if}} {{/each}}
                                 <tr>
                                   <td
+                                    colspan="2"
                                     width="80%"
                                     class="purchase_footer"
                                     valign="middle"
@@ -977,6 +1001,7 @@
                                 {{#if discount}}
                                 <tr>
                                   <td
+                                    colspan="2"
                                     width="80%"
                                     class="purchase_subfooter"
                                     valign="middle"
@@ -1031,6 +1056,7 @@
                                 {{/if}} {{#if tip}}
                                 <tr>
                                   <td
+                                    colspan="2"
                                     width="80%"
                                     class="purchase_subfooter"
                                     valign="middle"
@@ -1085,6 +1111,7 @@
                                 {{/if}} {{#if serviceFee}}
                                 <tr>
                                   <td
+                                    colspan="2"
                                     width="80%"
                                     class="purchase_subfooter"
                                     valign="middle"
@@ -1139,6 +1166,7 @@
                                 {{/if}} {{#if smallOrderFee}}
                                 <tr>
                                   <td
+                                    colspan="2"
                                     width="80%"
                                     class="purchase_subfooter"
                                     valign="middle"
@@ -1193,6 +1221,7 @@
                                 {{/if}} {{#if deliveryFee}}
                                 <tr>
                                   <td
+                                    colspan="2"
                                     width="80%"
                                     class="purchase_subfooter"
                                     valign="middle"
@@ -1247,6 +1276,7 @@
                                 {{/if}} {{#if processingFee}}
                                 <tr>
                                   <td
+                                    colspan="2"
                                     width="80%"
                                     class="purchase_subfooter"
                                     valign="middle"
@@ -1301,6 +1331,7 @@
                                 {{/if}} {{#if tax}}
                                 <tr>
                                   <td
+                                    colspan="2"
                                     width="80%"
                                     class="purchase_subfooter"
                                     valign="middle"
@@ -1355,6 +1386,7 @@
                                 {{/if}}
                                 <tr>
                                   <td
+                                    colspan="2"
                                     width="80%"
                                     valign="middle"
                                     style="
@@ -1537,6 +1569,7 @@
                               text-align: right;
                               vertical-align: middle;
                               padding-right: 6px;
+                              width: 36%;
                             "
                             align="right"
                             valign="middle"
@@ -1572,6 +1605,7 @@
                               text-align: left;
                               vertical-align: middle;
                               padding-left: 6px;
+                              width: 50%;
                             "
                             align="left"
                             valign="middle"

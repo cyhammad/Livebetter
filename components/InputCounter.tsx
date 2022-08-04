@@ -1,12 +1,15 @@
+import classNames from "classnames";
 import { Minus, Plus } from "phosphor-react";
 
 interface InputCounterProps {
+  className?: string;
   onChange: (value: number | null) => void;
   value: number | null;
   min?: number;
 }
 
 export const InputCounter = ({
+  className,
   onChange,
   value,
   min = 0,
@@ -14,7 +17,12 @@ export const InputCounter = ({
   const defaultedValue = value ?? min;
 
   return (
-    <span className="flex px-2 gap-1 bg-slate-100 rounded-sm">
+    <span
+      className={classNames(
+        className,
+        "flex px-2 gap-1 bg-slate-100 rounded border-2 border-slate-200"
+      )}
+    >
       <button
         disabled={value === min}
         onClick={() => onChange(defaultedValue - 1)}

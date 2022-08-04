@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { OrderChoicesList } from "components/OrderChoicesList";
 import { useCartContext } from "hooks/useCartContext";
 import { getCartFees } from "lib/getCartPricingBreakdown";
+import { getOrderMenuItemTotal } from "lib/getOrderMenuItemTotal";
 import type { ApiOrder, ShippingMethod } from "types";
 
 interface OrderConfirmationDetailsProps {
@@ -112,23 +113,34 @@ export const OrderConfirmationDetails = ({
             <h3 className="text-xl font-bold underline">Order details</h3>
             <ul className="flex flex-col gap-4">
               {order.order_items.map((item, index) => (
-                <li className="flex flex-col gap-1" key={index}>
-                  <div
-                    className="grid justify-between items-start"
-                    style={{ gridTemplateColumns: "1fr auto auto" }}
-                  >
-                    <b>{item.item_id}</b>
-                    <p className="min-w-[60px] text-right tabular-nums">
-                      ${((item.item_price ?? 0) * item.qty).toFixed(2)}
+                <li className="flex gap-2 items-center" key={index}>
+                  <span className="flex-none font-bold">{item.qty} ×</span>
+                  <div className="flex flex-col gap-0 w-full">
+                    <p
+                      className="grid justify-between items-start line-clamp-1"
+                      style={{ gridTemplateColumns: "1fr auto auto" }}
+                    >
+                      {item.item_id}
                     </p>
+                    <OrderChoicesList choices={item.choices} />
+                    <OrderChoicesList choices={item.optionalChoices} />
+                    {item.item_description ? (
+                      <p className="text-sm text-gray-600 ml-4">
+                        Notes: {item.item_description}
+                      </p>
+                    ) : null}
                   </div>
-                  <OrderChoicesList choices={item.choices} />
-                  <OrderChoicesList choices={item.optionalChoices} />
-                  {item.item_description ? (
-                    <p className="text-sm text-gray-600 ml-4">
-                      <b>Notes</b> {item.item_description}
-                    </p>
-                  ) : null}
+                  <div className="flex gap-1">
+                    <span className="min-w-[60px] text-right tabular-nums">
+                      $
+                      {getOrderMenuItemTotal(
+                        item.item_price ?? 0,
+                        item.qty,
+                        item.choices,
+                        item.optionalChoices
+                      ).toFixed(2)}
+                    </span>
+                  </div>
                 </li>
               ))}
             </ul>
