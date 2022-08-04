@@ -26,6 +26,7 @@ _Prettier and ESLint are fantastic tools for enforcing stylistic guidelines and 
 11. Never disable lint rules unless absolutely necessary, and always leave a comment about why it was necessary.
 12. Everything should be 80 chars width, including comments if possible. Some comments that include links cannot be 80 chars so this is the exception.
 13. Use `import type` wherever possible.
+14. Don't commit commented code. Remove the code altogether! This keeps the project clean and you can always get the code back from git.
 
 ## Commit messages
 
