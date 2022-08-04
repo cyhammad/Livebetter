@@ -43,6 +43,7 @@ export type DeliveryDropOffPreference = "Leave it at my door" | "Hand it to me";
 
 export interface Cart {
   didOptInToLoyaltyProgramWithThisOrder: boolean;
+  distance: number;
   items: CartMenuItem[];
   restaurant: ApiRestaurant;
   tip: number;

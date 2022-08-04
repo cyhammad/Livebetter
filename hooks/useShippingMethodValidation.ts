@@ -27,48 +27,46 @@ export const useShippingMethodValidation = (
     );
   }, [allowedShippingMethods, shippingMethod]);
 
-  const [isShippingMethodValid, shippingMethodValidationMessage]: [
-    boolean,
-    string | null
-  ] = useMemo(() => {
+  const [
+    isShippingMethodValid,
+    shippingMethodValidationMessage,
+    distanceFromCustomer,
+  ]: [boolean, string | null, number] = useMemo(() => {
     if (!shippingMethod || !Latitude || !Longitude) {
-      return [
-        false,
-        null,
-        // 'Please select either "Pickup" or "Delivery".'
-      ];
+      return [false, null, 1];
     }
 
-    const distanceFromCustomer = getDistanceToCoordinates({
-      latitude: parseFloat(Latitude),
-      longitude: parseFloat(Longitude),
-    });
+    const distance =
+      getDistanceToCoordinates({
+        latitude: parseFloat(Latitude),
+        longitude: parseFloat(Longitude),
+      }) ?? 1;
 
     if (shippingMethod === "delivery") {
-      if (distanceFromCustomer === null) {
-        return [false, "Please enter your delivery address."];
+      if (distance === null) {
+        return [false, "Please enter your delivery address.", 1];
       }
 
-      const isDeliveryWithinRange = !!(
-        distanceFromCustomer && distanceFromCustomer <= 3
-      );
+      const isDeliveryWithinRange = !!(distance && distance <= 4);
 
       if (!isDeliveryWithinRange) {
         return [
           false,
           "Your location is outside of our delivery range for this restaurant.",
+          distance,
         ];
       }
     }
 
-    return [true, null];
+    return [true, null, distance];
   }, [getDistanceToCoordinates, Latitude, Longitude, shippingMethod]);
 
   return {
     allowedShippingMethods,
+    distanceFromCustomer,
     isShippingMethodValid,
+    setShouldShowShippingMethodOptions,
     shippingMethodValidationMessage,
     shouldShowShippingMethodOptions,
-    setShouldShowShippingMethodOptions,
   };
 };

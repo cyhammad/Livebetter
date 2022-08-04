@@ -24,10 +24,10 @@ export const RestaurantPickAndDelivery = ({
           />
           <p className="flex items-center gap-2">
             {restaurant.distance
-              ? restaurant.distance <= 3
+              ? restaurant.distance <= 4
                 ? "Delivery"
                 : "No delivery at your location"
-              : "Delivery within 3 miles"}
+              : "Delivery within 4 miles"}
           </p>
         </div>
       ) : null}

@@ -1,4 +1,3 @@
-import haversineDistance from "haversine-distance";
 import {
   Dispatch,
   PropsWithChildren,
@@ -10,6 +9,7 @@ import {
 } from "react";
 
 import { usePersistentState } from "hooks/usePersistentState";
+import { getDistanceInMiles } from "lib/getDistanceInMiles";
 import { getFormattedPhoneNumber } from "lib/getFormattedPhoneNumber";
 import { getTenDigitPhoneNumber } from "lib/getTenDigitPhoneNumber";
 import type {
@@ -102,14 +102,10 @@ export const UserContextProvider = ({
     ({ latitude, longitude }: Coordinates) => {
       const distance: number | null =
         location && latitude && longitude
-          ? Math.floor(
-              (haversineDistance(location, {
-                latitude,
-                longitude,
-              }) /
-                1609.344) *
-                100
-            ) / 100
+          ? getDistanceInMiles(location, {
+              latitude,
+              longitude,
+            })
           : null;
 
       return distance;

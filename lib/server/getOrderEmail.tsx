@@ -1,8 +1,8 @@
 import type React from "react";
 import ReactDomServer from "react-dom/server";
 
-import { getCartProfit } from "lib/getCartPricingBreakdown";
-import { toMoney } from "lib/toMoney";
+import { getTotal } from "lib/getCartPricingBreakdown";
+import { roundToTwoDecimals } from "lib/roundToTwoDecimals";
 import type { Order } from "types";
 
 const getRowBg = (index: number): React.CSSProperties => {
@@ -13,13 +13,45 @@ const getRowBg = (index: number): React.CSSProperties => {
   }
 };
 
-export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
-  const profit = getCartProfit(
-    order.subTotal ?? 0,
-    order.tip,
-    order.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery",
-    order.discount
+const getOrderProfit = (order: Order) => {
+  let { deliveryFee, processingFee, serviceFee, smallOrderFee, tax } = order;
+
+  deliveryFee = deliveryFee ?? 0;
+  processingFee = processingFee ?? 0;
+  serviceFee = serviceFee ?? 0;
+  smallOrderFee = smallOrderFee ?? 0;
+  tax = tax ?? 0;
+
+  /**
+   * Stripe's fee is currently 2.9% + 30 cents, per transaction
+   */
+  const stripeFee = roundToTwoDecimals(
+    getTotal(
+      order.subTotal ?? 0,
+      order.discount ?? 0,
+      tax,
+      order.tip,
+      deliveryFee,
+      processingFee,
+      serviceFee,
+      smallOrderFee
+    ) *
+      0.029 +
+      0.3
   );
+
+  return roundToTwoDecimals(
+    deliveryFee +
+      processingFee +
+      serviceFee +
+      smallOrderFee +
+      order.tip -
+      stripeFee
+  );
+};
+
+export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
+  const profit = getOrderProfit(order);
 
   const pStyles: React.CSSProperties = {
     fontWeight: "700",
@@ -208,7 +240,7 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
               <th style={thStyles} role="row">
                 Profit
               </th>
-              <td style={tdStyles}>${toMoney(profit)}</td>
+              <td style={tdStyles}>${roundToTwoDecimals(profit)}</td>
             </tr>
             <tr style={getRowBg(rowIndex++)}>
               <th style={thStyles} role="row">

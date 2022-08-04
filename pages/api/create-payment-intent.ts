@@ -141,22 +141,37 @@ async function handler(
       }
     }
 
-    const { amount, subtotal, total } = getCartPricingBreakdown({
+    const {
+      amount,
+      subtotal,
+      total,
+      deliveryFee,
+      serviceFee,
+      tax,
+      smallOrderFee,
+      processingFee,
+    } = getCartPricingBreakdown({
       items: cart.items,
       shippingMethod: user.shippingMethod,
       tip: cart.tip,
+      distance: cart.distance,
       discount,
     });
 
-    const order = createOrder(
+    const order = createOrder({
       cart,
-      user,
       customerId,
-      subtotal,
+      deliveryFee,
       discount,
-      cart.tip,
-      total
-    );
+      processingFee,
+      serviceFee,
+      smallOrderFee,
+      subtotal,
+      tax,
+      tip: cart.tip,
+      total,
+      user,
+    });
 
     const paymentIntentOrder: PaymentIntentOrder = {
       didOptInToLoyaltyProgramWithThisOrder:

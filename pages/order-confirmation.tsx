@@ -21,7 +21,7 @@ import { db } from "lib/server/db";
 import { ApiOrder, Order, PaymentIntentOrder, ShippingMethod } from "types";
 
 interface OrderConfirmationProps {
-  order: ApiOrder | null;
+  order: ApiOrder;
 }
 
 export const getServerSideProps: GetServerSideProps<
@@ -86,24 +86,24 @@ const OrderConfirmation: NextPage<OrderConfirmationProps> = ({ order }) => {
   const scrollAreaTopRef = useRef<HTMLDivElement | null>(null);
 
   const shippingMethod: ShippingMethod =
-    order?.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery";
+    order.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery";
 
   useEffect(() => {
-    if (order?.total && order?.charges_id) {
+    if (order.total && order.charges_id) {
       reportEvent({
         action: "purchase",
         category: "Checkout",
         label: "Order successful",
-        value: `${order?.total}`,
-        transactionId: order?.charges_id,
+        value: `${order.total}`,
+        transactionId: order.charges_id,
       });
     }
-  }, [order?.total, order?.charges_id]);
+  }, [order.total, order.charges_id]);
 
   return (
     <>
       <Head
-        titles={["Order Confirmation", order?.restaurant_id ?? ""]}
+        titles={["Order Confirmation", order.restaurant_id ?? ""]}
         description=""
       />
       <main className="flex flex-col mb-6">
@@ -114,7 +114,7 @@ const OrderConfirmation: NextPage<OrderConfirmationProps> = ({ order }) => {
               <div className="flex flex-col gap-1 sm:gap-4 md:flex-row justify-between md:items-center">
                 <h2 className="text-2xl sm:text-4xl font-bold">
                   <span className="capitalize">
-                    {order?.restaurant_id.toLowerCase()}
+                    {order.restaurant_id.toLowerCase()}
                   </span>{" "}
                   {shippingMethod} order confirmation
                 </h2>

@@ -6,8 +6,8 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import haversineDistance from "haversine-distance";
 
+import { getDistanceInMiles } from "lib/getDistanceInMiles";
 import { db } from "lib/server/db";
 import { sortApiRestaurants } from "lib/sortApiRestaurants";
 import type {
@@ -16,8 +16,6 @@ import type {
   GetFeaturedApiRestaurants,
   Restaurant,
 } from "types";
-
-const METERS_TO_MILES_DIVISOR = 1609.344;
 
 export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
   options
@@ -31,13 +29,10 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
     const apiRestaurant: ApiRestaurant = { ...restaurant };
 
     if (sortByDistanceFrom && restaurant.Latitude && restaurant.Longitude) {
-      const distanceInMiles =
-        haversineDistance(sortByDistanceFrom, {
-          latitude: parseFloat(restaurant.Latitude),
-          longitude: parseFloat(restaurant.Longitude),
-        }) / METERS_TO_MILES_DIVISOR;
-
-      apiRestaurant.distance = Math.floor(distanceInMiles * 100) / 100;
+      apiRestaurant.distance = getDistanceInMiles(sortByDistanceFrom, {
+        latitude: parseFloat(restaurant.Latitude),
+        longitude: parseFloat(restaurant.Longitude),
+      });
     }
 
     apiRestaurantsMap.set(doc.id, apiRestaurant);
@@ -80,7 +75,7 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
 
       if (
         curr.isDeliveryAvailable &&
-        (typeof curr.distance === "number" ? curr.distance <= 3 : true)
+        (typeof curr.distance === "number" ? curr.distance <= 4 : true)
       ) {
         if (!acc["tracking"]) {
           acc["tracking"] = [];

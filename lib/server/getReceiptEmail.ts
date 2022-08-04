@@ -6,7 +6,6 @@ import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
 import Handlebars from "handlebars";
 import Stripe from "stripe";
 
-import { getCartPricingBreakdown } from "lib/getCartPricingBreakdown";
 import { getOrderMenuItemTotal } from "lib/getOrderMenuItemTotal";
 import { restaurantNameToStatementDescriptorSuffix } from "lib/restaurantNameToStatementDescriptorSuffix";
 import type { Order } from "types";
@@ -74,15 +73,6 @@ export const getReceiptEmail = async ({
     };
   });
 
-  const { serviceFee, smallOrderFee, deliveryFee, processingFee, tax } =
-    getCartPricingBreakdown({
-      subtotal: order.subTotal,
-      discount: order.discount,
-      tip: order.tip,
-      shippingMethod:
-        order.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery",
-    });
-
   const orderHtml = fs
     .readFileSync(path.resolve("./templates/order.html"))
     .toString();
@@ -95,11 +85,13 @@ export const getReceiptEmail = async ({
       utcToZonedTime(order.created_at.toDate(), "America/New_York"),
       "PP, pp"
     ),
-    deliveryFee: deliveryFee ? `$${deliveryFee.toFixed(2)}` : null,
+    deliveryFee: order.deliveryFee ? `$${order.deliveryFee.toFixed(2)}` : null,
     discount: order.discount ? `-$${order.discount.toFixed(2)}` : null,
     dropoffNote: order.deliver_to.dropoff_note,
     name: order.deliver_to.firstName,
-    processingFee: processingFee ? `$${processingFee.toFixed(2)}` : null,
+    processingFee: order.processingFee
+      ? `$${order.processingFee.toFixed(2)}`
+      : null,
     items,
     receiptId: orderId.slice(0, 7),
     receiptUrl: `${
@@ -108,13 +100,13 @@ export const getReceiptEmail = async ({
         : "https://live-better-web.vercel.app"
     }/order-confirmation?payment_intent=${paymentIntentId}`,
     restaurantName: order.restaurant_id.toLowerCase(),
-    serviceFee: serviceFee ? `$${serviceFee.toFixed(2)}` : serviceFee,
-    smallOrderFee: smallOrderFee
-      ? `$${smallOrderFee.toFixed(2)}`
-      : smallOrderFee,
+    serviceFee: order.serviceFee ? `$${order.serviceFee.toFixed(2)}` : null,
+    smallOrderFee: order.smallOrderFee
+      ? `$${order.smallOrderFee.toFixed(2)}`
+      : null,
     statementDescriptorSuffix,
     subtotal: order.subTotal ? `$${order.subTotal.toFixed(2)}` : null,
-    tax: `$${tax.toFixed(2)}`,
+    tax: order.tax ? `$${order.tax.toFixed(2)}` : null,
     tip: order.tip ? `$${order.tip.toFixed(2)}` : null,
     total: `$${order.total.toFixed(2)}`,
   });

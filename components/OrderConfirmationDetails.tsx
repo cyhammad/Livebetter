@@ -9,7 +9,7 @@ import { getOrderMenuItemTotal } from "lib/getOrderMenuItemTotal";
 import type { ApiOrder, ShippingMethod } from "types";
 
 interface OrderConfirmationDetailsProps {
-  order: ApiOrder | null;
+  order: ApiOrder;
 }
 
 export const OrderConfirmationDetails = ({
@@ -75,8 +75,31 @@ export const OrderConfirmationDetails = ({
   const shippingMethod: ShippingMethod =
     order?.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery";
 
-  const { tax, deliveryFee, processingFee, serviceFee, smallOrderFee } =
-    getCartFees(order?.subTotal ?? 0, shippingMethod, order?.discount);
+  let tax, deliveryFee, processingFee, serviceFee, smallOrderFee;
+
+  // Checking order.tax is a cheap way of figuring out if all fees will be on
+  // the order document. `tax`, `deliveryFee`, `processingFee`, `serviceFee`,
+  // and `smallOrderFee` were all added to the Order document at the same time
+  if (order.tax) {
+    tax = order.tax;
+    deliveryFee = order.deliveryFee;
+    processingFee = order.processingFee;
+    serviceFee = order.serviceFee;
+    smallOrderFee = order.smallOrderFee;
+  } else {
+    const fees = getCartFees(
+      order?.subTotal ?? 0,
+      shippingMethod,
+      order?.distance ?? 1,
+      order?.discount
+    );
+
+    tax = fees.tax;
+    deliveryFee = fees.deliveryFee;
+    processingFee = fees.processingFee;
+    serviceFee = fees.serviceFee;
+    smallOrderFee = fees.smallOrderFee;
+  }
 
   return (
     <div className="flex flex-col gap-6">

@@ -39,6 +39,7 @@ interface CartContextDefaultValue {
   serviceFee: number;
   setCart: React.Dispatch<React.SetStateAction<Cart | undefined>>;
   setDidOptInToLoyaltyProgramWithThisOrder: (didOptIn: boolean) => void;
+  setDistance: (distance: number) => void;
   setMenuItemCount: (menuItemIndex: number, count: number) => void;
   setPaymentIntentClientSecret: (secret: string) => void;
   setTip: (tip: number) => void;
@@ -63,6 +64,7 @@ export const CartContext = createContext<CartContextDefaultValue>({
   serviceFee: 0,
   setCart: () => undefined,
   setDidOptInToLoyaltyProgramWithThisOrder: () => undefined,
+  setDistance: () => undefined,
   setMenuItemCount: () => undefined,
   setPaymentIntentClientSecret: () => undefined,
   setTip: () => undefined,
@@ -129,6 +131,7 @@ export const CartContextProvider = ({
           didOptInToLoyaltyProgramWithThisOrder:
             !!prevCart?.didOptInToLoyaltyProgramWithThisOrder,
           // If the restaurant changed, we reset the cart
+          distance: prevCart?.distance ?? 1,
           items: didRestaurantChange
             ? [addedItem]
             : [...prevCart.items, addedItem],
@@ -226,6 +229,20 @@ export const CartContextProvider = ({
       [setCart]
     );
 
+  const setDistance: CartContextDefaultValue["setDistance"] = useCallback(
+    (distance) => {
+      setCart((prevCart) => {
+        if (prevCart) {
+          return {
+            ...prevCart,
+            distance,
+          };
+        }
+      });
+    },
+    [setCart]
+  );
+
   const emptyCart = useCallback(() => {
     setCart(undefined);
   }, [setCart]);
@@ -250,10 +267,11 @@ export const CartContextProvider = ({
     tax,
     tip,
   } = getCartPricingBreakdown({
+    discount,
+    distance: cart?.distance ?? 1,
     items: cart?.items ?? [],
     shippingMethod,
     tip: cart?.tip,
-    discount,
   });
 
   return (
@@ -269,6 +287,7 @@ export const CartContextProvider = ({
         removeMenuItem,
         serviceFee,
         setCart,
+        setDistance,
         setDidOptInToLoyaltyProgramWithThisOrder,
         setMenuItemCount,
         setPaymentIntentClientSecret,

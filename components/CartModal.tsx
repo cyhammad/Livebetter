@@ -22,7 +22,7 @@ import { fetchCreateOtp } from "lib/client/fetchCreateOtp";
 import { fetchCreatePaymentIntent } from "lib/client/fetchCreatePaymentIntent";
 import { reportEvent } from "lib/client/gtag";
 import { getCartMenuItemTotal } from "lib/getCartMenuItemTotal";
-import { toMoney } from "lib/toMoney";
+import { roundToTwoDecimals } from "lib/roundToTwoDecimals";
 import type {
   ApiErrorResponse,
   CartFlowModalName,
@@ -65,6 +65,7 @@ export const CartModal = ({
     tax,
     tip,
     total,
+    setDistance,
   } = useCartContext();
   const {
     apartmentNumber,
@@ -114,8 +115,15 @@ export const CartModal = ({
     }
   );
 
-  const { isShippingMethodValid, shippingMethodValidationMessage } =
-    useShippingMethodValidation(cart?.restaurant, shippingMethod);
+  const {
+    isShippingMethodValid,
+    shippingMethodValidationMessage,
+    distanceFromCustomer,
+  } = useShippingMethodValidation(cart?.restaurant, shippingMethod);
+
+  useEffect(() => {
+    setDistance(distanceFromCustomer);
+  }, [distanceFromCustomer, setDistance]);
 
   const { isRestaurantOrderValid, restaurantOrderValidationMessage } =
     useRestaurantOrderValidation(cart?.restaurant);
@@ -137,16 +145,16 @@ export const CartModal = ({
   }, [setDidOptInToLoyaltyProgramWithThisOrder, userWithLoyaltyProgram]);
 
   const [lowTip, midTip, highTip] = useMemo((): [number, number, number] => {
-    const low = toMoney(Math.ceil(subtotal * 0.15));
-    let mid = toMoney(Math.ceil(subtotal * 0.18));
-    let high = toMoney(Math.ceil(subtotal * 0.2));
+    const low = roundToTwoDecimals(Math.ceil(subtotal * 0.15));
+    let mid = roundToTwoDecimals(Math.ceil(subtotal * 0.18));
+    let high = roundToTwoDecimals(Math.ceil(subtotal * 0.2));
 
-    if (mid === low) {
-      mid++;
+    if (mid <= low) {
+      mid = low + 1;
     }
 
     if (high <= mid) {
-      high++;
+      high = mid + 1;
     }
 
     return [low, mid, high];
@@ -189,6 +197,7 @@ export const CartModal = ({
       const createPaymentIntentCart: CreatePaymentIntentCart = {
         didOptInToLoyaltyProgramWithThisOrder:
           !!cart?.didOptInToLoyaltyProgramWithThisOrder,
+        distance: cart?.distance ?? 1,
         items: cart?.items ?? [],
         restaurantName: cart?.restaurant?.Restaurant ?? "",
         tip: cart?.tip ?? 0,

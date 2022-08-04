@@ -8,15 +8,35 @@ import type {
   OrderItem,
 } from "types";
 
-export const createOrder = (
-  cart: CreatePaymentIntentCart,
-  user: CreatePaymentIntentUser,
-  customerId: string,
-  subtotal: number,
-  discount: number,
-  tip: number,
-  total: number
-): Order => {
+interface CreateOrderOptions {
+  cart: CreatePaymentIntentCart;
+  customerId: string;
+  deliveryFee: number;
+  discount: number;
+  processingFee: number;
+  serviceFee: number;
+  smallOrderFee: number;
+  subtotal: number;
+  tax: number;
+  tip: number;
+  total: number;
+  user: CreatePaymentIntentUser;
+}
+
+export const createOrder = ({
+  cart,
+  customerId,
+  deliveryFee,
+  discount,
+  processingFee,
+  serviceFee,
+  smallOrderFee,
+  subtotal,
+  tax,
+  tip,
+  total,
+  user,
+}: CreateOrderOptions): Order => {
   const deliver_to: Order["deliver_to"] =
     user.shippingMethod === "pickup"
       ? {
@@ -51,7 +71,13 @@ export const createOrder = (
     created_at: Timestamp.now(),
     customers_id: customerId,
     deliver_to,
+    deliveryFee,
+    processingFee,
+    serviceFee,
+    tax,
+    smallOrderFee,
     discount,
+    distance: cart.distance,
     order_items: cart.items.map(
       ({
         choices,

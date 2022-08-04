@@ -6,10 +6,20 @@ export interface Order {
   created_at: Timestamp;
   customers_id: string;
   deliver_to: DeliverTo;
+  /**
+   * Do not use `distance` to calculate delivery fee. Read from `deliveryFee`
+   * instead, because the calculation for `deliveryFee` may change over time.
+   */
+  distance?: number;
+  deliveryFee?: number;
+  processingFee?: number;
+  serviceFee?: number;
+  smallOrderFee?: number;
   order_items: OrderItem[];
   restaurant_id: string;
   subTotal?: number;
   discount?: number;
+  tax?: number;
   tip: number;
   total: number;
 }
