@@ -1,6 +1,7 @@
 import type { ApiRestaurant, CartMenuItemChoices, ShippingMethod } from "types";
 
 export interface MenuItem {
+  allowNotes?: boolean;
   category?: string;
   /**
    * An object that looks like:
@@ -42,6 +43,7 @@ export type ApiMenuItemChoices = Record<
 >;
 
 export interface ApiMenuItem {
+  allowNotes: boolean;
   category: string | null;
   choices: ApiMenuItemChoices | null;
   mealDescription: string | null;

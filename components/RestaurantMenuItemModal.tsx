@@ -442,21 +442,30 @@ export const RestaurantMenuItemModal = ({
                 )}
               </>
             ) : null}
-            <label className="flex flex-col text-sm gap-2 px-4 sm:px-6">
-              <h3
-                className="
+            {menuItem.allowNotes ? (
+              <label className="flex flex-col text-sm gap-2 px-4 sm:px-6">
+                <h3
+                  className="
                   z-0 flex justify-between items-center gap-1
                   sticky top-10 text-xl font-bold bg-white
                 "
-              >
-                Extra instructions
-              </h3>
-              <InputTextarea
-                placeholder="Add any special requests (e.g., food allergies, extra spicy, etc.) and the store will do its best to accommodate you."
-                value={menuItemNotes}
-                onChange={(event) => setMenuItemNotes(event.target.value)}
-              />
-            </label>
+                >
+                  Extra instructions
+                </h3>
+                <InputTextarea
+                  placeholder="Add any special requests (e.g., food allergies, extra spicy, etc.) and the store will do its best to accommodate you."
+                  value={menuItemNotes}
+                  onChange={(event) => setMenuItemNotes(event.target.value)}
+                />
+              </label>
+            ) : (
+              <p className="px-4 sm:px-6 text-neutral-600 text-sm font-semibold">
+                <span className="capitalize">
+                  {restaurantName.toLowerCase()}
+                </span>{" "}
+                has disabled notes and modifications for this item.
+              </p>
+            )}
           </section>
           <div
             className="

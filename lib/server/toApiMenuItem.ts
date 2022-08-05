@@ -48,6 +48,7 @@ const toApiChoices = (
 export const toApiMenuItem = (
   name: string,
   {
+    allowNotes,
     category,
     choices,
     meal_Description,
@@ -59,6 +60,7 @@ export const toApiMenuItem = (
   }: MenuItem
 ): ApiMenuItem => {
   return {
+    allowNotes: allowNotes ?? true,
     category: category?.trim() ?? null,
     choices: toApiChoices(choices) ?? null,
     mealDescription: meal_Description?.trim() ?? null,
