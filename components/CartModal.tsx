@@ -54,6 +54,7 @@ export const CartModal = ({
     count: cartCount,
     deliveryFee,
     discount,
+    hasVeganItems,
     processingFee,
     removeMenuItem,
     serviceFee,
@@ -486,6 +487,10 @@ export const CartModal = ({
             ) : !isShippingMethodValid && shippingMethodValidationMessage ? (
               <p className="text-amber-600 text-sm sm:text-base font-semibold">
                 {shippingMethodValidationMessage}
+              </p>
+            ) : !hasVeganItems ? (
+              <p className="text-amber-600 text-sm sm:text-base font-semibold">
+                Please add vegan items to your cart to place your order.
               </p>
             ) : null}
             <SelectShippingMethod

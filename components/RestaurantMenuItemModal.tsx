@@ -538,6 +538,7 @@ export const RestaurantMenuItemModal = ({
                       {
                         shippingMethod: selectedShippingMethod,
                         restaurant,
+                        isVegan: menuItem.isVegan,
                         menuItemName: menuItem.name,
                         menuItemPrice: menuItem.mealPrice,
                         menuItemCategory: menuItem.category,

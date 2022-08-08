@@ -11,6 +11,7 @@ export interface MenuItem {
    * };
    */
   choices?: Record<string, number>;
+  isVegan?: boolean;
   meal_Description?: string;
   meal_Price: number;
   outOfStock?: boolean;
@@ -46,6 +47,7 @@ export interface ApiMenuItem {
   allowNotes: boolean;
   category: string | null;
   choices: ApiMenuItemChoices | null;
+  isVegan: boolean;
   mealDescription: string | null;
   mealPrice: number;
   name: string;
@@ -58,6 +60,7 @@ export interface ApiMenuItem {
 export interface MenuItemData {
   choices?: CartMenuItemChoices | undefined;
   count: number;
+  isVegan: boolean;
   menuItemCategory: string | null;
   menuItemName: string;
   menuItemNotes: string;

@@ -451,6 +451,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               data.menuItemCategory,
               data.count,
               data.menuItemNotes,
+              data.isVegan,
               data.choices,
               data.optionalChoices
             );
@@ -472,6 +473,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
               menuItemData.menuItemCategory,
               menuItemData.count,
               menuItemData.menuItemNotes,
+              menuItemData.isVegan,
               menuItemData.choices,
               menuItemData.optionalChoices
             );

@@ -31,6 +31,7 @@ export interface CartMenuItem {
    * The number of this exact item that have been added
    */
   count: number;
+  isVegan: boolean;
   mealPrice: number;
   name: string;
   notes: string;

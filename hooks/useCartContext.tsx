@@ -23,6 +23,7 @@ interface CartContextDefaultValue {
     menuItemCategory: string | null,
     count: number,
     menuItemNotes: string,
+    isVegan: boolean,
     choices?: CartMenuItemChoices,
     optionalChoices?: CartMenuItemChoices
   ) => void;
@@ -34,6 +35,7 @@ interface CartContextDefaultValue {
   deliveryFee: number;
   discount: number;
   emptyCart: () => void;
+  hasVeganItems: boolean;
   processingFee: number;
   removeMenuItem: (menuItemIndex: number) => void;
   serviceFee: number;
@@ -59,6 +61,7 @@ export const CartContext = createContext<CartContextDefaultValue>({
   deliveryFee: 0,
   discount: 0,
   emptyCart: () => undefined,
+  hasVeganItems: false,
   processingFee: 0,
   removeMenuItem: () => undefined,
   serviceFee: 0,
@@ -109,6 +112,7 @@ export const CartContextProvider = ({
       menuItemCategory,
       count,
       menuItemNotes,
+      isVegan,
       choices,
       optionalChoices
     ) => {
@@ -117,6 +121,7 @@ export const CartContextProvider = ({
           category: menuItemCategory,
           choices,
           count,
+          isVegan,
           mealPrice: menuItemPrice,
           name: menuItemName,
           notes: menuItemNotes,
@@ -274,6 +279,8 @@ export const CartContextProvider = ({
     tip: cart?.tip,
   });
 
+  const hasVeganItems = !!cart?.items.some((item) => item.isVegan !== false);
+
   return (
     <CartContext.Provider
       value={{
@@ -283,6 +290,7 @@ export const CartContextProvider = ({
         deliveryFee,
         discount,
         emptyCart,
+        hasVeganItems,
         processingFee,
         removeMenuItem,
         serviceFee,
