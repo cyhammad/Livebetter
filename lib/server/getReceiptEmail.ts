@@ -78,6 +78,9 @@ export const getReceiptEmail = async ({
     .toString();
   const template = Handlebars.compile(orderHtml);
 
+  const isTipHigh =
+    order.subTotal && order.tip && order.tip / order.subTotal >= 0.2;
+
   return template({
     creditCardBrand,
     creditCardLastFour,
@@ -92,6 +95,7 @@ export const getReceiptEmail = async ({
     processingFee: order.processingFee
       ? `$${order.processingFee.toFixed(2)}`
       : null,
+    isTipHigh,
     items,
     receiptId: orderId.slice(0, 7),
     receiptUrl: `${
