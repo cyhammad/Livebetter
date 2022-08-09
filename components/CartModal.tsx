@@ -704,11 +704,13 @@ export const CartModal = ({
                   !isRestaurantOrderValid ||
                   !isShippingMethodValid ||
                   isCreatePaymentIntentLoading ||
+                  !hasVeganItems ||
                   isCreateOtpLoading,
               }),
               disabled:
                 !isRestaurantOrderValid ||
                 !isShippingMethodValid ||
+                !hasVeganItems ||
                 isCreatePaymentIntentLoading ||
                 isCreateOtpLoading,
               type: "submit",
