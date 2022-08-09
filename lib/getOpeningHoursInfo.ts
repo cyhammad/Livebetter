@@ -19,6 +19,15 @@ export const getOpeningHoursInfo = (
   closeDate: Date | null;
   isOpen: boolean;
 } => {
+  if (process.env.NODE_ENV === "development") {
+    return {
+      openDate: new Date(Date.now() - 10000),
+      closeDate: new Date(Date.now() + 10000),
+      status: "open-now",
+      isOpen: true,
+    };
+  }
+
   const [openDate, closeDate] = openAndCloseDates(restaurant, targetDate);
 
   if (openDate) {
