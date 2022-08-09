@@ -73,6 +73,11 @@ const handlePreSuccessEvent = async (event: Stripe.Event) => {
   }
 };
 
+/**
+ * This is a webhook that can only (reasonably) be tested within the dev
+ * environment. Checkout the `dev` branch, make your changes there, then push
+ * that up and test the changes again before pushing them to the `main`
+ */
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiErrorResponse | { received: boolean }>
@@ -197,6 +202,7 @@ async function handler(
                 ? existingLoyaltyDoc.data()
                 : {
                     created_at: Timestamp.now(),
+                    updatedAt: Timestamp.now(),
                     phoneNumber,
                     points: 0,
                     restaurantName,
@@ -210,6 +216,7 @@ async function handler(
 
               if (didReceiveDiscount) {
                 nextLoyaltyData.points -= restaurant.discountUpon ?? 0;
+                nextLoyaltyData.updatedAt = Timestamp.now();
               }
 
               // Next, we check if we should award the customer a point for this
@@ -220,6 +227,7 @@ async function handler(
 
               if (shouldAwardLoyaltyPoint) {
                 nextLoyaltyData.points++;
+                nextLoyaltyData.updatedAt = Timestamp.now();
 
                 const loyaltyVisitsDate = format(new Date(), "yyyy-MM-dd");
 
@@ -332,9 +340,9 @@ async function handler(
             await sendGridMail.send({
               from: "livebetterphl@gmail.com",
               to:
-                process.env.VERCEL_ENV !== "production"
-                  ? "atdrago@gmail.com"
-                  : "livebetterphl@gmail.com",
+                process.env.VERCEL_ENV === "production"
+                  ? "livebetterphl@gmail.com"
+                  : "atdrago@gmail.com",
               subject: `New Order Notification ✔ (Order #${orderDoc.id})`,
               html: orderEmailHtml,
               headers: { Accept: "application/json" },
