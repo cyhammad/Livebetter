@@ -124,7 +124,6 @@ export const Cart = ({ className, ...props }: HTMLMotionProps<"div">) => {
                     action: "view_cart",
                     category: "Checkout",
                     label: "View cart",
-                    value: subtotal.toFixed(2),
                   });
 
                   setCurrentModal("cart");

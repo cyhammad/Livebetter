@@ -169,8 +169,6 @@ export const RestaurantMenuItemModal = ({
 
       reportEvent({
         action: "view_item",
-        currency: "USD",
-        value: `${menuItem?.mealPrice}`,
         items: [{ item_id: `${menuItem?.name}` }],
       });
     }
@@ -557,8 +555,6 @@ export const RestaurantMenuItemModal = ({
 
                     reportEvent({
                       action: "add_to_cart",
-                      currency: "USD",
-                      value: `${menuItem?.mealPrice}`,
                       items: [{ item_id: `${menuItem?.name}` }],
                     });
                   }

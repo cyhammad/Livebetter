@@ -96,6 +96,7 @@ const OrderConfirmation: NextPage<OrderConfirmationProps> = ({ order }) => {
         label: "Order successful",
         value: `${order.total}`,
         transactionId: order.charges_id,
+        currency: "USD",
       });
     }
   }, [order.total, order.charges_id]);
