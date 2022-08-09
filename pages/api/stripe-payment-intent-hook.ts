@@ -332,7 +332,7 @@ async function handler(
             await sendGridMail.send({
               from: "livebetterphl@gmail.com",
               to:
-                process.env.VERCEL_ENV === "development"
+                process.env.VERCEL_ENV !== "production"
                   ? "atdrago@gmail.com"
                   : "livebetterphl@gmail.com",
               subject: `New Order Notification ✔ (Order #${orderDoc.id})`,
