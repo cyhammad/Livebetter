@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import classNames from "classnames";
 import type { GetStaticProps, NextPage } from "next";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Head } from "components/Head";
 import { Header } from "components/Header";
@@ -66,26 +66,33 @@ const Home: NextPage<HomeProps> = () => {
   const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
   const { location } = useUserContext();
   const { latitude, longitude } = location || {};
-  const userPosition: Coordinates | null =
-    latitude && longitude ? { latitude, longitude } : null;
 
-  const queryKey: FetchFeaturedApiRestaurantsQueryKey = [
-    "featured_restaurants",
-    getSectionKeys(),
-    userPosition,
-  ];
+  const [queryKey, setQueryKey] = useState<FetchFeaturedApiRestaurantsQueryKey>(
+    ["featured_restaurants", getSectionKeys(), null]
+  );
 
   const { data } = useQuery(
     queryKey,
-    () =>
-      fetchFeaturedRestaurants({
+    () => {
+      const userPosition: Coordinates | null =
+        latitude && longitude ? { latitude, longitude } : null;
+
+      return fetchFeaturedRestaurants({
         sectionKeys: getSectionKeys(),
         sortByDistanceFrom: userPosition ?? undefined,
-      }),
+      });
+    },
     {
       keepPreviousData: true,
     }
   );
+
+  useEffect(() => {
+    const userPosition: Coordinates | null =
+      latitude && longitude ? { latitude, longitude } : null;
+
+    setQueryKey(["featured_restaurants", getSectionKeys(), userPosition]);
+  }, [latitude, longitude]);
 
   return (
     <>
