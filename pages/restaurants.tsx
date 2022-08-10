@@ -125,7 +125,7 @@ const Home: NextPage<HomeProps> = () => {
           title: "Restaurants - Live Better PHL",
           image: "https://www.livebetterphl.com/logo.png",
           type: "website",
-          url: "https://www.livebetterphl.com/",
+          url: "https://www.livebetterphl.com/restaurants",
         }}
       ></Head>
       <main className="flex flex-col mb-6">

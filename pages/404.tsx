@@ -4,37 +4,40 @@ import {
   dehydrate,
   useQuery,
 } from "@tanstack/react-query";
-import classNames from "classnames";
 import type { GetStaticProps, NextPage } from "next";
 import { useEffect, useRef, useState } from "react";
 
 import { Head } from "components/Head";
 import { Header } from "components/Header";
-import { HomeHero } from "components/HomeHero";
 import { RestaurantSections } from "components/RestaurantSections";
 import { Toolbar } from "components/Toolbar";
 import { useUserContext } from "hooks/useUserContext";
 import { fetchFeaturedRestaurants } from "lib/client/fetchFeaturedRestaurants";
-import { getSectionKeys } from "lib/getSectionKeys";
 import { getFeaturedApiRestaurants } from "lib/server/getFeaturedApiRestaurants";
-import type { Coordinates, FetchFeaturedApiRestaurantsQueryKey } from "types";
+import type {
+  Coordinates,
+  FeaturedSection,
+  FetchFeaturedApiRestaurantsQueryKey,
+} from "types";
 
-interface HomeProps {
+interface Error404Props {
   dehydratedState: DehydratedState;
 }
 
-export const getStaticProps: GetStaticProps<HomeProps> = async () => {
+const sectionKeys: FeaturedSection[] = ["staff_picks", "city_favorites"];
+
+export const getStaticProps: GetStaticProps<Error404Props> = async () => {
   const queryClient = new QueryClient();
 
   const queryKey: FetchFeaturedApiRestaurantsQueryKey = [
     "featured_restaurants",
-    getSectionKeys(),
+    sectionKeys,
     null,
   ];
 
   await queryClient.prefetchQuery(queryKey, async () => {
     return await getFeaturedApiRestaurants({
-      sectionKeys: getSectionKeys(),
+      sectionKeys,
     });
   });
 
@@ -47,13 +50,16 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   };
 };
 
-const Home: NextPage<HomeProps> = () => {
-  const restaurantListTopRef = useRef<HTMLDivElement | null>(null);
+const Error404Page: NextPage = () => {
+  const headerRef = useRef<HTMLElement | null>(null);
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
+  const scrollAreaTopRef = useRef<HTMLDivElement | null>(null);
+
   const { location } = useUserContext();
   const { latitude, longitude } = location || {};
 
   const [queryKey, setQueryKey] = useState<FetchFeaturedApiRestaurantsQueryKey>(
-    ["featured_restaurants", getSectionKeys(), null]
+    ["featured_restaurants", ["city_favorites", "staff_picks"], null]
   );
 
   const { data } = useQuery(
@@ -63,7 +69,7 @@ const Home: NextPage<HomeProps> = () => {
         latitude && longitude ? { latitude, longitude } : null;
 
       return fetchFeaturedRestaurants({
-        sectionKeys: getSectionKeys(),
+        sectionKeys,
         sortByDistanceFrom: userPosition ?? undefined,
       });
     },
@@ -76,47 +82,45 @@ const Home: NextPage<HomeProps> = () => {
     const userPosition: Coordinates | null =
       latitude && longitude ? { latitude, longitude } : null;
 
-    setQueryKey(["featured_restaurants", getSectionKeys(), userPosition]);
+    setQueryKey(["featured_restaurants", sectionKeys, userPosition]);
   }, [latitude, longitude]);
 
   return (
     <>
       <Head
-        titles={[]}
-        description={`Find and order vegan food near you.`}
+        titles={["404", "Not found"]}
+        description=""
         ogMetadata={{
-          description: `Find and order vegan food near you.`,
-          title: "Live Better PHL",
           image: "https://www.livebetterphl.com/logo.png",
+          title: "404 Not found - Live Better PHL",
           type: "website",
-          url: "https://www.livebetterphl.com/",
+          url: "https://www.livebetterphl.com/404",
         }}
-      ></Head>
+      />
       <main className="flex flex-col mb-6">
-        <Header />
-        <HomeHero />
-        <Toolbar scrollAreaTopRef={restaurantListTopRef}>
-          <div
-            className={classNames({
-              "grid grid-cols-3 grid-rows-1 gap-x-4": true,
-            })}
-            style={{ gridTemplateColumns: "auto 1fr 1fr" }}
-          >
+        <Header ref={headerRef} />
+        <Toolbar ref={toolbarRef} scrollAreaTopRef={scrollAreaTopRef}>
+          <div className="flex flex-col gap-1 sm:gap-4 md:flex-row justify-between md:items-center">
             <h2 className="text-2xl sm:text-4xl font-bold">
-              Browse Restaurants
+              Uh oh... we couldn&apos;t find that page
             </h2>
           </div>
         </Toolbar>
-        <div ref={restaurantListTopRef} />
-        {data?.sections ? (
-          <RestaurantSections
-            sectionKeys={getSectionKeys()}
-            sections={data.sections}
-          />
-        ) : null}
+        <div ref={scrollAreaTopRef} />
+        <div className="flex flex-col gap-4">
+          <p className="text-lg container mx-auto px-4 sm:px-6">
+            But here are some other restaurants you might be interested in:
+          </p>
+          {data?.sections ? (
+            <RestaurantSections
+              sectionKeys={sectionKeys}
+              sections={data.sections}
+            />
+          ) : null}
+        </div>
       </main>
     </>
   );
 };
 
-export default Home;
+export default Error404Page;

@@ -15,8 +15,13 @@ interface GetFeaturedApiRestaurantsOptions {
   sortByDistanceFrom?: Coordinates;
 }
 
+export type FeaturedApiRestaurantResultSections = Record<
+  FeaturedSection,
+  ApiRestaurant[]
+>;
+
 export interface GetFeaturedApiRestaurantsResult {
-  sections: Record<FeaturedSection, ApiRestaurant[]>;
+  sections: FeaturedApiRestaurantResultSections;
 }
 
 export type GetFeaturedApiRestaurants = (
