@@ -12,7 +12,7 @@
     "format:check": "npx prettier --check .",
     "prepare": "husky install",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "test:ci": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test:ci": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.5",
