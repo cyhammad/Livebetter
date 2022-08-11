@@ -42,8 +42,12 @@ export const getOpeningHoursInfo = (
   const { openDate: openJsonDate, closeDate: closeJsonDate } =
     restaurant.openHours?.[days[todayDayIndex]] ?? {};
 
-  const openDate = openJsonDate ? new Date(openJsonDate) : null;
-  const closeDate = closeJsonDate ? new Date(closeJsonDate) : null;
+  const openDate = openJsonDate
+    ? utcToZonedTime(new Date(openJsonDate), "America/New_York")
+    : null;
+  const closeDate = closeJsonDate
+    ? utcToZonedTime(new Date(closeJsonDate), "America/New_York")
+    : null;
 
   if (openDate) {
     if (targetDate < openDate) {
