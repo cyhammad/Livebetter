@@ -25,7 +25,20 @@ export interface Restaurant {
   discountUpon?: number;
 }
 
+export type Day =
+  | "Sunday"
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday";
+
 export type RestaurantOpenHours = Record<string, string>;
+export type ApiRestaurantOpenHours = Record<
+  Day,
+  { openDate: string; closeDate: string } | null
+>;
 
 export interface ApiRestaurant extends Restaurant {
   cuisines?: string[];
@@ -37,4 +50,11 @@ export interface ApiRestaurant extends Restaurant {
    * Distance in miles
    */
   distance?: number;
+
+  /**
+   * @deprecated Use `openHours`
+   */
+  OpenHours?: string;
+
+  openHours?: ApiRestaurantOpenHours;
 }

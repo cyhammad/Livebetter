@@ -332,7 +332,10 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 style={{ gridArea: "1/1" }}
               >
                 <div className="flex flex-col gap-1 sm:gap-2">
-                  <RestaurantOpeningHours restaurant={restaurant} />
+                  <RestaurantOpeningHours
+                    restaurant={restaurant}
+                    shouldShowHoursList={true}
+                  />
                   <RestaurantPickAndDelivery restaurant={restaurant} />
                   <RestaurantCuisine restaurant={restaurant} />
                 </div>

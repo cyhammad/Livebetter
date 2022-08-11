@@ -1,7 +1,6 @@
 import { Elements } from "@stripe/react-stripe-js";
 import classNames from "classnames";
 import { CreditCard, Taxi } from "phosphor-react";
-import type React from "react";
 
 import { CheckoutForm } from "components/CheckoutForm";
 import { Modal } from "components/Modal";

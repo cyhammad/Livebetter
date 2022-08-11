@@ -3,7 +3,6 @@ import classNames from "classnames";
 import Script from "next/script";
 import { MapPin, NavigationArrow } from "phosphor-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type React from "react";
 
 import { useCurrentPosition } from "hooks/useCurrentPosition";
 import { useInputPlacesAutocompleteContext } from "hooks/useInputPlacesAutocompleteContext";

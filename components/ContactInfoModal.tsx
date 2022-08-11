@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import { Check, User } from "phosphor-react";
 import { useState } from "react";
-import type React from "react";
 
 import { InputText } from "components/InputText";
 import { InputTextarea } from "components/InputTextarea";

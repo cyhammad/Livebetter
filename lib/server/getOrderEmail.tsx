@@ -1,4 +1,3 @@
-import type React from "react";
 import ReactDomServer from "react-dom/server";
 
 import { getTotal } from "lib/getCartPricingBreakdown";

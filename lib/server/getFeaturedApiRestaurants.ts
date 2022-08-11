@@ -17,6 +17,8 @@ import type {
   Restaurant,
 } from "types";
 
+import { toApiRestaurant } from "./toApiRestaurant";
+
 export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
   options
 ) => {
@@ -26,7 +28,7 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
 
   function addApiRestaurant(doc: QueryDocumentSnapshot<DocumentData>) {
     const restaurant = doc.data() as Restaurant;
-    const apiRestaurant: ApiRestaurant = { ...restaurant };
+    const apiRestaurant: ApiRestaurant = toApiRestaurant(restaurant);
 
     if (sortByDistanceFrom && restaurant.Latitude && restaurant.Longitude) {
       apiRestaurant.distance = getDistanceInMiles(sortByDistanceFrom, {

@@ -1,7 +1,6 @@
 import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
 
-import { openAndCloseDates } from "lib/isOpen";
-import type { Restaurant } from "types";
+import type { ApiRestaurant, Day } from "types";
 
 type OpeningHoursStatus =
   | "open-now"
@@ -10,8 +9,18 @@ type OpeningHoursStatus =
   | "closed-today"
   | "closes-after-midnight";
 
+const days: Day[] = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
 export const getOpeningHoursInfo = (
-  restaurant: Restaurant,
+  restaurant: ApiRestaurant,
   targetDate = utcToZonedTime(new Date(), "America/New_York")
 ): {
   status: OpeningHoursStatus;
@@ -28,7 +37,13 @@ export const getOpeningHoursInfo = (
     };
   }
 
-  const [openDate, closeDate] = openAndCloseDates(restaurant, targetDate);
+  const todayDayIndex = new Date().getDay();
+
+  const { openDate: openJsonDate, closeDate: closeJsonDate } =
+    restaurant.openHours?.[days[todayDayIndex]] ?? {};
+
+  const openDate = openJsonDate ? new Date(openJsonDate) : null;
+  const closeDate = closeJsonDate ? new Date(closeJsonDate) : null;
 
   if (openDate) {
     if (targetDate < openDate) {

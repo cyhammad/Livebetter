@@ -3,7 +3,6 @@ import { useMutation } from "@tanstack/react-query";
 import classNames from "classnames";
 import { ArrowRight, DeviceMobile, Spinner } from "phosphor-react";
 import { useState } from "react";
-import type React from "react";
 
 import { Modal } from "components/Modal";
 import { ModalButtons } from "components/ModalButtons";

@@ -1,5 +1,26 @@
+import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
+import setHours from "date-fns/setHours";
+import setMinutes from "date-fns/setMinutes";
+
 import { getDistanceInMiles } from "lib/getDistanceInMiles";
-import type { ApiRestaurant, Coordinates, Restaurant } from "types";
+import type {
+  ApiRestaurant,
+  ApiRestaurantOpenHours,
+  Coordinates,
+  Day,
+  Restaurant,
+  RestaurantOpenHours,
+} from "types";
+
+const days: Day[] = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 export const toApiRestaurant = (
   restaurant: Restaurant,
@@ -9,6 +30,84 @@ export const toApiRestaurant = (
 
   if (restaurant.Cuisine) {
     apiRestaurant.cuisines = restaurant.Cuisine.toLowerCase().split(", ");
+  }
+
+  if (restaurant.OpenHours) {
+    let openHoursParsed: RestaurantOpenHours | null = null;
+
+    try {
+      openHoursParsed = JSON.parse(restaurant.OpenHours) as RestaurantOpenHours;
+    } catch {
+      // TODO Report error to Sentry
+    }
+
+    if (openHoursParsed) {
+      const openHours = days.reduce((acc, dayName, index) => {
+        if (!openHoursParsed) {
+          return acc;
+        }
+
+        if (!openHoursParsed[`${index + 1}`]) {
+          return { ...acc, [dayName]: null };
+        }
+
+        const hours = openHoursParsed[`${index + 1}`];
+
+        const [openTime, closeTime] = hours.split("/");
+
+        // Enforce that there should be two hours parts, like 11:00/20:30
+        if (!openTime || !closeTime) {
+          return { ...acc, [dayName]: null };
+        }
+
+        const openTimeParts = openTime.split(":");
+        const closeTimeParts = closeTime.split(":");
+
+        const openTimeHours = parseInt(openTimeParts[0]);
+        const openTimeMinutes = parseInt(openTimeParts[1]);
+        const closeTimeHours = parseInt(closeTimeParts[0]);
+        const closeTimeMinutes = parseInt(closeTimeParts[1]);
+
+        if (
+          typeof openTimeHours !== "number" ||
+          isNaN(openTimeHours) ||
+          typeof openTimeMinutes !== "number" ||
+          isNaN(openTimeMinutes) ||
+          typeof closeTimeHours !== "number" ||
+          isNaN(closeTimeHours) ||
+          typeof closeTimeMinutes !== "number" ||
+          isNaN(closeTimeMinutes)
+        ) {
+          return { ...acc, [dayName]: null };
+        }
+
+        const openDate = setMinutes(
+          setHours(
+            utcToZonedTime(new Date(), "America/New_York"),
+            openTimeHours
+          ),
+          openTimeMinutes
+        );
+
+        const closeDate = setMinutes(
+          setHours(
+            utcToZonedTime(new Date(), "America/New_York"),
+            closeTimeHours
+          ),
+          closeTimeMinutes
+        );
+
+        return {
+          ...acc,
+          [dayName]: {
+            openDate: openDate.toJSON(),
+            closeDate: closeDate.toJSON(),
+          },
+        };
+      }, {} as ApiRestaurantOpenHours);
+
+      apiRestaurant.openHours = openHours;
+    }
   }
 
   if (addDistanceFrom && restaurant.Latitude && restaurant.Longitude) {

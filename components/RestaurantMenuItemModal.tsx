@@ -2,7 +2,6 @@ import classNames from "classnames";
 import Image from "next/future/image";
 import { X } from "phosphor-react";
 import { useEffect, useMemo, useState } from "react";
-import type React from "react";
 
 import { ButtonPrimary } from "components/ButtonPrimary";
 import { Checkbox } from "components/Checkbox";
