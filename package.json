@@ -15,7 +15,7 @@
     "test:ci": "NODE_OPTIONS=--experimental-vm-modules jest --passWithNoTests"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.5",
+    "@popperjs/core": "^2.11.6",
     "@sendgrid/mail": "^7.7.0",
     "@sentry/nextjs": "^7.10.0",
     "@stripe/react-stripe-js": "^1.10.0",
