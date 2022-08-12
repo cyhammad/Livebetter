@@ -37,7 +37,7 @@ export const RestaurantCard = ({
         <a
           className={classNames({
             [className ?? ""]: true,
-            "flex flex-col gap-1 justify-items-stretch": true,
+            "flex flex-col gap-3 justify-items-stretch": true,
             "sm:flex-row sm:items-center sm:gap-5": layout === "auto",
             "w-80 sm:w-96": layout === "vertical",
             "opacity-60": ["closed-today", "closed-earlier"].includes(status),
@@ -45,7 +45,7 @@ export const RestaurantCard = ({
           itemProp="url"
         >
           <div
-            className={classNames("flex flex-col gap-2 sm:gap-3 ", {
+            className={classNames("flex flex-col", {
               "sm:w-52 md:w-80 lg:w-96": layout === "auto",
               "w-80 sm:w-96": layout === "vertical",
             })}
@@ -70,9 +70,9 @@ export const RestaurantCard = ({
               </div>
             )}
           </div>
-          <div className="flex flex-col gap-1 sm:gap-2">
+          <div className="flex flex-col gap-1">
             <h3
-              className="text-xl font-bold sm:text-2xl -mb-0.5 sm:mb-0"
+              className="text-xl font-bold sm:text-2xl -mb-0.5 sm:mb-0 leading-6 sm:leading-8"
               itemProp="name"
             >
               {restaurant.Restaurant}

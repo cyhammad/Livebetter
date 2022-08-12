@@ -1,7 +1,3 @@
-import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
-import setHours from "date-fns/setHours";
-import setMinutes from "date-fns/setMinutes";
-
 import { getDistanceInMiles } from "lib/getDistanceInMiles";
 import type {
   ApiRestaurant,
@@ -81,27 +77,11 @@ export const toApiRestaurant = (
           return { ...acc, [dayName]: null };
         }
 
-        const openDate = setMinutes(
-          setHours(
-            utcToZonedTime(new Date(), "America/New_York"),
-            openTimeHours
-          ),
-          openTimeMinutes
-        );
-
-        const closeDate = setMinutes(
-          setHours(
-            utcToZonedTime(new Date(), "America/New_York"),
-            closeTimeHours
-          ),
-          closeTimeMinutes
-        );
-
         return {
           ...acc,
           [dayName]: {
-            openDate: openDate.toJSON(),
-            closeDate: closeDate.toJSON(),
+            openTime: [openTimeHours, openTimeMinutes],
+            closeTime: [closeTimeHours, closeTimeMinutes],
           },
         };
       }, {} as ApiRestaurantOpenHours);

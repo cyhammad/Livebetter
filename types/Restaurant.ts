@@ -37,7 +37,7 @@ export type Day =
 export type RestaurantOpenHours = Record<string, string>;
 export type ApiRestaurantOpenHours = Record<
   Day,
-  { openDate: string; closeDate: string } | null
+  { openTime: [number, number]; closeTime: [number, number] } | null
 >;
 
 export interface ApiRestaurant extends Restaurant {

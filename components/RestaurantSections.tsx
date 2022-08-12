@@ -36,8 +36,8 @@ export const RestaurantSections = ({
         }
 
         return (
-          <section className="flex flex-col gap-2" key={sectionKey}>
-            <h3 className="text-xl sm:text-2xl font-bold container mx-auto ">
+          <section className="flex flex-col gap-4" key={sectionKey}>
+            <h3 className="text-xl sm:text-3xl font-bold container mx-auto">
               <div className="px-4 sm:px-6">
                 {sectionKeyToHeadingMap[sectionKey]}
               </div>

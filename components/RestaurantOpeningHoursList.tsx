@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { format } from "date-fns";
+import { format, setHours, setMinutes } from "date-fns";
 
 import type { ApiRestaurantOpenHours } from "types";
 
@@ -24,8 +24,21 @@ export const RestaurantOpeningHoursList = ({
               <td className="pl-4">
                 {hours ? (
                   <>
-                    {format(new Date(hours.openDate), "p")} -{" "}
-                    {format(new Date(hours.closeDate), "p")}
+                    {format(
+                      setHours(
+                        setMinutes(new Date(), hours.openTime[1]),
+                        hours.openTime[0]
+                      ),
+                      "p"
+                    )}{" "}
+                    -{" "}
+                    {format(
+                      setHours(
+                        setMinutes(new Date(), hours.closeTime[1]),
+                        hours.closeTime[0]
+                      ),
+                      "p"
+                    )}
                   </>
                 ) : (
                   "Closed"
