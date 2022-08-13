@@ -2,6 +2,11 @@ import getObjectPath from "lodash.get";
 import setObjectPath from "lodash.set";
 import { useEffect, useState } from "react";
 
+import {
+  tryLocalStorageGetItem,
+  tryLocalStorageSetItem,
+} from "lib/client/localStorage";
+
 const ROOT_KEY = "lb";
 
 export const usePersistentState = <S>(
@@ -15,7 +20,7 @@ export const usePersistentState = <S>(
    * Update our React state from localStorage
    */
   useEffect(() => {
-    const storageText = localStorage.getItem(ROOT_KEY);
+    const storageText = tryLocalStorageGetItem(ROOT_KEY);
     const storage = storageText ? JSON.parse(storageText) : {};
 
     const valueFromStorage = getObjectPath(storage, path, initialState);
@@ -32,12 +37,12 @@ export const usePersistentState = <S>(
    * Write changes to localStorage
    */
   useEffect(() => {
-    const storageText = localStorage.getItem(ROOT_KEY);
+    const storageText = tryLocalStorageGetItem(ROOT_KEY);
     const storage = storageText ? JSON.parse(storageText) : {};
 
     setObjectPath(storage, path, value);
 
-    localStorage.setItem(ROOT_KEY, JSON.stringify(storage));
+    tryLocalStorageSetItem(ROOT_KEY, JSON.stringify(storage));
   }, [path, value]);
 
   return useStateResult;
