@@ -19,7 +19,7 @@ export const Popper = ({ buttonLabel, children }: PopperProps) => {
     popperButton,
     popperContainer,
     {
-      placement: "right-start",
+      placement: "auto-start",
       modifiers: [
         { name: "arrow", options: { element: popperArrow } },
         { name: "eventListeners", enabled: isPopperVisible },
