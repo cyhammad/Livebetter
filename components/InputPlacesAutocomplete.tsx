@@ -4,6 +4,7 @@ import Script from "next/script";
 import { MapPin, NavigationArrow } from "phosphor-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { Popper } from "components/Popper";
 import { useCurrentPosition } from "hooks/useCurrentPosition";
 import { useInputPlacesAutocompleteContext } from "hooks/useInputPlacesAutocompleteContext";
 import { usePrevious } from "hooks/usePrevious";
@@ -12,11 +13,13 @@ import { useUserContext } from "hooks/useUserContext";
 interface InputPlacesAutocompleteProps {
   containerClassName?: string;
   inputClassName?: string;
+  isCentered?: boolean;
 }
 
 export const InputPlacesAutocomplete = ({
   containerClassName,
   inputClassName,
+  isCentered = true,
 }: InputPlacesAutocompleteProps) => {
   const {
     mapsApiStatus,
@@ -247,29 +250,37 @@ export const InputPlacesAutocomplete = ({
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDns9eCy_4Zge-qYP3Ycnp7qtLw_QsPNIE&libraries=places"
       />
       <div
-        className={classNames(containerClassName, "grid w-full items-center")}
+        className={classNames({
+          "flex flex-col gap-1 w-full": true,
+          "items-center": isCentered,
+          "items-start": !isCentered,
+        })}
       >
-        <MapPin
-          size={32}
-          color="currentColor"
-          fill="currentColor"
-          style={{ gridArea: "1 / 1" }}
-          weight="duotone"
-          className={classNames({
-            "text-gray-600":
-              (!location && mapsApiStatus !== "failure") ||
-              location?.address !== address,
-            "text-emerald-600": mapsApiStatus !== "failure" && !!location,
-            "text-amber-600": mapsApiStatus === "failure",
-            "h-5 w-5 sm:h-7 sm:w-7": true,
-            "animate-pulse": mapsApiStatus === "loading",
-          })}
-        />
-        <input
-          type="text"
-          className={classNames(
-            inputClassName,
-            `
+        <div
+          className={classNames(containerClassName, "grid w-full items-center")}
+        >
+          <MapPin
+            size={32}
+            color="currentColor"
+            fill="currentColor"
+            style={{ gridArea: "1 / 1" }}
+            weight="duotone"
+            className={classNames({
+              "text-gray-600":
+                (!location && mapsApiStatus !== "failure") ||
+                location?.address !== address,
+              "text-emerald-600": mapsApiStatus !== "failure" && !!location,
+              "text-amber-600": mapsApiStatus === "failure",
+              "h-5 w-5 sm:h-7 sm:w-7": true,
+              "animate-pulse": mapsApiStatus === "loading",
+            })}
+          />
+          <input
+            type="text"
+            className={classNames(
+              inputClassName,
+              { "opacity-50": mapsApiStatus !== "success" },
+              `
               w-full
               text-sm sm:text-base
               mt-0 px-6 sm:px-8
@@ -279,35 +290,53 @@ export const InputPlacesAutocomplete = ({
               placeholder:text-gray-600
               peer
             `
-          )}
-          ref={addressInputRef}
-          style={{ gridArea: "1 / 1" }}
-          value={address}
-          onChange={(event) => {
-            setAddress(event.target.value);
-          }}
-          onBlur={handleBlur}
-          placeholder="Enter your address"
-        />
-        <button
-          className="justify-self-end rotate-90"
-          style={{ gridArea: "1 / 1" }}
-          onClick={() => {
-            setShouldQueryLocation(!shouldQueryLocation);
-          }}
-        >
-          <NavigationArrow
-            size={20}
-            color="currentColor"
-            fill="currentColor"
-            weight={shouldQueryLocation ? "fill" : "regular"}
-            className={classNames({
-              "text-black fill-sky-600 origin-center": true,
-              "h-5 w-5 sm:h-6 sm:w-6": true,
-              "animate-compass": isCurrentPositionLoading,
-            })}
+            )}
+            ref={addressInputRef}
+            style={{ gridArea: "1 / 1" }}
+            value={address}
+            onChange={(event) => {
+              setAddress(event.target.value);
+            }}
+            onBlur={handleBlur}
+            placeholder="Enter your address"
+            disabled={mapsApiStatus !== "success"}
           />
-        </button>
+          <button
+            disabled={mapsApiStatus !== "success"}
+            className="justify-self-end rotate-90"
+            style={{ gridArea: "1 / 1" }}
+            onClick={() => {
+              setShouldQueryLocation(!shouldQueryLocation);
+            }}
+          >
+            <NavigationArrow
+              size={20}
+              color="currentColor"
+              fill="currentColor"
+              weight={shouldQueryLocation ? "fill" : "regular"}
+              className={classNames({
+                "text-black fill-sky-600 origin-center": true,
+                "h-5 w-5 sm:h-6 sm:w-6": true,
+                "animate-compass": isCurrentPositionLoading,
+                "opacity-50": mapsApiStatus !== "success",
+              })}
+            />
+          </button>
+        </div>
+        {mapsApiStatus === "failure" ? (
+          <p className="text-xs text-amber-900">
+            Failed to connect to Google Maps.{" "}
+            <Popper buttonLabel="Learn more." placement="auto-end">
+              <span className="text-black">
+                If you already set your address, you can safely ignore this
+                error.
+                <br />
+                If you still need to set your address, please reload the page
+                and this error should go away.
+              </span>
+            </Popper>
+          </p>
+        ) : null}
       </div>
     </>
   );

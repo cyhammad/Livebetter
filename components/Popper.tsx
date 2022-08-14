@@ -1,12 +1,18 @@
+import type PopperJS from "@popperjs/core";
 import { useEffect, useId, useState } from "react";
 import { usePopper } from "react-popper";
 
 interface PopperProps {
   buttonLabel: React.ReactNode;
   children: React.ReactNode;
+  placement?: PopperJS.Placement;
 }
 
-export const Popper = ({ buttonLabel, children }: PopperProps) => {
+export const Popper = ({
+  buttonLabel,
+  children,
+  placement = "auto-start",
+}: PopperProps) => {
   const [isPopperVisible, setIsPopperVisible] = useState(false);
   const [popperButton, setPopperButton] = useState<HTMLButtonElement | null>(
     null
@@ -19,7 +25,7 @@ export const Popper = ({ buttonLabel, children }: PopperProps) => {
     popperButton,
     popperContainer,
     {
-      placement: "auto-start",
+      placement,
       modifiers: [
         { name: "arrow", options: { element: popperArrow } },
         { name: "eventListeners", enabled: isPopperVisible },

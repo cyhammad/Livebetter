@@ -51,7 +51,7 @@ export const SelectShippingMethod = ({
         </Select>
         {value === "delivery" ? (
           <>
-            to <InputPlacesAutocomplete />{" "}
+            to <InputPlacesAutocomplete isCentered={false} />{" "}
           </>
         ) : null}
       </div>
