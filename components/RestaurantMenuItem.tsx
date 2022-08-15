@@ -72,22 +72,10 @@ export const RestaurantMenuItem = ({
             <small className="leading-tight px-2 py-1 bg-amber-600 text-white rounded-sm">
               Out of stock
             </small>
-          ) : null}
-          {process.env.NODE_ENV === "development" ? (
-            <>
-              {menuItem.quantity && menuItem.quantity > 0 ? (
-                <small>
-                  {Object.keys(menuItem.choices ?? {})?.length ?? 0} choices (
-                  {menuItem.quantity} required)
-                </small>
-              ) : null}
-              {menuItem.optionalChoices ? (
-                <small>
-                  {Object.keys(menuItem.optionalChoices ?? {})?.length ?? 0}{" "}
-                  optional choices
-                </small>
-              ) : null}
-            </>
+          ) : menuItem.isPopular ? (
+            <small className="leading-tight px-2 py-1 bg-emerald-600 text-white rounded-sm">
+              Popular
+            </small>
           ) : null}
         </span>
       </div>

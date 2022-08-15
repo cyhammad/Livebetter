@@ -28,6 +28,8 @@ export interface MenuItem {
    * };
    */
   optionalChoices?: Record<string, number>;
+
+  popular?: boolean;
 }
 
 export interface ApiMenuItemChoice {
@@ -47,6 +49,7 @@ export interface ApiMenuItem {
   allowNotes: boolean;
   category: string | null;
   choices: ApiMenuItemChoices | null;
+  isPopular: boolean;
   isVegan: boolean;
   mealDescription: string | null;
   mealPrice: number;

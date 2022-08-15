@@ -56,6 +56,7 @@ export const toApiMenuItem = (
     meal_Price,
     outOfStock,
     picture,
+    popular,
     quantity,
     optionalChoices,
   }: MenuItem
@@ -64,6 +65,7 @@ export const toApiMenuItem = (
     allowNotes: allowNotes ?? true,
     category: category?.trim() ?? null,
     choices: toApiChoices(choices) ?? null,
+    isPopular: !!popular,
     isVegan: isVegan !== false,
     mealDescription: meal_Description?.trim() ?? null,
     mealPrice: meal_Price,
