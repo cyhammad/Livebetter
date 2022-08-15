@@ -48,7 +48,7 @@ async function handler(
       to:
         process.env.VERCEL_ENV === "production"
           ? "livebetterphl@gmail.com"
-          : "atdrago@gmail.com",
+          : "testorders4@gmail.com",
       subject: `New Order Notification ✔ (Order #${orderDoc.id})`,
       html: orderEmailHtml,
       headers: { Accept: "application/json" },
