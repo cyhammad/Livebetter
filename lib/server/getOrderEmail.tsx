@@ -231,6 +231,12 @@ export const getOrderEmail = (order: Order, didAwardLoyaltyPoint = false) => {
             </tr>
             <tr style={getRowBg(rowIndex++)}>
               <th style={thStyles} role="row">
+                Delivery fee
+              </th>
+              <td style={tdStyles}>${(order.deliveryFee ?? 0).toFixed(2)}</td>
+            </tr>
+            <tr style={getRowBg(rowIndex++)}>
+              <th style={thStyles} role="row">
                 Discount
               </th>
               <td style={tdStyles}>${(order.discount ?? 0).toFixed(2)}</td>
