@@ -64,6 +64,20 @@ export const InputPlacesAutocomplete = ({
         {
           componentRestrictions: { country: "us" },
           fields: ["formatted_address", "geometry.location"],
+          types: [
+            "intersection",
+            "point_of_interest",
+            "premise",
+            "street_address",
+            "street_number",
+          ],
+          bounds: {
+            east: -74.956322,
+            north: 40.137276,
+            west: -75.278833,
+            south: 39.868364,
+          },
+          strictBounds: true,
         }
       );
 
