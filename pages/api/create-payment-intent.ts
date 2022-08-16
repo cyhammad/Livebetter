@@ -71,6 +71,7 @@ async function handler(
           db,
           process.env.VERCEL_ENV === "production" ? "orders" : "__dev_orders"
         ),
+        where("customers_id", ">=", "cus_"),
         where("deliver_to.email", "==", user.email),
         limit(1)
       )
