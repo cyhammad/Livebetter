@@ -72,10 +72,10 @@ export const RestaurantCard = ({
           </div>
           <div className="flex flex-col gap-1">
             <h3
-              className="text-xl font-bold sm:text-2xl -mb-0.5 sm:mb-0 leading-6 sm:leading-8"
+              className="text-xl font-bold sm:text-2xl -mb-0.5 sm:mb-0 leading-6 sm:leading-8 capitalize"
               itemProp="name"
             >
-              {restaurant.Restaurant}
+              {restaurant.Restaurant.toLowerCase()}
               {process.env.NODE_ENV === "development" ? (
                 <small>
                   <sup>

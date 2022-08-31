@@ -264,8 +264,11 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         <section className="flex flex-col gap-0 container mx-auto">
           <Toolbar ref={toolbarRef} scrollAreaTopRef={scrollAreaTopRef}>
             <div className="flex flex-col gap-1 sm:gap-4 md:flex-row justify-between md:items-center">
-              <h2 className="text-2xl sm:text-4xl font-bold" itemProp="name">
-                {restaurant.Restaurant}
+              <h2
+                className="text-2xl sm:text-4xl font-bold capitalize"
+                itemProp="name"
+              >
+                {restaurant.Restaurant.toLowerCase()}
               </h2>
               <Select
                 className="md:text-lg"
@@ -399,7 +402,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                     >
                       <Element name={category} className="flex flex-col gap-3">
                         <h4
-                          className="text-xl sm:text-3xl uppercase font-bold"
+                          className="text-xl sm:text-3xl font-bold"
                           itemProp="name"
                         >
                           {category}
