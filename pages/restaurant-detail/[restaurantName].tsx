@@ -1,8 +1,9 @@
+import classNames from "classnames";
 import { collection, getDocs } from "firebase/firestore";
 import type { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import Image from "next/future/image";
 import { Browser, MapPin } from "phosphor-react";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Element, Events, Link, scrollSpy, scroller } from "react-scroll";
 
 import { Cart } from "components/Cart";
@@ -97,8 +98,10 @@ export const getStaticProps: GetStaticProps<
     .sort((a: ApiMenuItem, b: ApiMenuItem) => {
       const aCategory = a.category?.toLowerCase() ?? "";
       const bCategory = b.category?.toLowerCase() ?? "";
-      const isANonVegan = aCategory.includes("non vegan");
-      const isBNonVegan = bCategory.includes("non vegan");
+      const isANonVegan =
+        aCategory.includes("non vegan") || a.isVegan === false;
+      const isBNonVegan =
+        bCategory.includes("non vegan") || b.isVegan === false;
 
       if (isANonVegan && !isBNonVegan) {
         return 1;
@@ -177,6 +180,8 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
   const { setShippingMethod } = useUserContext();
   const { addToCart } = useCartContext();
   const previousModal = usePrevious(currentModal);
+  const [isNonVeganSectionVisible, setIsNonVeganSectionVisible] =
+    useState(false);
 
   const distance = getDistanceToCoordinates({
     latitude: parseFloat(restaurant.Latitude),
@@ -282,11 +287,17 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 }}
                 value={selectedCategory}
               >
-                {menu.map(({ category }) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
+                {menu.map(({ category, menuItems }) => {
+                  const isSectionVegan = menuItems[0]?.isVegan !== false;
+
+                  return (
+                    <Fragment key={category}>
+                      {!isSectionVegan && !isNonVeganSectionVisible ? null : (
+                        <option value={category}>{category}</option>
+                      )}
+                    </Fragment>
+                  );
+                })}
               </Select>
             </div>
             {menu.map(({ category }) => (
@@ -392,35 +403,62 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                 itemScope
                 itemType="https://schema.org/Menu"
               >
-                {menu.map(({ category, menuItems }) => {
+                {menu.map(({ category, menuItems }, sectionIndex) => {
+                  const isSectionVegan = menuItems[0]?.isVegan !== false;
+                  const isFirstNonVeganSection =
+                    !isSectionVegan &&
+                    menu[sectionIndex - 1]?.menuItems[0]?.isVegan !== false;
+
                   return (
-                    <section
-                      itemProp="hasMenuSection"
-                      itemScope
-                      itemType="https://schema.org/MenuSection"
-                      key={category}
-                    >
-                      <Element name={category} className="flex flex-col gap-3">
-                        <h4
-                          className="text-xl sm:text-3xl font-bold"
-                          itemProp="name"
+                    <Fragment key={category}>
+                      {isFirstNonVeganSection ? (
+                        <button
+                          className="w-auto bg-slate-100 py-3 px-4 rounded self-start text-slate-700"
+                          type="button"
+                          onClick={() =>
+                            setIsNonVeganSectionVisible(
+                              !isNonVeganSectionVisible
+                            )
+                          }
                         >
-                          {category}
-                        </h4>
-                        <ul className="grid grid-cols-12 gap-4">
-                          {menuItems.map((menuItem, index) => (
-                            <RestaurantMenuItem
-                              key={index}
-                              menuItem={menuItem}
-                              onClick={() => {
-                                setSelectedMenuItem(menuItem);
-                                setCurrentModal("menu-item");
-                              }}
-                            />
-                          ))}
-                        </ul>
-                      </Element>
-                    </section>
+                          {isNonVeganSectionVisible
+                            ? "Hide non-vegan items"
+                            : "Eating with a non-vegan friend?"}
+                        </button>
+                      ) : null}
+                      <section
+                        className={classNames({
+                          hidden: !isSectionVegan && !isNonVeganSectionVisible,
+                        })}
+                        itemProp="hasMenuSection"
+                        itemScope
+                        itemType="https://schema.org/MenuSection"
+                      >
+                        <Element
+                          name={category}
+                          className="flex flex-col gap-3"
+                        >
+                          <h4
+                            className="text-xl sm:text-3xl font-bold"
+                            itemProp="name"
+                          >
+                            {category}
+                          </h4>
+                          <ul className="grid grid-cols-12 gap-4">
+                            {menuItems.map((menuItem, index) => (
+                              <RestaurantMenuItem
+                                key={index}
+                                menuItem={menuItem}
+                                onClick={() => {
+                                  setSelectedMenuItem(menuItem);
+                                  setCurrentModal("menu-item");
+                                }}
+                              />
+                            ))}
+                          </ul>
+                        </Element>
+                      </section>
+                    </Fragment>
                   );
                 })}
               </div>
