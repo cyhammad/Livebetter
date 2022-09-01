@@ -24,7 +24,7 @@ export const InputCounter = ({
       )}
     >
       <button
-        disabled={value === min}
+        disabled={defaultedValue === min}
         onClick={() => onChange(defaultedValue - 1)}
         type="button"
       >
