@@ -29,7 +29,7 @@ export const RestaurantOpeningHours = ({
   return (
     <div
       className={classNames({
-        "flex gap-2 items-start": true,
+        "flex gap-2 items-start text-sm sm:text-base": true,
         "text-red-800": !isOpen,
         "text-green-800": isOpen,
       })}
@@ -39,7 +39,7 @@ export const RestaurantOpeningHours = ({
         size={20}
       />
       {isMounted ? (
-        <p className="text-sm sm:text-base flex items-center gap-2">
+        <p className="flex items-center gap-2">
           {status === "open-later" && openDate ? (
             <span>
               <b className="font-semibold">Closed</b> until{" "}
