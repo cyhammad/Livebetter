@@ -8,7 +8,14 @@ import { useUserContext } from "hooks/useUserContext";
 
 export const HEADER_HEIGHT = 48;
 
-export const Header = forwardRef<HTMLElement>(function Header(_, ref) {
+interface HeaderProps {
+  isNonVeganMenuVisible?: boolean;
+}
+
+export const Header = forwardRef<HTMLElement, HeaderProps>(function Header(
+  { isNonVeganMenuVisible = false },
+  ref
+) {
   const { location } = useUserContext();
 
   const address = location?.address.split(",")[0];
@@ -31,7 +38,15 @@ export const Header = forwardRef<HTMLElement>(function Header(_, ref) {
                 width={40}
               />
             </div>
-            <h1 className="text-2xl font-bold">Live Better</h1>
+            <span className="flex flex-col">
+              <h1 className="text-2xl font-bold">Live Better</h1>
+              {isNonVeganMenuVisible ? null : (
+                <p className="text-xs sm:text-sm mb-1 -mt-1.5">
+                  Everything is{" "}
+                  <span className="font-medium text-emerald-900">Vegan</span>
+                </p>
+              )}
+            </span>
           </a>
         </Link>
 

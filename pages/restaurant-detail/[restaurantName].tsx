@@ -265,7 +265,10 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         itemScope
         itemType="https://schema.org/Restaurant"
       >
-        <Header ref={headerRef} />
+        <Header
+          isNonVeganMenuVisible={isNonVeganSectionVisible}
+          ref={headerRef}
+        />
         <section className="flex flex-col gap-0 container mx-auto">
           <Toolbar ref={toolbarRef} scrollAreaTopRef={scrollAreaTopRef}>
             <div className="flex flex-col gap-1 sm:gap-4 md:flex-row justify-between md:items-center">
