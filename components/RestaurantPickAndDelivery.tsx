@@ -26,7 +26,7 @@ export const RestaurantPickAndDelivery = ({
             {restaurant.distance
               ? restaurant.distance <= 4
                 ? "Delivery"
-                : "No delivery at your location"
+                : "Outside delivery range"
               : "Delivery within 4 miles"}
           </p>
         </div>

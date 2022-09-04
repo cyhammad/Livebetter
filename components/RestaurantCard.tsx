@@ -3,9 +3,11 @@ import Image from "next/future/image";
 import Link from "next/link";
 import { ArrowRight, MapPin } from "phosphor-react";
 
+import { HorizontalStackWithSeparator } from "components/HorizontalStackWithSeparator";
 import { RestaurantCuisine } from "components/RestaurantCuisine";
 import { RestaurantOpeningHours } from "components/RestaurantOpeningHours";
 import { RestaurantPickAndDelivery } from "components/RestaurantPickAndDelivery";
+import { getDeliveryFee } from "lib/getDeliveryFee";
 import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import type { ApiRestaurant } from "types";
@@ -21,11 +23,36 @@ export const RestaurantCard = ({
   layout = "auto",
   restaurant,
 }: RestaurantCardProps) => {
-  const isAddressVisible = !!restaurant.Address;
-  const isDistanceVisible =
-    typeof restaurant.distance === "number" && !isNaN(restaurant.distance);
+  const { status, isOpen } = getOpeningHoursInfo(restaurant);
 
-  const { status } = getOpeningHoursInfo(restaurant);
+  let addressLabel = "";
+  let deliveryFeeLabel = "";
+  let distanceLabel = "";
+  let waitTimeLabel = "";
+
+  if (typeof restaurant.distance === "number" && !isNaN(restaurant.distance)) {
+    distanceLabel = `${restaurant.distance} mi`;
+  }
+
+  if (restaurant.isDeliveryAvailable && isOpen) {
+    if (restaurant.waitTime) {
+      const minWaitTime = restaurant.waitTime + 15;
+      const maxWaitTime = restaurant.waitTime + 30;
+      waitTimeLabel = `${minWaitTime}-${maxWaitTime} min`;
+    }
+
+    if (restaurant.distance && restaurant.distance <= 4) {
+      deliveryFeeLabel = `$${getDeliveryFee(restaurant.distance)} delivery fee`;
+    }
+  }
+
+  if (!deliveryFeeLabel) {
+    const addressParts = restaurant.Address.split(", ");
+
+    addressParts.pop();
+
+    addressLabel = addressParts.join(", ");
+  }
 
   return (
     <div itemScope itemType="https://schema.org/Restaurant">
@@ -72,7 +99,7 @@ export const RestaurantCard = ({
           </div>
           <div className="flex flex-col gap-1">
             <h3
-              className="text-xl font-bold sm:text-2xl -mb-0.5 sm:mb-0 leading-6 sm:leading-8 capitalize"
+              className="text-xl font-bold sm:text-2xl sm:mb-0 leading-6 sm:leading-8 capitalize"
               itemProp="name"
             >
               {restaurant.Restaurant.toLowerCase()}
@@ -86,7 +113,10 @@ export const RestaurantCard = ({
             </h3>
             <RestaurantOpeningHours restaurant={restaurant} />
             <RestaurantPickAndDelivery restaurant={restaurant} />
-            {isAddressVisible || isDistanceVisible ? (
+            {distanceLabel ||
+            waitTimeLabel ||
+            deliveryFeeLabel ||
+            addressLabel ? (
               <div className="flex gap-2 items-start">
                 <MapPin
                   className="flex-none mt-0 sm:mt-0.5 w-[16px] sm:w-[20px] text-black"
@@ -94,13 +124,17 @@ export const RestaurantCard = ({
                   color="currentColor"
                 />
                 <p className="text-sm sm:text-base line-clamp-1">
-                  {isDistanceVisible ? (
-                    <span>{restaurant.distance} mi</span>
-                  ) : null}
-                  {isDistanceVisible && isAddressVisible ? " ∙ " : null}
-                  {isAddressVisible ? (
-                    <span itemProp="address">{restaurant.Address}</span>
-                  ) : null}
+                  <HorizontalStackWithSeparator
+                    separator=" • "
+                    parts={[
+                      distanceLabel,
+                      waitTimeLabel,
+                      deliveryFeeLabel,
+                      addressLabel ? (
+                        <span itemProp="address">{addressLabel}</span>
+                      ) : null,
+                    ]}
+                  />
                 </p>
               </div>
             ) : null}

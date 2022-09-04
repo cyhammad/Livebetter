@@ -4,7 +4,6 @@ import {
   dehydrate,
   useQuery,
 } from "@tanstack/react-query";
-import classNames from "classnames";
 import type { GetStaticProps, NextPage } from "next";
 import { useEffect, useRef, useState } from "react";
 
@@ -12,7 +11,6 @@ import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { HomeHero } from "components/HomeHero";
 import { RestaurantSections } from "components/RestaurantSections";
-import { Toolbar } from "components/Toolbar";
 import { useUserContext } from "hooks/useUserContext";
 import { fetchFeaturedRestaurants } from "lib/client/fetchFeaturedRestaurants";
 import { getSectionKeys } from "lib/getSectionKeys";
@@ -95,21 +93,10 @@ const Home: NextPage<HomeProps> = () => {
       <main className="flex flex-col mb-6">
         <Header />
         <HomeHero />
-        <Toolbar scrollAreaTopRef={restaurantListTopRef}>
-          <div
-            className={classNames({
-              "grid grid-cols-3 grid-rows-1 gap-x-4": true,
-            })}
-            style={{ gridTemplateColumns: "auto 1fr 1fr" }}
-          >
-            <h2 className="text-2xl sm:text-4xl font-bold">
-              Browse Restaurants
-            </h2>
-          </div>
-        </Toolbar>
         <div ref={restaurantListTopRef} />
         {data?.sections ? (
           <RestaurantSections
+            className="mt-4 sm:mt-5"
             sectionKeys={getSectionKeys()}
             sections={data.sections}
           />

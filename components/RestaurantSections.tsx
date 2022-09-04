@@ -7,6 +7,7 @@ import type {
 } from "types";
 
 interface RestaurantSectionsProps {
+  className?: string;
   sectionKeys: FeaturedSection[];
   sections: FeaturedApiRestaurantResultSections;
 }
@@ -23,11 +24,17 @@ const sectionKeyToHeadingMap: Record<FeaturedSection, string> = {
 };
 
 export const RestaurantSections = ({
+  className,
   sectionKeys,
   sections,
 }: RestaurantSectionsProps) => {
   return (
-    <div className="flex flex-col col-span-2 h-full w-full gap-8">
+    <div
+      className={classNames(
+        "flex flex-col col-span-2 h-full w-full gap-8",
+        className
+      )}
+    >
       {sectionKeys.map((sectionKey) => {
         const restaurants = sections[sectionKey];
 
@@ -37,7 +44,7 @@ export const RestaurantSections = ({
 
         return (
           <section className="flex flex-col gap-4" key={sectionKey}>
-            <h3 className="text-xl sm:text-3xl font-bold container mx-auto">
+            <h3 className="text-2xl sm:text-3xl font-bold container mx-auto">
               <div className="px-4 sm:px-6">
                 {sectionKeyToHeadingMap[sectionKey]}
               </div>

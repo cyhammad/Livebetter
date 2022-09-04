@@ -17,6 +17,7 @@ export interface Restaurant {
   isPickUpAvailable?: boolean;
   Tracking?: number;
   featured_in?: FeaturedSection[];
+  waitTime?: number;
 
   // loyalty program properties
   loyaltyProgramAvailable?: boolean;
