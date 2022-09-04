@@ -74,7 +74,7 @@ export default function App({ Component, pageProps }: AppProps) {
             />
             <meta
               name="description"
-              content="Find and order vegan food near you."
+              content="Find and order vegan food in Philly."
             />
           </Head>
           <UserContextProvider>

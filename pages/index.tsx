@@ -81,9 +81,9 @@ const Home: NextPage<HomeProps> = () => {
     <>
       <Head
         titles={[]}
-        description={`Find and order vegan food near you.`}
+        description={`Find and order vegan food in Philly.`}
         ogMetadata={{
-          description: `Find and order vegan food near you.`,
+          description: `Find and order vegan food in Philly.`,
           title: "Live Better PHL",
           image: "https://www.livebetterphl.com/logo.png",
           type: "website",

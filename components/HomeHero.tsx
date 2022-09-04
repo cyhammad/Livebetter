@@ -41,7 +41,7 @@ export const HomeHero = () => {
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-center">
               Find and order
               <br />
-              vegan food near you.
+              vegan food in Philly.
             </h2>
             <div className="flex flex-col w-full sm:max-w-none mx-auto sm:mt-0 gap-1 sm:gap-6 sm:items-center">
               <InputPlacesAutocomplete containerClassName="sm:max-w-md" />
