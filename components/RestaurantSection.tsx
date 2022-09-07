@@ -60,7 +60,7 @@ export const RestaurantSection = ({
         className={classNames({
           [`
           hidden  items-center justify-center
-          absolute top-1/2 mr-auto left-0 ml-3 z-50 -mb-10 p-3
+          absolute top-1/2 mr-auto left-0 ml-3 z-10 -mb-10 p-3
           leading-none text-2xl shadow-md bg-slate-50 rounded-full
         `]: true,
           hidden: isLeftArrowHidden,
@@ -96,7 +96,7 @@ export const RestaurantSection = ({
         aria-label="Scroll right"
         className="
           hidden md:flex items-center justify-center
-          absolute top-1/2 ml-auto right-0 mr-3 z-50 -mb-10 p-3
+          absolute top-1/2 ml-auto right-0 mr-3 z-10 -mb-10 p-3
           leading-none text-2xl shadow-md bg-slate-50 rounded-full
         "
         type="button"
