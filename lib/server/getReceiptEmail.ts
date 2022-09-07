@@ -3,9 +3,11 @@ import path from "path";
 
 import { format } from "date-fns";
 import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
+import { Timestamp } from "firebase/firestore";
 import Handlebars from "handlebars";
 import Stripe from "stripe";
 
+import { getDeliveryTimeLabel } from "lib/getDeliveryTimeLabel";
 import { getOrderMenuItemTotal } from "lib/getOrderMenuItemTotal";
 import { restaurantNameToStatementDescriptorSuffix } from "lib/restaurantNameToStatementDescriptorSuffix";
 import type { Order } from "types";
@@ -113,5 +115,8 @@ export const getReceiptEmail = async ({
     tax: order.tax ? `$${order.tax.toFixed(2)}` : null,
     tip: order.tip ? `$${order.tip.toFixed(2)}` : null,
     total: `$${order.total.toFixed(2)}`,
+    deliveryTime: order.waitTime
+      ? getDeliveryTimeLabel(order.waitTime, order.created_at.toDate())
+      : null,
   });
 };

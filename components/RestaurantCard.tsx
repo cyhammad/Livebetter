@@ -9,6 +9,7 @@ import { RestaurantOpeningHours } from "components/RestaurantOpeningHours";
 import { RestaurantPickAndDelivery } from "components/RestaurantPickAndDelivery";
 import { getDeliveryFee } from "lib/getDeliveryFee";
 import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
+import { getWaitTimeMinMax } from "lib/getWaitTimeMinMax";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import type { ApiRestaurant } from "types";
 
@@ -36,8 +37,8 @@ export const RestaurantCard = ({
 
   if (restaurant.isDeliveryAvailable && isOpen) {
     if (restaurant.waitTime) {
-      const minWaitTime = restaurant.waitTime + 15;
-      const maxWaitTime = restaurant.waitTime + 30;
+      const [minWaitTime, maxWaitTime] = getWaitTimeMinMax(restaurant.waitTime);
+
       waitTimeLabel = `${minWaitTime}-${maxWaitTime} min`;
     }
 

@@ -22,6 +22,7 @@ export interface Order {
   tax?: number;
   tip: number;
   total: number;
+  waitTime?: number;
 }
 
 export interface ApiOrder extends Omit<Order, "created_at"> {

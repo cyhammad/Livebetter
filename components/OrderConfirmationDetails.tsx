@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { OrderChoicesList } from "components/OrderChoicesList";
 import { useCartContext } from "hooks/useCartContext";
 import { getCartFees } from "lib/getCartPricingBreakdown";
+import { getDeliveryTimeLabel } from "lib/getDeliveryTimeLabel";
 import { getOrderMenuItemTotal } from "lib/getOrderMenuItemTotal";
 import type { ApiOrder, ShippingMethod } from "types";
 
@@ -119,6 +120,15 @@ export const OrderConfirmationDetails = ({
                       ? ` (${order.deliver_to.appartmentNo})`
                       : null}
                   </p>
+                  {order.waitTime ? (
+                    <p>
+                      <b className="font-medium">Approximate arrival time:</b>{" "}
+                      {getDeliveryTimeLabel(
+                        order.waitTime,
+                        new Date(order.created_at)
+                      )}
+                    </p>
+                  ) : null}
                 </div>
               </>
             ) : (

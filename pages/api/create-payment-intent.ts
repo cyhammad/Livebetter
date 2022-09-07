@@ -172,6 +172,7 @@ async function handler(
       tip: cart.tip,
       total,
       user,
+      waitTime: restaurant?.waitTime,
     });
 
     const paymentIntentOrder: PaymentIntentOrder = {

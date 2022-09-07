@@ -21,6 +21,7 @@ interface CreateOrderOptions {
   tip: number;
   total: number;
   user: CreatePaymentIntentUser;
+  waitTime?: number;
 }
 
 export const createOrder = ({
@@ -36,6 +37,7 @@ export const createOrder = ({
   tip,
   total,
   user,
+  waitTime,
 }: CreateOrderOptions): Order => {
   const deliver_to: Order["deliver_to"] =
     user.shippingMethod === "pickup"
@@ -66,7 +68,7 @@ export const createOrder = ({
           phoneNumber: user.phoneNumber,
         };
 
-  return {
+  const order: Order = {
     charges_id: "",
     created_at: Timestamp.now(),
     customers_id: customerId,
@@ -129,4 +131,10 @@ export const createOrder = ({
     tip,
     total,
   };
+
+  if (waitTime) {
+    order.waitTime = waitTime;
+  }
+
+  return order;
 };
