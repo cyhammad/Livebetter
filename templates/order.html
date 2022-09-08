@@ -700,7 +700,19 @@
                             >{{ restaurantName }}</strong
                           >. No action is needed.
                         </p>
-
+                        {{#if deliveryTime}}
+                        <p
+                          style="
+                            font-size: 16px;
+                            line-height: 1.625;
+                            color: #51545e;
+                            margin: 0.4em 0 0.4em;
+                          "
+                        >
+                          <strong>Estimated Delivery Time:</strong>
+                          {{deliveryTime}}
+                        </p>
+                        {{/if}}
                         <table
                           class="purchase"
                           width="100%"
@@ -1483,18 +1495,6 @@
                           "
                         >
                           <strong>Delivery notes:</strong> {{dropoffNote}}
-                        </p>
-                        {{/if}} {{#if deliveryTime}}
-                        <p
-                          style="
-                            font-size: 16px;
-                            line-height: 1.625;
-                            color: #51545e;
-                            margin: 0.4em 0 1.1875em;
-                          "
-                        >
-                          <strong>Approximate delivery time:</strong>
-                          {{deliveryTime}}
                         </p>
                         {{/if}}
                         <p
