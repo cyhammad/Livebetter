@@ -15,6 +15,7 @@ import {
   useTransition,
 } from "react";
 
+import { Footer } from "components/Footer";
 import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { RestaurantList } from "components/RestaurantList";
@@ -128,7 +129,7 @@ const Home: NextPage<HomeProps> = () => {
           url: "https://www.livebetterphl.com/restaurants",
         }}
       ></Head>
-      <main className="flex flex-col mb-6">
+      <main className="flex flex-col">
         <Header />
         <section className="flex flex-col gap-0 container mx-auto">
           <Toolbar
@@ -253,6 +254,7 @@ const Home: NextPage<HomeProps> = () => {
             restaurants={data?.restaurants ?? []}
           />
         </section>
+        <Footer className="mt-6" />
       </main>
     </>
   );

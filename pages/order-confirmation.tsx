@@ -11,6 +11,7 @@ import {
 import type { GetServerSideProps, NextPage } from "next";
 import { useEffect, useRef } from "react";
 
+import { Footer } from "components/Footer";
 import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { OrderConfirmationDetails } from "components/OrderConfirmationDetails";
@@ -107,7 +108,7 @@ const OrderConfirmation: NextPage<OrderConfirmationProps> = ({ order }) => {
         titles={["Order Confirmation", order.restaurant_id ?? ""]}
         description=""
       />
-      <main className="flex flex-col mb-6">
+      <main className="flex flex-col">
         <Header ref={headerRef} />
         <Elements stripe={getStripePromise()}>
           <section className="flex flex-col gap-0 container mx-auto max-w-3xl">
@@ -125,6 +126,7 @@ const OrderConfirmation: NextPage<OrderConfirmationProps> = ({ order }) => {
             <OrderConfirmationDetails order={order} />
           </section>
         </Elements>
+        <Footer className="mt-6" />
       </main>
     </>
   );

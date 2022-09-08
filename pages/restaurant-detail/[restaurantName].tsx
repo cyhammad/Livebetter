@@ -8,6 +8,7 @@ import { Element, Events, Link, scrollSpy, scroller } from "react-scroll";
 
 import { Cart } from "components/Cart";
 import { ContactInfoModal } from "components/ContactInfoModal";
+import { Footer } from "components/Footer";
 import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { ModalGroupOverlay } from "components/ModalGroupOverlay";
@@ -261,7 +262,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         }}
       ></Head>
       <main
-        className="flex flex-col mb-6"
+        className="flex flex-col"
         itemScope
         itemType="https://schema.org/Restaurant"
       >
@@ -469,6 +470,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
           </div>
           <Cart className="mt-4" />
         </section>
+        <Footer className="mt-6" />
       </main>
       <ModalGroupOverlay
         isOpen={!!currentModal}

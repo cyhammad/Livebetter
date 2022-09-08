@@ -7,6 +7,7 @@ import {
 import type { GetStaticProps, NextPage } from "next";
 import { useEffect, useRef, useState } from "react";
 
+import { Footer } from "components/Footer";
 import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { HomeHero } from "components/HomeHero";
@@ -90,7 +91,7 @@ const Home: NextPage<HomeProps> = () => {
           url: "https://www.livebetterphl.com/",
         }}
       ></Head>
-      <main className="flex flex-col mb-6">
+      <main className="flex flex-col">
         <Header />
         <HomeHero />
         <div ref={restaurantListTopRef} />
@@ -101,6 +102,7 @@ const Home: NextPage<HomeProps> = () => {
             sections={data.sections}
           />
         ) : null}
+        <Footer className="mt-6" />
       </main>
     </>
   );

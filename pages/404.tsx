@@ -7,6 +7,7 @@ import {
 import type { GetStaticProps, NextPage } from "next";
 import { useEffect, useRef, useState } from "react";
 
+import { Footer } from "components/Footer";
 import { Head } from "components/Head";
 import { Header } from "components/Header";
 import { RestaurantSections } from "components/RestaurantSections";
@@ -97,7 +98,7 @@ const Error404Page: NextPage = () => {
           url: "https://www.livebetterphl.com/404",
         }}
       />
-      <main className="flex flex-col mb-6">
+      <main className="flex flex-col">
         <Header ref={headerRef} />
         <Toolbar ref={toolbarRef} scrollAreaTopRef={scrollAreaTopRef}>
           <div className="flex flex-col gap-1 sm:gap-4 md:flex-row justify-between md:items-center">
@@ -118,6 +119,7 @@ const Error404Page: NextPage = () => {
             />
           ) : null}
         </div>
+        <Footer className="mt-6" />
       </main>
     </>
   );
