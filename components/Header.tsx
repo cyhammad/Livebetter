@@ -27,15 +27,15 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(function Header(
     >
       <div className="container mx-auto flex justify-between items-center py-2 px-4 sm:px-6">
         <Link href="/">
-          <a className="flex gap-3 items-center">
+          <a className="flex gap-2 items-center">
             <div className="flex-none">
               <Image
                 alt="Live Better logo"
-                className="h-8 w-8 sm:h-10 sm:w-10"
-                height={40}
+                className="h-8 w-8 sm:h-11 sm:w-11"
+                height={44}
                 priority={true}
-                src="/logo.png"
-                width={40}
+                src="/logo.svg"
+                width={44}
               />
             </div>
             <span className="flex flex-col">
