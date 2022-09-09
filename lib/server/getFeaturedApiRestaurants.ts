@@ -7,6 +7,7 @@ import {
   where,
 } from "firebase/firestore";
 
+import { MAX_DELIVERY_RANGE } from "lib/constants";
 import { getDistanceInMiles } from "lib/getDistanceInMiles";
 import { db } from "lib/server/db";
 import { sortApiRestaurants } from "lib/sortApiRestaurants";
@@ -77,7 +78,9 @@ export const getFeaturedApiRestaurants: GetFeaturedApiRestaurants = async (
 
       if (
         curr.isDeliveryAvailable &&
-        (typeof curr.distance === "number" ? curr.distance <= 4 : true)
+        (typeof curr.distance === "number"
+          ? curr.distance <= MAX_DELIVERY_RANGE
+          : true)
       ) {
         if (!acc["tracking"]) {
           acc["tracking"] = [];

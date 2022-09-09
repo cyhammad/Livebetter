@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useUserContext } from "hooks/useUserContext";
+import { MAX_DELIVERY_RANGE } from "lib/constants";
 import { notNullOrUndefined } from "lib/notNullOrUndefined";
 import { ApiRestaurant, ShippingMethod } from "types";
 
@@ -59,7 +60,9 @@ export const useShippingMethodValidation = (
         ];
       }
 
-      const isDeliveryWithinRange = !!(distance && distance <= 4);
+      const isDeliveryWithinRange = !!(
+        distance && distance <= MAX_DELIVERY_RANGE
+      );
 
       if (!isDeliveryWithinRange) {
         return [

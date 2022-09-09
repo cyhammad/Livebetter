@@ -7,6 +7,7 @@ import { HorizontalStackWithSeparator } from "components/HorizontalStackWithSepa
 import { RestaurantCuisine } from "components/RestaurantCuisine";
 import { RestaurantOpeningHours } from "components/RestaurantOpeningHours";
 import { RestaurantPickAndDelivery } from "components/RestaurantPickAndDelivery";
+import { MAX_DELIVERY_RANGE } from "lib/constants";
 import { getDeliveryFee } from "lib/getDeliveryFee";
 import { getOpeningHoursInfo } from "lib/getOpeningHoursInfo";
 import { getWaitTimeMinMax } from "lib/getWaitTimeMinMax";
@@ -42,7 +43,7 @@ export const RestaurantCard = ({
       waitTimeLabel = `${minWaitTime}-${maxWaitTime} min`;
     }
 
-    if (restaurant.distance && restaurant.distance <= 4) {
+    if (restaurant.distance && restaurant.distance <= MAX_DELIVERY_RANGE) {
       deliveryFeeLabel = `$${getDeliveryFee(restaurant.distance)} delivery fee`;
     }
   }

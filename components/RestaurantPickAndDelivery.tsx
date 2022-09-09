@@ -1,5 +1,6 @@
 import { PersonSimpleWalk, Taxi } from "phosphor-react";
 
+import { MAX_DELIVERY_RANGE } from "lib/constants";
 import type { ApiRestaurant } from "types";
 
 interface RestaurantPickAndDeliveryProps {
@@ -24,10 +25,10 @@ export const RestaurantPickAndDelivery = ({
           />
           <p className="flex items-center gap-2">
             {restaurant.distance
-              ? restaurant.distance <= 4
+              ? restaurant.distance <= MAX_DELIVERY_RANGE
                 ? "Delivery"
                 : "Outside delivery range"
-              : "Delivery within 4 miles"}
+              : `Delivery within ${MAX_DELIVERY_RANGE} miles`}
           </p>
         </div>
       ) : null}
