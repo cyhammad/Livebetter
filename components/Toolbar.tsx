@@ -9,7 +9,7 @@ interface ToolbarProps {
   scrollAreaTopRef: React.MutableRefObject<HTMLElement | null>;
 }
 
-export const TOOLBAR_HEIGHT = 56;
+const TOOLBAR_HEIGHT = 56;
 
 export const Toolbar = forwardRef<
   HTMLDivElement,
