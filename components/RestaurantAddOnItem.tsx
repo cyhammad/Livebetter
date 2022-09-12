@@ -16,7 +16,7 @@ export const RestaurantAddOnItem = ({
 }: RestaurantAddOnItemProps) => {
   return (
     <RestaurantMenuItem menuItem={menuItem} {...props}>
-      <span className="flex gap-3 items-center">
+      <span className="flex gap-2 items-center">
         <button
           disabled={!!menuItem.outOfStock}
           onClick={() => {
@@ -24,7 +24,7 @@ export const RestaurantAddOnItem = ({
 
             onChange(nextValue);
           }}
-          className="flex gap-1 items-center justify-center text-xs leading-tight h-5 w-5 rounded-full bg-slate-100 border border-slate-200 text-white"
+          className="flex items-center justify-center text-xs leading-tight h-5 w-5 rounded-full bg-slate-100 border border-slate-200 text-white"
         >
           <span className="-mt-0.5 text-slate-800 text-center ">&minus;</span>
         </button>

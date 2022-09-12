@@ -3,7 +3,6 @@ import path from "path";
 
 import { format } from "date-fns";
 import utcToZonedTime from "date-fns-tz/esm/utcToZonedTime";
-import { Timestamp } from "firebase/firestore";
 import Handlebars from "handlebars";
 import Stripe from "stripe";
 
@@ -76,7 +75,7 @@ export const getReceiptEmail = async ({
   });
 
   const orderHtml = fs
-    .readFileSync(path.resolve("./templates/order.html"))
+    .readFileSync(path.resolve("./templates/receipt.html"))
     .toString();
   const template = Handlebars.compile(orderHtml);
 

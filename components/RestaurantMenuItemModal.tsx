@@ -495,7 +495,7 @@ export const RestaurantMenuItemModal = ({
                     sticky top-10 text-xl font-bold bg-white
                   "
                 >
-                  Popular add-ons
+                  Popular Add-Ons
                 </h3>
                 <ul className="grid grid-cols-12 gap-4">
                   {addOnItems.map((addOnItem) => (

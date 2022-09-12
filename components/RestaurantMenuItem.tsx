@@ -34,7 +34,7 @@ export const RestaurantMenuItem = ({
       })}
     >
       {menuItem.picture ? (
-        <div className="flex flex-row gap-2 overflow-hidden flex-none h-28 w-28 sm:h-32 sm:w-32">
+        <div className="flex flex-row overflow-hidden flex-none h-28 w-28 sm:h-32 sm:w-32 relative">
           <Image
             alt=""
             height={224}
@@ -43,6 +43,17 @@ export const RestaurantMenuItem = ({
             className="object-cover"
             itemProp="image"
           />
+          <span className="absolute top-0 left-0.5">
+            {menuItem.outOfStock ? (
+              <span className="text-xs leading-tight px-2 py-1 bg-amber-600 text-white rounded">
+                Out of stock
+              </span>
+            ) : menuItem.isPopular ? (
+              <span className="text-xs leading-tight px-2 py-1 bg-emerald-600 text-white rounded">
+                Popular
+              </span>
+            ) : null}
+          </span>
         </div>
       ) : null}
       <div className="flex flex-grow flex-col gap-1 py-2">
@@ -68,18 +79,7 @@ export const RestaurantMenuItem = ({
           </span>
         ) : null}
         <span className="flex justify-between items-end text-base font-medium mt-auto">
-          <span className="flex gap-2 items-center">
-            <span>${menuItem.mealPrice.toFixed(2)}</span>
-            {menuItem.outOfStock ? (
-              <span className="text-xs leading-tight px-2 py-1 bg-amber-600 text-white rounded-sm">
-                Out of stock
-              </span>
-            ) : menuItem.isPopular ? (
-              <span className="text-xs leading-tight px-2 py-1 bg-emerald-600 text-white rounded-sm">
-                Popular
-              </span>
-            ) : null}
-          </span>
+          ${menuItem.mealPrice.toFixed(2)}
           {children}
         </span>
       </div>
