@@ -500,6 +500,7 @@ export const RestaurantMenuItemModal = ({
                 <ul className="grid grid-cols-12 gap-4">
                   {addOnItems.map((addOnItem) => (
                     <RestaurantAddOnItem
+                      className="2xl:col-span-6"
                       key={addOnItem.name}
                       menuItem={addOnItem}
                       value={addOnItemCounts[addOnItem.name] ?? 0}
