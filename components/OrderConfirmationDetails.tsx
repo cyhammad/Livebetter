@@ -121,13 +121,17 @@ export const OrderConfirmationDetails = ({
                       : null}
                   </p>
                   {order.waitTime ? (
-                    <p>
-                      <b className="font-medium">Estimated Delivery Time:</b>{" "}
-                      {getDeliveryTimeLabel(
-                        order.waitTime,
-                        new Date(order.created_at)
-                      )}
-                    </p>
+                    <>
+                      <p>
+                        <b className="font-medium">Estimated Delivery Time:</b>{" "}
+                        {getDeliveryTimeLabel(
+                          order.waitTime,
+                          new Date(order.created_at)
+                        )}
+                        <br />
+                        <small>* Delivery times are not guaranteed.</small>
+                      </p>
+                    </>
                   ) : null}
                 </div>
               </>
