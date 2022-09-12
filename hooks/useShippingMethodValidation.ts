@@ -61,7 +61,7 @@ export const useShippingMethodValidation = (
       }
 
       const isDeliveryWithinRange = !!(
-        distance && distance <= MAX_DELIVERY_RANGE
+        typeof distance === "number" && distance <= MAX_DELIVERY_RANGE
       );
 
       if (!isDeliveryWithinRange) {
