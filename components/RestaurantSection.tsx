@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import debounce from "lodash.debounce";
 import { ArrowLeft, ArrowRight } from "phosphor-react";
 import { useRef, useState } from "react";
 
@@ -16,6 +17,10 @@ export const RestaurantSection = ({
 }: RestaurantSectionProps) => {
   const listRef = useRef<HTMLUListElement>(null);
   const [isLeftArrowHidden, setIsLeftArrowHidden] = useState(true);
+
+  const handleScroll = debounce(() => {
+    setIsLeftArrowHidden(listRef.current?.scrollLeft === 0);
+  }, 500);
 
   return (
     <section className="relative">
@@ -44,6 +49,7 @@ export const RestaurantSection = ({
             2xl:scroll-ml-[calc(((100vw-1536px)/2)+1rem)]
           "
           ref={listRef}
+          onScroll={handleScroll}
         >
           {restaurants.map((restaurant, index) => (
             <li
@@ -59,10 +65,10 @@ export const RestaurantSection = ({
         aria-label="Close menu item"
         className={classNames({
           [`
-          hidden  items-center justify-center
-          absolute top-1/2 mr-auto left-0 ml-3 z-10 -mb-10 p-3
-          leading-none text-2xl shadow-md bg-slate-50 rounded-full
-        `]: true,
+            hidden items-center justify-center
+            absolute top-1/2 mr-auto left-0 ml-3 z-10 -mb-10 p-3
+            leading-none text-2xl shadow-md bg-slate-50 rounded-full
+          `]: true,
           hidden: isLeftArrowHidden,
           "md:flex": !isLeftArrowHidden,
         })}
