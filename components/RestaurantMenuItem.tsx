@@ -4,6 +4,7 @@ import Image from "next/future/image";
 import type { ApiMenuItem } from "types";
 
 export interface RestaurantMenuItemProps {
+  className?: string;
   menuItem: ApiMenuItem;
   children?: React.ReactNode;
   onClick?: () => void;
@@ -11,6 +12,7 @@ export interface RestaurantMenuItemProps {
 }
 
 export const RestaurantMenuItem = ({
+  className,
   menuItem,
   children,
   ...props
@@ -26,12 +28,15 @@ export const RestaurantMenuItem = ({
       itemProp="hasMenuItem"
       itemScope
       itemType="https://schema.org/MenuItem"
-      className={classNames({
-        "flex gap-3 pr-3 flex-none col-span-12 md:col-span-6 2xl:col-span-4 shadow-sm border border-gray-100 rounded-lg overflow-hidden":
-          true,
-        "px-3": !hasPicture,
-        "opacity-50": !!menuItem.outOfStock,
-      })}
+      className={classNames(
+        {
+          "flex gap-3 pr-3 flex-none col-span-12 md:col-span-6 2xl:col-span-4 shadow-sm border border-gray-100 rounded-lg overflow-hidden":
+            true,
+          "px-3": !hasPicture,
+          "opacity-50": !!menuItem.outOfStock,
+        },
+        className
+      )}
     >
       {menuItem.picture ? (
         <div className="flex flex-row overflow-hidden flex-none h-28 w-28 sm:h-32 sm:w-32 relative">
@@ -44,11 +49,7 @@ export const RestaurantMenuItem = ({
             itemProp="image"
           />
           <span className="absolute top-0 left-0.5">
-            {menuItem.outOfStock ? (
-              <span className="text-xs leading-tight px-2 py-1 bg-amber-600 text-white rounded">
-                Out of stock
-              </span>
-            ) : menuItem.isPopular ? (
+            {menuItem.isPopular ? (
               <span className="text-xs leading-tight px-2 py-1 bg-emerald-600 text-white rounded">
                 Popular
               </span>
@@ -79,7 +80,19 @@ export const RestaurantMenuItem = ({
           </span>
         ) : null}
         <span className="flex justify-between items-end text-base font-medium mt-auto">
-          ${menuItem.mealPrice.toFixed(2)}
+          <span className="flex flex-row gap-2">
+            ${menuItem.mealPrice.toFixed(2)}
+            {menuItem.isPopular && !menuItem.picture ? (
+              <span className="text-xs leading-tight px-2 py-1 bg-emerald-600 text-white rounded">
+                Popular
+              </span>
+            ) : null}
+          </span>
+          {menuItem.outOfStock ? (
+            <span className="text-xs leading-tight px-2 py-1 bg-amber-600 text-white rounded">
+              Out of stock
+            </span>
+          ) : null}
           {children}
         </span>
       </div>
