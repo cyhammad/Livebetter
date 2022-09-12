@@ -1,17 +1,19 @@
 import classNames from "classnames";
 import Image from "next/future/image";
-import { MouseEventHandler } from "react";
 
 import type { ApiMenuItem } from "types";
 
-interface RestaurantMenuItemProps {
+export interface RestaurantMenuItemProps {
   menuItem: ApiMenuItem;
-  onClick?: MouseEventHandler;
+  children?: React.ReactNode;
+  onClick?: () => void;
+  role?: string;
 }
 
 export const RestaurantMenuItem = ({
   menuItem,
-  onClick,
+  children,
+  ...props
 }: RestaurantMenuItemProps) => {
   const hasPicture = !!menuItem.picture;
   const isDescriptionEmpty = !menuItem.mealDescription;
@@ -20,11 +22,10 @@ export const RestaurantMenuItem = ({
 
   return (
     <li
+      {...props}
       itemProp="hasMenuItem"
       itemScope
       itemType="https://schema.org/MenuItem"
-      role="button"
-      onClick={onClick}
       className={classNames({
         "flex gap-3 pr-3 flex-none col-span-12 md:col-span-6 2xl:col-span-4 shadow-sm border border-gray-100 rounded-lg overflow-hidden":
           true,
@@ -67,16 +68,19 @@ export const RestaurantMenuItem = ({
           </span>
         ) : null}
         <span className="flex justify-between items-end text-base font-medium mt-auto">
-          <span>${menuItem.mealPrice.toFixed(2)}</span>
-          {menuItem.outOfStock ? (
-            <small className="leading-tight px-2 py-1 bg-amber-600 text-white rounded-sm">
-              Out of stock
-            </small>
-          ) : menuItem.isPopular ? (
-            <small className="leading-tight px-2 py-1 bg-emerald-600 text-white rounded-sm">
-              Popular
-            </small>
-          ) : null}
+          <span className="flex gap-2 items-center">
+            <span>${menuItem.mealPrice.toFixed(2)}</span>
+            {menuItem.outOfStock ? (
+              <span className="text-xs leading-tight px-2 py-1 bg-amber-600 text-white rounded-sm">
+                Out of stock
+              </span>
+            ) : menuItem.isPopular ? (
+              <span className="text-xs leading-tight px-2 py-1 bg-emerald-600 text-white rounded-sm">
+                Popular
+              </span>
+            ) : null}
+          </span>
+          {children}
         </span>
       </div>
     </li>

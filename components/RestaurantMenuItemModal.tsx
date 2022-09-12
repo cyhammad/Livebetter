@@ -8,6 +8,7 @@ import { Checkbox } from "components/Checkbox";
 import { InputCounter } from "components/InputCounter";
 import { InputTextarea } from "components/InputTextarea";
 import { Modal } from "components/Modal";
+import { RestaurantAddOnItem } from "components/RestaurantAddOnItem";
 import { Select } from "components/Select";
 import { SelectShippingMethod } from "components/SelectShippingMethod";
 import { useCartContext } from "hooks/useCartContext";
@@ -29,6 +30,7 @@ import type {
 } from "types";
 
 interface RestaurantMenuItemModalProps extends ModalProps {
+  addOnItems?: ApiMenuItem[];
   menuItem?: ApiMenuItem;
   restaurant: ApiRestaurant;
   onRequestNext?: (
@@ -37,7 +39,18 @@ interface RestaurantMenuItemModalProps extends ModalProps {
   ) => void;
 }
 
+const getAddOnItemInitialCounts = (addOnItems?: ApiMenuItem[]) => {
+  return (
+    addOnItems?.reduce((acc: Record<string, number>, { name }) => {
+      acc[name] = 0;
+
+      return acc;
+    }, {}) ?? {}
+  );
+};
+
 export const RestaurantMenuItemModal = ({
+  addOnItems,
   restaurant,
   menuItem,
   onRequestClose,
@@ -71,6 +84,9 @@ export const RestaurantMenuItemModal = ({
     );
   const [menuItemNotes, setMenuItemNotes] = useState("");
   const [menuItemCount, setMenuItemCount] = useState(1);
+  const [addOnItemCounts, setAddOnItemCounts] = useState(
+    getAddOnItemInitialCounts(addOnItems)
+  );
 
   const didRestaurantChange =
     !cart?.restaurant.Restaurant ||
@@ -82,12 +98,18 @@ export const RestaurantMenuItemModal = ({
     menuItem &&
     menuItem.quantity === Object.keys(menuItem?.choices ?? {}).length;
 
-  const menuItemTotal = getCartMenuItemTotal(
-    menuItem?.mealPrice ?? 0,
-    menuItemCount,
-    selectedChoices,
-    selectedOptionalChoices
-  );
+  const menuItemTotal =
+    getCartMenuItemTotal(
+      menuItem?.mealPrice ?? 0,
+      menuItemCount,
+      selectedChoices,
+      selectedOptionalChoices
+    ) +
+    (addOnItems?.reduce(
+      (acc: number, { name, mealPrice }) =>
+        acc + getCartMenuItemTotal(mealPrice, addOnItemCounts[name] ?? 0),
+      0
+    ) ?? 0);
 
   const hasNoChoices = Object.keys(menuItem?.choices ?? {}).length === 0;
 
@@ -126,6 +148,9 @@ export const RestaurantMenuItemModal = ({
    */
   useEffect(() => {
     if (isOpen && !wasOpen) {
+      setAddOnItemCounts(getAddOnItemInitialCounts(addOnItems));
+      setMenuItemNotes("");
+      setMenuItemCount(1);
       setSelectedChoices(
         menuItem?.choices &&
           menuItem.quantity &&
@@ -163,8 +188,6 @@ export const RestaurantMenuItemModal = ({
           ? "pickup"
           : null
       );
-      setMenuItemNotes("");
-      setMenuItemCount(1);
 
       reportEvent({
         action: "view_item",
@@ -186,6 +209,7 @@ export const RestaurantMenuItemModal = ({
     setShouldShowShippingMethodOptions,
     shippingMethod,
     shouldUseDropdownForChoices,
+    addOnItems,
   ]);
 
   return (
@@ -463,12 +487,42 @@ export const RestaurantMenuItemModal = ({
                 has disabled notes and modifications for this item.
               </p>
             )}
+            {addOnItems ? (
+              <section className="flex flex-col gap-2 px-4 sm:px-6">
+                <h3
+                  className="
+                    z-0 flex justify-between items-center gap-1
+                    sticky top-10 text-xl font-bold bg-white
+                  "
+                >
+                  Popular add-ons
+                </h3>
+                <ul className="grid grid-cols-12 gap-4">
+                  {addOnItems.map((addOnItem) => (
+                    <RestaurantAddOnItem
+                      key={addOnItem.name}
+                      menuItem={addOnItem}
+                      value={addOnItemCounts[addOnItem.name] ?? 0}
+                      onChange={(value) => {
+                        setAddOnItemCounts((prevState) => {
+                          return {
+                            ...prevState,
+                            [addOnItem.name]: value,
+                          };
+                        });
+                      }}
+                    />
+                  ))}
+                </ul>
+              </section>
+            ) : null}
           </section>
           <div
             className="
-            z-30 flex flex-col gap-3 justify-between pt-3 p-4 sm:p-6
-            bg-white sticky
-            bottom-0 border-t border-gray-200"
+              z-30 flex flex-col gap-3 justify-between pt-3 p-4 sm:p-6
+              bg-white sticky
+              bottom-0 border-t border-gray-200
+            "
           >
             {!isFormValid ||
             !isShippingMethodValid ||
@@ -535,18 +589,33 @@ export const RestaurantMenuItemModal = ({
                       {
                         shippingMethod: selectedShippingMethod,
                         restaurant,
-                        isVegan: menuItem.isVegan,
-                        menuItemName: menuItem.name,
-                        menuItemPrice: menuItem.mealPrice,
-                        menuItemCategory: menuItem.category,
-                        count: menuItemCount,
-                        menuItemNotes,
-                        choices: selectedChoices
-                          ? toCartMenuItemChoices(selectedChoices)
-                          : undefined,
-                        optionalChoices: selectedOptionalChoices
-                          ? toCartMenuItemChoices(selectedOptionalChoices)
-                          : undefined,
+                        menuItems: [
+                          {
+                            choices: selectedChoices
+                              ? toCartMenuItemChoices(selectedChoices)
+                              : undefined,
+                            count: menuItemCount,
+                            isVegan: menuItem.isVegan,
+                            category: menuItem.category,
+                            name: menuItem.name,
+                            menuItemNotes,
+                            mealPrice: menuItem.mealPrice,
+                            optionalChoices: selectedOptionalChoices
+                              ? toCartMenuItemChoices(selectedOptionalChoices)
+                              : undefined,
+                          },
+                          ...(addOnItems
+                            ?.filter(({ name }) => addOnItemCounts[name] > 0)
+                            .map(({ isVegan, name, mealPrice, category }) => ({
+                              count: addOnItemCounts[name],
+                              isVegan,
+                              category,
+                              name,
+                              // Add-on items have no notes, choices, or optionalChoices
+                              menuItemNotes: "",
+                              mealPrice,
+                            })) ?? []),
+                        ],
                         shouldVerifyContactInfo: didRestaurantChange,
                       },
                       event

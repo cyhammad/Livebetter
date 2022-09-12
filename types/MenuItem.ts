@@ -1,6 +1,7 @@
 import type { ApiRestaurant, CartMenuItemChoices, ShippingMethod } from "types";
 
 export interface MenuItem {
+  addOnItems?: string[];
   allowNotes?: boolean;
   category?: string;
   /**
@@ -46,6 +47,10 @@ export type ApiMenuItemChoices = Record<
 >;
 
 export interface ApiMenuItem {
+  /**
+   * The ids of menu items that can be added to the cart with this menu item
+   */
+  addOnItems: string[] | null;
   allowNotes: boolean;
   category: string | null;
   choices: ApiMenuItemChoices | null;
@@ -61,14 +66,16 @@ export interface ApiMenuItem {
 }
 
 export interface MenuItemData {
-  choices?: CartMenuItemChoices | undefined;
-  count: number;
-  isVegan: boolean;
-  menuItemCategory: string | null;
-  menuItemName: string;
-  menuItemNotes: string;
-  menuItemPrice: number;
-  optionalChoices?: CartMenuItemChoices | undefined;
+  menuItems: {
+    choices?: CartMenuItemChoices | undefined;
+    count: number;
+    isVegan: boolean;
+    category: string | null;
+    name: string;
+    menuItemNotes: string;
+    mealPrice: number;
+    optionalChoices?: CartMenuItemChoices | undefined;
+  }[];
   restaurant: ApiRestaurant;
   shippingMethod: ShippingMethod;
   shouldVerifyContactInfo: boolean;

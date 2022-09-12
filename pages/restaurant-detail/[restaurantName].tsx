@@ -23,6 +23,7 @@ import { Toolbar } from "components/Toolbar";
 import { useCartContext } from "hooks/useCartContext";
 import { usePrevious } from "hooks/usePrevious";
 import { useUserContext } from "hooks/useUserContext";
+import { notNullOrUndefined } from "lib/notNullOrUndefined";
 import { restaurantNameToUrlParam } from "lib/restaurantNameToUrlParam";
 import { db } from "lib/server/db";
 import { findRestaurant } from "lib/server/findRestaurant";
@@ -246,6 +247,8 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
       ? `Order pickup from ${restaurant.Restaurant}`
       : `View ${restaurant.Restaurant}'s menu`;
 
+  const allMenuItems = menu.flatMap(({ menuItems }) => menuItems);
+
   return (
     <>
       <Head
@@ -457,6 +460,7 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
                                   setSelectedMenuItem(menuItem);
                                   setCurrentModal("menu-item");
                                 }}
+                                role="button"
                               />
                             ))}
                           </ul>
@@ -477,6 +481,9 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         onRequestClose={handleRequestClose}
       />
       <RestaurantMenuItemModal
+        addOnItems={selectedMenuItem?.addOnItems
+          ?.map((itemId) => allMenuItems.find((item) => item.name === itemId))
+          .filter(notNullOrUndefined)}
         origin={
           [currentModal, previousModal].includes("contact")
             ? "carousel-left"
@@ -493,16 +500,29 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
           if (data.shouldVerifyContactInfo) {
             setCurrentModal("contact");
           } else {
-            addToCart(
-              restaurant,
-              data.menuItemName,
-              data.menuItemPrice,
-              data.menuItemCategory,
-              data.count,
-              data.menuItemNotes,
-              data.isVegan,
-              data.choices,
-              data.optionalChoices
+            data.menuItems.forEach(
+              ({
+                name: menuItemName,
+                mealPrice: menuItemPrice,
+                category: menuItemCategory,
+                count,
+                menuItemNotes,
+                isVegan,
+                choices,
+                optionalChoices,
+              }) => {
+                addToCart(
+                  restaurant,
+                  menuItemName,
+                  menuItemPrice,
+                  menuItemCategory,
+                  count,
+                  menuItemNotes,
+                  isVegan,
+                  choices,
+                  optionalChoices
+                );
+              }
             );
 
             handleRequestClose();
@@ -515,16 +535,29 @@ const RestaurantDetail: NextPage<RestaurantDetailPageProps> = ({
         onRequestPrevious={() => setCurrentModal("menu-item")}
         onRequestNext={() => {
           if (menuItemData) {
-            addToCart(
-              restaurant,
-              menuItemData.menuItemName,
-              menuItemData.menuItemPrice,
-              menuItemData.menuItemCategory,
-              menuItemData.count,
-              menuItemData.menuItemNotes,
-              menuItemData.isVegan,
-              menuItemData.choices,
-              menuItemData.optionalChoices
+            menuItemData.menuItems.forEach(
+              ({
+                name: menuItemName,
+                mealPrice: menuItemPrice,
+                category: menuItemCategory,
+                count,
+                menuItemNotes,
+                isVegan,
+                choices,
+                optionalChoices,
+              }) => {
+                addToCart(
+                  restaurant,
+                  menuItemName,
+                  menuItemPrice,
+                  menuItemCategory,
+                  count,
+                  menuItemNotes,
+                  isVegan,
+                  choices,
+                  optionalChoices
+                );
+              }
             );
 
             handleRequestClose();
