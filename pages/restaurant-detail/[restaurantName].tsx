@@ -158,8 +158,8 @@ export const getStaticProps: GetStaticProps<
       restaurant: toApiRestaurant(restaurant),
       menu,
     },
-    // Regenerate the page every 30 minutes (30 * 60 seconds)
-    revalidate: 30 * 60,
+    // Regenerate the page every 2 minutes (2 * 60 seconds)
+    revalidate: 2 * 60,
   };
 };
 
