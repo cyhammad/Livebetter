@@ -58,4 +58,6 @@ export interface ApiRestaurant extends Restaurant {
   OpenHours?: string;
 
   openHours?: ApiRestaurantOpenHours;
+
+  Shipday?: boolean;
 }

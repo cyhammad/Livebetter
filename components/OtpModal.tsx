@@ -60,13 +60,16 @@ export const OtpModal = ({
         if (result.otpValid) {
           onRequestNext && onRequestNext();
         } else {
+          // onRequestNext && onRequestNext();
           setMessage("Invalid verification code.");
         }
       }
     } catch (error) {
       if (error instanceof Error) {
+        // onRequestNext && onRequestNext();
         setMessage(error.message);
       } else {
+        // onRequestNext && onRequestNext();
         setMessage("An unknown error occurred. Please try again.");
       }
 

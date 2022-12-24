@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/nextjs";
 import { useStripe } from "@stripe/react-stripe-js";
+import { addMinutes, format } from "date-fns";
 import { useEffect, useState } from "react";
 
 import { OrderChoicesList } from "components/OrderChoicesList";
@@ -38,7 +39,69 @@ export const OrderConfirmationDetails = ({
       .then(({ paymentIntent }) => {
         switch (paymentIntent?.status) {
           case "succeeded":
-            setPaymentMessage("Payment succeeded!");
+            if (cart?.restaurant.Shipday) {
+              const myHeaders = new Headers();
+              myHeaders.append(
+                "Authorization",
+                "Basic nsVaSmjKXw.WAG4PMbcIVmTuY6DGDBa"
+              );
+              myHeaders.append("Content-Type", "application/json");
+
+              const raw = JSON.stringify({
+                orderNumber: order.charges_id,
+                customerName:
+                  order.deliver_to.firstName + " " + order.deliver_to.lastName,
+                customerAddress: order.deliver_to.address,
+                customerEmail: order.deliver_to.email,
+                customerPhoneNumber: order.deliver_to.phoneNumber,
+                restaurantName: order.restaurant_id,
+                restaurantAddress: cart?.restaurant.Address,
+                restaurantPhoneNumber: cart?.restaurant.Phone,
+                expectedDeliveryDate: format(new Date(), "yyyy-MM-dd"),
+                expectedPickupTime: format(new Date(), "hh:mm:ss"),
+                expectedDeliveryTime: format(
+                  addMinutes(new Date(), 30),
+                  "HH:mm:ss"
+                ),
+                pickupLatitude: cart?.restaurant.Latitude,
+                pickupLongitude: cart?.restaurant.Longitude,
+                deliveryLatitude: order.deliver_to.customerLocation?.lat,
+                deliveryLongitude: order.deliver_to.customerLocation?.lng,
+                tips: order.tip,
+                tax: order.tax,
+                discountAmount: order.discount,
+                deliveryFee: order.deliveryFee,
+                totalOrderCost: order.total,
+                deliveryInstruction: order.deliver_to.dropoff_note,
+                orderSource: "Seamless",
+                additionalId: "4532",
+                clientRestaurantId: 12,
+                paymentMethod: "credit_card",
+                creditCardType: "visa",
+                creditCardId: 965,
+                readyToPickup: true,
+              });
+
+              const requestOptions: RequestInit = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow",
+              };
+              console.log("sending api request!!!");
+              fetch("https://api.shipday.com/orders", requestOptions)
+                .then((response) => {
+                  setPaymentMessage("Order assigned to Shipday");
+                })
+                .then((result) => {
+                  setPaymentMessage("Order assigned to Shipday");
+                })
+                .catch((error) => {
+                  setPaymentMessage("Order could not be assigned to Shipday");
+                });
+            } else {
+              setPaymentMessage("Payment succeeded!");
+            }
 
             // Check if our current cart's client secret matches the client secret
             // for this order. If it does, that means the user was just redirected
