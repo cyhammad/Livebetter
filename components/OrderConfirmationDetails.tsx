@@ -88,16 +88,19 @@ export const OrderConfirmationDetails = ({
                 body: raw,
                 redirect: "follow",
               };
-              console.log("sending api request!!!");
               fetch("https://api.shipday.com/orders", requestOptions)
                 .then((response) => {
-                  setPaymentMessage("Order assigned to Shipday");
+                  setPaymentMessage(
+                    "Order assigned to Shipday " + response.status
+                  );
                 })
                 .then((result) => {
-                  setPaymentMessage("Order assigned to Shipday");
+                  setPaymentMessage("Order assigned to Shipday" + result);
                 })
                 .catch((error) => {
-                  setPaymentMessage("Order could not be assigned to Shipday");
+                  setPaymentMessage(
+                    "Order could not be assigned to Shipday" + error
+                  );
                 });
             } else {
               setPaymentMessage("Payment succeeded!");
@@ -134,7 +137,31 @@ export const OrderConfirmationDetails = ({
         });
         setPaymentMessage("Something went wrong.");
       });
-  }, [cart?.paymentIntentClientSecret, emptyCart, stripe]);
+  }, [
+    cart?.paymentIntentClientSecret,
+    cart?.restaurant.Address,
+    cart?.restaurant.Latitude,
+    cart?.restaurant.Longitude,
+    cart?.restaurant.Phone,
+    cart?.restaurant.Shipday,
+    emptyCart,
+    order.charges_id,
+    order.deliver_to.address,
+    order.deliver_to.customerLocation?.lat,
+    order.deliver_to.customerLocation?.lng,
+    order.deliver_to.dropoff_note,
+    order.deliver_to.email,
+    order.deliver_to.firstName,
+    order.deliver_to.lastName,
+    order.deliver_to.phoneNumber,
+    order.deliveryFee,
+    order.discount,
+    order.restaurant_id,
+    order.tax,
+    order.tip,
+    order.total,
+    stripe,
+  ]);
 
   const shippingMethod: ShippingMethod =
     order?.deliver_to.address === "PICKUP ORDER" ? "pickup" : "delivery";

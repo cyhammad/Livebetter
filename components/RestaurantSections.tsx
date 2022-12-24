@@ -1,8 +1,6 @@
 import classNames from "classnames";
-import { ArrowLeft, ArrowRight } from "phosphor-react";
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment } from "react";
 
-import { RestaurantCard } from "components/RestaurantCard";
 import { RestaurantSection } from "components/RestaurantSection";
 import type {
   FeaturedApiRestaurantResultSections,
