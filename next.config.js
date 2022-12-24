@@ -11,6 +11,7 @@ const nextConfig = {
       allowFutureImage: true,
     },
   },
+  sentry: {},
 };
 
 /** @type {import("@sentry/nextjs").SentryWebpackPluginOptions} */
