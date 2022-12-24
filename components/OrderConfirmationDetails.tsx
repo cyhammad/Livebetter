@@ -14,8 +14,10 @@ interface OrderConfirmationDetailsProps {
   order: ApiOrder;
 }
 
-export const OrderConfirmationDetails = () => {
-  return <div>THIS IS ORDER CONFIRMATION PAGE</div>;
+export const OrderConfirmationDetails = ({
+  order,
+}: OrderConfirmationDetailsProps) => {
+  return <div>THIS IS ORDER CONFIRMATION PAGE {order.charges_id}</div>;
 };
 
 // export const OrderConfirmationDetails = ({
