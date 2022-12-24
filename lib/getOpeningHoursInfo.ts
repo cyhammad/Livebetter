@@ -74,14 +74,14 @@ export const getOpeningHoursInfo = (
   // });
 
   if (openDate) {
-    if (targetDate < openDate) {
-      return {
-        openDate,
-        closeDate,
-        status: "open-later",
-        isOpen: false,
-      };
-    }
+    // if (targetDate < openDate) {
+    //   return {
+    //     openDate,
+    //     closeDate,
+    //     status: "open-later",
+    //     isOpen: false,
+    //   };
+    // }
 
     if (!closeDate) {
       return {
