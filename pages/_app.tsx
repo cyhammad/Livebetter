@@ -43,51 +43,65 @@ export default function App({ Component, pageProps }: AppProps) {
     };
   }, [router.events]);
 
-  return (
-    <>
-      {/* Global Site Tag (gtag.js) - Google Analytics */}
-      <Script
-        id="gtag-script"
-        strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-      />
-      <Script
-        id="gtag-init"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
-              page_path: window.location.pathname,
-            });
-          `,
-        }}
-      />
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <Head>
-            <meta
-              name="viewport"
-              content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-            />
-            <meta
-              name="description"
-              content="Find and order vegan food in Philly."
-            />
-          </Head>
-          <UserContextProvider>
-            <CartContextProvider>
-              <HomeContextProvider>
-                <InputPlacesAutocompleteContextProvider>
-                  <Component {...pageProps} />
-                </InputPlacesAutocompleteContextProvider>
-              </HomeContextProvider>
-            </CartContextProvider>
-          </UserContextProvider>
-        </Hydrate>
-      </QueryClientProvider>
-    </>
-  );
+  const [showChild, setShowChild] = useState(false);
+
+  useEffect(() => {
+    setShowChild(true);
+  }, []);
+
+  if (!showChild) {
+    return null;
+  }
+
+  if (typeof window === "undefined") {
+    return <></>;
+  } else {
+    return (
+      <>
+        {/* Global Site Tag (gtag.js) - Google Analytics */}
+        <Script
+          id="gtag-script"
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
+        />
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+        <QueryClientProvider client={queryClient}>
+          <Hydrate state={pageProps.dehydratedState}>
+            <Head>
+              <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+              />
+              <meta
+                name="description"
+                content="Find and order vegan food in Philly."
+              />
+            </Head>
+            <UserContextProvider>
+              <CartContextProvider>
+                <HomeContextProvider>
+                  <InputPlacesAutocompleteContextProvider>
+                    <Component {...pageProps} />
+                  </InputPlacesAutocompleteContextProvider>
+                </HomeContextProvider>
+              </CartContextProvider>
+            </UserContextProvider>
+          </Hydrate>
+        </QueryClientProvider>
+      </>
+    );
+  }
 }
